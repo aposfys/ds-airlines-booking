@@ -1,18 +1,21 @@
-import { createContext, useState, useContext, useEffect } from 'react';
+import { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
+import api from '../api';
 
-interface User {
-  id: string;
+export interface User {
+  _id: string;
   username: string;
   fullname: string;
-  passport_num: string;
+  passport_num: string | null;
   email: string;
+  is_admin: boolean;
+  is_active: boolean;
 }
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (token: string) => void;
+  login: (token: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -22,27 +25,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUser({ id: payload.sub, username: payload.sub, fullname: 'User', passport_num: 'N/A', email: payload.sub });
-      } catch (e) {
-        localStorage.removeItem('token');
-      }
+  // The profile is fetched from the server rather than decoded out of the
+  // JWT. The previous implementation read the token payload and filled the
+  // rest with placeholders — `fullname: 'User'`, `passport_num: 'N/A'` — so
+  // the dashboard greeted every passenger as "User", and a token that the
+  // server had since rejected still looked like a valid session.
+  const loadProfile = useCallback(async () => {
+    if (!localStorage.getItem('token')) {
+      setUser(null);
+      return;
     }
-    setLoading(false);
+    try {
+      const { data } = await api.get<User>('/auth/me');
+      setUser(data);
+    } catch {
+      localStorage.removeItem('token');
+      setUser(null);
+    }
   }, []);
 
-  const login = (token: string) => {
+  useEffect(() => {
+    loadProfile().finally(() => setLoading(false));
+  }, [loadProfile]);
+
+  const login = async (token: string) => {
     localStorage.setItem('token', token);
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        setUser({ id: payload.sub, username: payload.sub, fullname: 'User', passport_num: 'N/A', email: payload.sub });
-    } catch (e) {
-        setUser({ id: 'user', username: 'user', fullname: 'User', passport_num: 'N/A', email: 'user@example.com' });
-    }
+    await loadProfile();
   };
 
   const logout = () => {
@@ -57,6 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

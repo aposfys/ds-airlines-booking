@@ -1,25 +1,41 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.auth import get_current_admin
-from app.models.schemas import UserCreate, UserModel
+from pymongo.errors import DuplicateKeyError
+
+from app.auth import get_current_admin, get_password_hash
 from app.database import db
-from app.auth import get_password_hash
-from typing import List
+from app.models.schemas import UserCreate, UserResponse
+from app.routers.auth import PASSWORD_FIELD
 
 router = APIRouter()
 
+
 @router.get("/dashboard", status_code=status.HTTP_200_OK)
 async def dashboard(current_user: dict = Depends(get_current_admin)):
-    return {"message": f"Welcome Admin {current_user.get('sub')}"}
+    return {"message": f"Welcome Admin {current_user.get('fullname')}"}
 
-@router.post("/create_admin", status_code=status.HTTP_201_CREATED)
+
+@router.post(
+    "/admins", response_model=UserResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_admin(user: UserCreate, current_user: dict = Depends(get_current_admin)):
-    # Create new admin logic
-    if await db.users.find_one({"email": user.email}):
-        raise HTTPException(status_code=400, detail="Email already registered")
-        
+    """Promote a new administrator.
+
+    This handler previously wrote the password digest to `hashed_password`
+    while the login handler read `password`, so every account created here
+    raised a KeyError at login and returned 500. Both now use the single
+    PASSWORD_FIELD constant.
+    """
     user_dict = user.model_dump()
-    user_dict["hashed_password"] = get_password_hash(user_dict.pop("password"))
+    user_dict[PASSWORD_FIELD] = get_password_hash(user_dict.pop("password"))
     user_dict["is_admin"] = True
-    
-    new_user = await db.users.insert_one(user_dict)
-    return {"message": "Admin created", "id": str(new_user.inserted_id)}
+    user_dict["is_active"] = True
+
+    try:
+        result = await db.users.insert_one(user_dict)
+    except DuplicateKeyError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Email or username is already registered",
+        )
+
+    return await db.users.find_one({"_id": result.inserted_id})

@@ -1,17 +1,27 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
+from app.config import DB_NAME, MONGO_URL
 
-# Use "MONGO_URL" to match .env or docker-compose, fallback to "mongodb://localhost:27017"
-# This allows local execution (e.g. uvicorn main:app) without errors when the db container is mapped to localhost.
-MONGO_URL = os.environ.get("MONGO_URL", os.environ.get("MONGODB_URL", "mongodb://localhost:27017"))
-DB_NAME = os.environ.get("DB_NAME", "dsairlines")
-
-# Create client
 client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
+
+
+async def ensure_indexes() -> None:
+    """Create the indexes the query patterns depend on.
+
+    Without these, uniqueness was enforced only by a read-then-write check in
+    the register handler, which two concurrent requests can both pass, and
+    every flight search was a full collection scan.
+    """
+    await db.users.create_index("email", unique=True)
+    await db.users.create_index("username", unique=True)
+    await db.availableFlights.create_index("unique_code", unique=True)
+    await db.availableFlights.create_index(
+        [("departure", 1), ("destination", 1), ("date", 1)]
+    )
+    await db.bookings.create_index("user_id")
+    await db.bookings.create_index("flight_code")
+
 
 async def get_db():
     return db

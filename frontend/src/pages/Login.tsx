@@ -14,7 +14,9 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await api.post('/auth/login', { username, password });
-      login(response.data.access_token);
+      // Awaited: login now fetches the profile from /auth/me, and navigating
+      // before it resolves lands on the dashboard with a null user.
+      await login(response.data.access_token);
       navigate('/dashboard');
     } catch (err) {
       setError('Invalid username or password');

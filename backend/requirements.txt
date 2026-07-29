@@ -10,9 +10,11 @@ python-multipart==0.0.32
 pydantic==2.13.4
 email-validator==2.3.0
 
-# ── Database (MongoDB — replaced by PostgreSQL in Phase 1) ─
-motor==3.5.3
-pymongo==4.6.3
+# ── Database ──────────────────────────────────────────────
+# PostgreSQL from Phase 1 — docs/adr/0001-postgresql-over-mongodb.md
+sqlalchemy[asyncio]==2.0.51
+asyncpg==0.31.0
+alembic==1.18.5
 
 # ── Auth ──────────────────────────────────────────────────
 # passlib omitted deliberately: it is unmaintained and its bcrypt

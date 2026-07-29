@@ -66,8 +66,16 @@ SECRET_KEY: str = _require_secret_key()
 ALGORITHM: str = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
-MONGO_URL: str = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME: str = os.environ.get("DB_NAME", "dsairlines")
+# PostgreSQL from Phase 1 — see docs/adr/0001-postgresql-over-mongodb.md.
+# The async driver is asyncpg; Alembic rewrites this to psycopg for its own
+# synchronous connection.
+DATABASE_URL: str = os.environ.get(
+    "DATABASE_URL", "postgresql+asyncpg://dsairlines:dsairlines@localhost:5432/dsairlines"
+)
+
+# Log every statement. Useful locally, ruinous in production — it prints
+# parameter values, which for this schema includes passenger names.
+SQL_ECHO: bool = _env_flag("SQL_ECHO", default=False)
 
 # Demo-data seeding is opt-in. It used to run unconditionally on every
 # startup, including production, creating a known admin account.

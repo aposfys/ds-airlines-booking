@@ -1,0 +1,17 @@
+# Development overrides — applied automatically by `docker compose up`.
+# Delete this file (or use `-f docker-compose.yml` alone) to run the
+# production-shaped stack.
+services:
+  db:
+    # Convenient for inspecting data with a local mongosh / Compass.
+    ports:
+      - "27017:27017"
+
+  backend:
+    # Bind-mount the source and enable the auto-reloader. Both belong here
+    # rather than in the image: the mount shadows the code baked into the
+    # image, so a production container built from docker-compose.yml alone
+    # is self-contained.
+    volumes:
+      - ./backend:/app
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

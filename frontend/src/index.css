@@ -1,18 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ══════════════════════════════════════════════════════════
+   DS Airlines — design tokens
+   The single source of truth for the values in docs/brand/brandbook.md.
+   docs/brand/contrast_check.py parses this file in CI, so a colour change
+   that breaks WCAG AA fails the build.
+   Never write a hex literal in a component; add a token here instead.
+   ══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #002A5C;
-  --color-secondary: #0072C6;
-  --color-accent: #F0F4F8;
-  --color-dark: #1A1A1A;
-  --color-danger: #D32F2F;
-  --color-success: #388E3C;
-  
-  --font-sans: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  
-  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-float: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  /* ── Core palette ─────────────────────────────────────── */
+  --color-primary: #002A5C;        /* Delos Navy        */
+  --color-secondary: #0072C6;      /* Meltemi Blue      */
+  --color-signal: #A8530C;         /* Kouros Ochre      — CTAs on light  */
+  --color-signal-light: #E0752D;   /* Kouros Ochre Light — CTAs on navy  */
+  --color-surface: #FFFFFF;        /* Cycladic White    */
+  --color-accent: #F0F4F8;         /* Aegean Mist       */
+  --color-dark: #1A1A1A;           /* Marble            */
+
+  /* ── Semantic ─────────────────────────────────────────── */
+  --color-success: #2E7D5B;        /* Olive  */
+  --color-warning: #A05F00;        /* Amber  */
+  --color-danger: #C62828;         /* Rust   */
+
+  /* ── Typography ───────────────────────────────────────── */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --text-display: 3rem;            /* 48px */
+  --text-display--line-height: 3.25rem;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 700;
+
+  --text-title: 2rem;              /* 32px */
+  --text-title--line-height: 2.375rem;
+  --text-title--letter-spacing: -0.01em;
+
+  --text-section: 1.5rem;          /* 24px */
+  --text-section--line-height: 1.875rem;
+
+  --text-label: 0.75rem;           /* 12px */
+  --text-label--line-height: 1rem;
+  --text-label--letter-spacing: 0.06em;
+  --text-label--font-weight: 700;
+
+  /* ── Shape and elevation ──────────────────────────────── */
+  --radius-control: 6px;
+  --radius-card: 12px;
+
+  --shadow-card: 0 4px 6px -1px rgb(0 42 92 / 0.10), 0 2px 4px -1px rgb(0 42 92 / 0.06);
+  --shadow-float: 0 10px 15px -3px rgb(0 42 92 / 0.12), 0 4px 6px -2px rgb(0 42 92 / 0.05);
 }
 
 @layer base {
@@ -22,5 +59,30 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Fares, times, dates and flight designators must align in columns and
+     must not reflow as they update. */
+  .tabular,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* A visible focus ring is a requirement, not a style preference — it is
+     the only way a keyboard user can tell where they are. */
+  :focus-visible {
+    outline: 2px solid var(--color-secondary);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }

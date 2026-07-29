@@ -22,8 +22,14 @@ const Register = () => {
     try {
       await api.post('/auth/register', formData);
       navigate('/login');
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed');
+    } catch (err) {
+      const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data
+        ?.detail;
+      setError(
+        typeof detail === 'string'
+          ? detail
+          : 'We could not create your account. Check your details and try again.',
+      );
     }
   };
 
@@ -42,13 +48,16 @@ const Register = () => {
     <div className="flex flex-col md:flex-row min-h-screen bg-accent font-sans">
       {/* Visual Side */}
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-primary text-white p-12 relative overflow-hidden order-last md:order-first">
-        <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center"></div>
+        {/* "A Star Alliance Member" and "Miles+Bonus" were removed here.
+            Star Alliance is a real alliance DS Airlines does not belong to,
+            and Miles+Bonus is Aegean Airlines' registered programme. */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-secondary opacity-90"></div>
         <div className="relative z-10 text-center">
-          <h1 className="text-5xl font-bold tracking-wider mb-4">DS Airlines</h1>
-          <p className="text-xl font-light opacity-90">A Star Alliance Member</p>
+          <h1 className="text-5xl font-bold tracking-wider mb-2">DS Airlines</h1>
+          <p className="text-sm font-light tracking-[0.3em] uppercase opacity-80">Delos Skyways</p>
           <div className="mt-12 text-left space-y-6">
-            <h2 className="text-3xl font-semibold leading-tight">Join Miles+Bonus</h2>
-            <p className="text-sm opacity-80 max-w-sm">Unlock a world of privileges. Earn miles, enjoy exclusive benefits, and travel the world with DS Airlines.</p>
+            <h2 className="text-3xl font-semibold leading-tight">Join Meltemi Club</h2>
+            <p className="text-sm opacity-80 max-w-sm">Collect points on every DS flight and spend them on fares, seats and bags. Free to join.</p>
           </div>
         </div>
       </div>

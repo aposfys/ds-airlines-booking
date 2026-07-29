@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 288 72" width="288" height="72" role="img" aria-label="DS Airlines — Delos Skyways">
+  <title>DS Airlines — Delos Skyways</title>
+
+  <!-- ── Mark: a wing stroke rising from a horizon ──────────
+       One continuous sweep reads as a wing in flight and as the
+       island breaking the sea line. Navy on light backgrounds; use
+       logo-reverse.svg on navy. -->
+  <g fill="none" stroke="#002A5C" stroke-linecap="round" stroke-linejoin="round">
+    <!-- horizon -->
+    <path d="M6 52 H62" stroke-width="3"/>
+    <!-- wing -->
+    <path d="M10 42 C24 42 30 30 38 20 C44 12 52 10 60 12 C52 22 44 34 34 40 C27 44 18 44 10 42 Z"
+          fill="#002A5C" stroke="none"/>
+    <!-- lift line -->
+    <path d="M22 32 C30 26 38 22 50 20" stroke="#A8530C" stroke-width="2.5"/>
+  </g>
+
+  <!-- ── Wordmark ────────────────────────────────────────── -->
+  <text x="84" y="38"
+        font-family="Inter, system-ui, sans-serif" font-size="34" font-weight="600"
+        letter-spacing="2.7" fill="#002A5C">DS</text>
+  <text x="146" y="37"
+        font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="300"
+        letter-spacing="1.2" fill="#002A5C">AIRLINES</text>
+  <text x="84" y="56"
+        font-family="Inter, system-ui, sans-serif" font-size="10" font-weight="300"
+        letter-spacing="3.4" fill="#0072C6">DELOS SKYWAYS</text>
+</svg>

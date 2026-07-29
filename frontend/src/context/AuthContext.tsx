@@ -45,7 +45,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    loadProfile().finally(() => setLoading(false));
+    let cancelled = false;
+    const bootstrap = async () => {
+      await loadProfile();
+      if (!cancelled) setLoading(false);
+    };
+    void bootstrap();
+    return () => {
+      cancelled = true;
+    };
   }, [loadProfile]);
 
   const login = async (token: string) => {

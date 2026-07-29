@@ -18,8 +18,8 @@ const Login = () => {
       // before it resolves lands on the dashboard with a null user.
       await login(response.data.access_token);
       navigate('/dashboard');
-    } catch (err) {
-      setError('Invalid username or password');
+    } catch {
+      setError('That username and password do not match. Check both and try again.');
     }
   };
 
@@ -27,13 +27,16 @@ const Login = () => {
     <div className="flex flex-col md:flex-row min-h-screen bg-accent font-sans">
       {/* Visual Side */}
       <div className="hidden md:flex flex-col justify-center items-center w-1/2 bg-primary text-white p-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20 bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center"></div>
+        {/* Was a hotlinked Unsplash photograph: an uncredited third-party
+            asset fetched on every render. Replaced with an owned gradient
+            until licensed photography exists (see brandbook, open items). */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-secondary opacity-90"></div>
         <div className="relative z-10 text-center">
-          <h1 className="text-5xl font-bold tracking-wider mb-4">DS Airlines</h1>
-          <p className="text-xl font-light opacity-90">A Star Alliance Member</p>
+          <h1 className="text-5xl font-bold tracking-wider mb-2">DS Airlines</h1>
+          <p className="text-sm font-light tracking-[0.3em] uppercase opacity-80">Delos Skyways</p>
           <div className="mt-12 text-left space-y-6">
             <h2 className="text-3xl font-semibold leading-tight">Your journey<br />begins here.</h2>
-            <p className="text-sm opacity-80 max-w-sm">Manage your bookings, discover new destinations, and experience award-winning service.</p>
+            <p className="text-sm opacity-80 max-w-sm">Short-haul across Europe from Athens and Thessaloniki. Cabin bag included, in every fare.</p>
           </div>
         </div>
       </div>

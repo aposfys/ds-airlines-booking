@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { formatFare, formatFlightDate, groupCardDigits, isLuhnValid } from '../lib/format';
-import type { Flight } from '../types';
+import {
+  formatDuration,
+  formatFare,
+  formatFlightDate,
+  formatTime,
+  groupCardDigits,
+  isLuhnValid,
+} from '../lib/format';
+import type { FareOption, Flight } from '../types';
 
 interface Props {
   flight: Flight;
@@ -8,23 +15,25 @@ interface Props {
   defaultPassport: string;
   onCancel: () => void;
   onConfirm: (details: {
-    full_name: string;
-    passport_num: string;
+    fare_class_code: string;
+    passenger_full_name: string;
+    passenger_passport: string;
     credit_card: string;
+    seat_number?: string;
   }) => Promise<void>;
 }
 
 /**
- * Collects the passenger and payment details for a booking.
+ * Collects the fare, passenger and payment details for a booking.
  *
- * The dashboard previously had no booking form at all: it posted the
- * passenger's account name, a passport number that fell back to the literal
- * string "N/A", and a hardcoded card number with the comment
- * "Mocking input for demo".
+ * The dashboard originally had no form at all: it posted the account holder's
+ * name, a passport number that fell back to the string "N/A", and a hardcoded
+ * card number commented "Mocking input for demo".
  *
- * The card is sent once and never stored — the API keeps only the last four
- * digits. Phase 3 replaces this field with a provider-hosted input so the
- * number never reaches our servers at all.
+ * Fare selection is new in Phase 1. The document model had one price per
+ * flight with no way to express what it entitled the passenger to; the
+ * relational model carries branded fares and their rules, so the passenger
+ * can see what they differ on before choosing.
  */
 const BookingDialog = ({
   flight,
@@ -33,12 +42,18 @@ const BookingDialog = ({
   onCancel,
   onConfirm,
 }: Props) => {
+  const [fareCode, setFareCode] = useState(flight.fares[0]?.fare_class_code ?? '');
   const [fullName, setFullName] = useState(defaultName);
   const [passport, setPassport] = useState(defaultPassport);
+  const [seat, setSeat] = useState('');
   const [card, setCard] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const firstFieldRef = useRef<HTMLInputElement>(null);
+
+  const selectedFare: FareOption | undefined = flight.fares.find(
+    (f) => f.fare_class_code === fareCode,
+  );
 
   useEffect(() => {
     firstFieldRef.current?.focus();
@@ -53,6 +68,10 @@ const BookingDialog = ({
     e.preventDefault();
     setError('');
 
+    if (!fareCode) {
+      setError('Choose a fare to continue.');
+      return;
+    }
     if (!fullName.trim()) {
       setError('Enter the passenger name exactly as printed in the passport.');
       return;
@@ -69,14 +88,20 @@ const BookingDialog = ({
     setSubmitting(true);
     try {
       await onConfirm({
-        full_name: fullName.trim(),
-        passport_num: passport.trim(),
+        fare_class_code: fareCode,
+        passenger_full_name: fullName.trim(),
+        passenger_passport: passport.trim().toUpperCase(),
         credit_card: card.replace(/\s/g, ''),
+        ...(seat.trim() ? { seat_number: seat.trim().toUpperCase() } : {}),
       });
     } catch (err) {
-      const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data
+      const detail = (err as { response?: { data?: { detail?: unknown } } })?.response?.data
         ?.detail;
-      setError(detail ?? 'We could not complete the booking. Nothing has been charged.');
+      setError(
+        typeof detail === 'string'
+          ? detail
+          : 'We could not complete the booking. Nothing has been charged.',
+      );
       setSubmitting(false);
     }
   };
@@ -87,22 +112,23 @@ const BookingDialog = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-dark/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-dark/50 p-4 overflow-y-auto"
       onClick={onCancel}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="booking-dialog-title"
-        className="bg-white rounded-[12px] shadow-float w-full max-w-lg p-6 md:p-8"
+        className="bg-white rounded-[12px] shadow-float w-full max-w-lg p-6 md:p-8 my-8"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 id="booking-dialog-title" className="text-section font-bold text-primary mb-1">
           Confirm your booking
         </h2>
-        <p className="text-sm text-gray-600 mb-6">
-          {flight.departure} → {flight.destination} · {formatFlightDate(flight.date)} at{' '}
-          {flight.time}
+        <p className="text-sm text-gray-600 mb-6 tabular">
+          {flight.flight_number} · {flight.origin_iata} → {flight.destination_iata} ·{' '}
+          {formatFlightDate(flight.departure_date)} at {formatTime(flight.scheduled_departure)}{' '}
+          · {formatDuration(flight.duration_minutes)}
         </p>
 
         {error && (
@@ -114,7 +140,50 @@ const BookingDialog = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <fieldset>
+            <legend className={label}>Fare</legend>
+            <div className="space-y-2">
+              {flight.fares.map((fare) => (
+                <label
+                  key={fare.fare_class_code}
+                  className={`flex items-start gap-3 p-3 border rounded-[6px] cursor-pointer transition-colors ${
+                    fareCode === fare.fare_class_code
+                      ? 'border-signal bg-accent'
+                      : 'border-gray-300 hover:border-secondary'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="fare"
+                    value={fare.fare_class_code}
+                    checked={fareCode === fare.fare_class_code}
+                    onChange={() => setFareCode(fare.fare_class_code)}
+                    className="mt-1"
+                  />
+                  <span className="flex-1">
+                    <span className="flex justify-between items-baseline gap-2">
+                      <span className="font-bold text-primary">{fare.name}</span>
+                      <span className="font-bold text-signal tabular">
+                        {formatFare(fare.price_eur)}
+                      </span>
+                    </span>
+                    <span className="block text-xs text-gray-600 mt-1">
+                      {[
+                        fare.cabin_bag_included && 'Cabin bag',
+                        fare.checked_bag_included && 'Checked bag',
+                        fare.changeable && 'Changeable',
+                        fare.refundable && 'Refundable',
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                    </span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
           <div>
             <label className={label} htmlFor="passenger-name">
               Passenger name
@@ -130,17 +199,32 @@ const BookingDialog = ({
             />
           </div>
 
-          <div>
-            <label className={label} htmlFor="passport">
-              Passport number
-            </label>
-            <input
-              id="passport"
-              className={field}
-              value={passport}
-              onChange={(e) => setPassport(e.target.value.toUpperCase())}
-              required
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={label} htmlFor="passport">
+                Passport number
+              </label>
+              <input
+                id="passport"
+                className={field}
+                value={passport}
+                onChange={(e) => setPassport(e.target.value.toUpperCase())}
+                required
+              />
+            </div>
+            <div>
+              <label className={label} htmlFor="seat">
+                Seat <span className="font-normal lowercase tracking-normal">(optional)</span>
+              </label>
+              <input
+                id="seat"
+                className={`${field} tabular`}
+                value={seat}
+                onChange={(e) => setSeat(e.target.value.toUpperCase())}
+                placeholder="12A"
+                maxLength={4}
+              />
+            </div>
           </div>
 
           <div>
@@ -168,7 +252,7 @@ const BookingDialog = ({
                 Total
               </div>
               <div className="text-section font-bold text-signal tabular">
-                {formatFare(flight.cost)}
+                {selectedFare ? formatFare(selectedFare.price_eur) : '—'}
               </div>
             </div>
             <div className="flex gap-3">

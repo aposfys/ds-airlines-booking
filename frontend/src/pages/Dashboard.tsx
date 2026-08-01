@@ -3,7 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import BookingDialog from '../components/BookingDialog';
 import { useAuth } from '../context/AuthContext';
-import { formatFare, formatFlightDate } from '../lib/format';
+import {
+  formatDuration,
+  formatFare,
+  formatFlightDate,
+  formatTime,
+} from '../lib/format';
 import type { Booking, Flight } from '../types';
 
 const Dashboard = () => {
@@ -18,7 +23,10 @@ const Dashboard = () => {
   );
   const [bookingFlight, setBookingFlight] = useState<Flight | null>(null);
 
-  const [departure, setDeparture] = useState('');
+  // IATA codes, matched exactly by the API. Free-text city search used to be
+  // interpolated into a Mongo $regex (DEF-005); there is no pattern matching
+  // left in the search path.
+  const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
 
   const loadBookings = useCallback(async () => {
@@ -26,35 +34,48 @@ const Dashboard = () => {
     setBookings(data);
   }, []);
 
-  // Search runs on the server. The previous implementation fetched a page of
-  // flights once and filtered that array in the browser, so anything outside
-  // the first page was simply invisible to search.
   const loadFlights = useCallback(async () => {
     const params: Record<string, string> = {};
-    if (departure.trim()) params.departure = departure.trim();
-    if (destination.trim()) params.destination = destination.trim();
+    if (origin.trim().length === 3) params.origin = origin.trim();
+    if (destination.trim().length === 3) params.destination = destination.trim();
     const { data } = await api.get<Flight[]>('/flights', { params });
     setFlights(data);
-  }, [departure, destination]);
+  }, [origin, destination]);
 
   useEffect(() => {
     if (!user) return;
-    Promise.all([loadFlights(), loadBookings()])
-      .catch(() => setNotice({ tone: 'error', text: 'We could not load your flights. Try again shortly.' }))
-      .finally(() => setLoading(false));
-    // Only on mount; searching is driven by the debounce below.
+    let cancelled = false;
+    const bootstrap = async () => {
+      try {
+        await Promise.all([loadFlights(), loadBookings()]);
+      } catch {
+        if (!cancelled) {
+          setNotice({
+            tone: 'error',
+            text: 'We could not load your flights. Try again shortly.',
+          });
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    void bootstrap();
+    return () => {
+      cancelled = true;
+    };
+    // Searching is driven by the debounce below, not by this effect.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || loading) return;
     const timer = setTimeout(() => {
       loadFlights().catch(() =>
         setNotice({ tone: 'error', text: 'Search is unavailable right now.' }),
       );
     }, 300);
     return () => clearTimeout(timer);
-  }, [departure, destination, user, loadFlights]);
+  }, [origin, destination, user, loading, loadFlights]);
 
   const handleLogout = () => {
     logout();
@@ -62,30 +83,42 @@ const Dashboard = () => {
   };
 
   const confirmBooking = async (details: {
-    full_name: string;
-    passport_num: string;
+    fare_class_code: string;
+    passenger_full_name: string;
+    passenger_passport: string;
     credit_card: string;
+    seat_number?: string;
   }) => {
     if (!bookingFlight) return;
-    await api.post('/bookings', { flight_code: bookingFlight.unique_code, ...details });
+    const { data } = await api.post<Booking>('/bookings', {
+      flight_id: bookingFlight.id,
+      ...details,
+    });
     setBookingFlight(null);
-    // State is refreshed in place. The previous version called
-    // window.location.reload() after every action, which threw away the
-    // session's scroll position and re-ran the whole bootstrap.
     await Promise.all([loadFlights(), loadBookings()]);
-    setNotice({ tone: 'success', text: 'Booked. Your itinerary is updated below.' });
+    setNotice({
+      tone: 'success',
+      text: `Booked. Your reference is ${data.booking_reference}.`,
+    });
   };
 
   const cancelBooking = async (booking: Booking) => {
-    if (!confirm(`Cancel your flight to ${booking.destination}? This cannot be undone.`)) {
+    if (
+      !confirm(
+        `Cancel booking ${booking.booking_reference} to ${booking.destination_iata}? This cannot be undone.`,
+      )
+    ) {
       return;
     }
     try {
-      await api.delete(`/bookings/${booking._id}`);
+      await api.delete(`/bookings/${booking.id}`);
       await Promise.all([loadFlights(), loadBookings()]);
       setNotice({ tone: 'success', text: 'Your booking has been cancelled.' });
     } catch {
-      setNotice({ tone: 'error', text: 'We could not cancel that booking. Nothing has changed.' });
+      setNotice({
+        tone: 'error',
+        text: 'We could not cancel that booking. Nothing has changed.',
+      });
     }
   };
 
@@ -99,6 +132,11 @@ const Dashboard = () => {
     );
   }
 
+  const searchField =
+    'w-full text-lg border-b-2 border-gray-200 focus:border-secondary focus:outline-none py-2 transition-colors text-primary font-semibold placeholder-gray-400 uppercase tabular';
+  const searchLabel =
+    'block text-label font-bold text-gray-500 uppercase tracking-[0.06em] mb-1';
+
   return (
     <div className="min-h-screen bg-accent font-sans text-dark">
       <nav className="bg-primary text-white shadow-md">
@@ -111,7 +149,7 @@ const Dashboard = () => {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium">Welcome, {user?.fullname}</span>
+              <span className="text-sm font-medium">Welcome, {user?.full_name}</span>
               <button
                 onClick={handleLogout}
                 className="border border-white hover:bg-white hover:text-primary px-4 py-1.5 rounded-full text-sm font-semibold transition-colors"
@@ -134,38 +172,36 @@ const Dashboard = () => {
           <div className="bg-white rounded-[12px] shadow-float p-6 md:p-8 mt-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="from"
-                  className="block text-label font-bold text-gray-500 uppercase tracking-[0.06em] mb-1"
-                >
+                <label htmlFor="origin" className={searchLabel}>
                   From
                 </label>
                 <input
-                  id="from"
-                  type="text"
-                  placeholder="Departure city"
-                  className="w-full text-lg border-b-2 border-gray-200 focus:border-secondary focus:outline-none py-2 transition-colors text-primary font-semibold placeholder-gray-400"
-                  value={departure}
-                  onChange={(e) => setDeparture(e.target.value)}
+                  id="origin"
+                  className={searchField}
+                  placeholder="ATH"
+                  maxLength={3}
+                  value={origin}
+                  onChange={(e) => setOrigin(e.target.value.toUpperCase())}
                 />
               </div>
               <div>
-                <label
-                  htmlFor="to"
-                  className="block text-label font-bold text-gray-500 uppercase tracking-[0.06em] mb-1"
-                >
+                <label htmlFor="destination" className={searchLabel}>
                   To
                 </label>
                 <input
-                  id="to"
-                  type="text"
-                  placeholder="Destination city"
-                  className="w-full text-lg border-b-2 border-gray-200 focus:border-secondary focus:outline-none py-2 transition-colors text-primary font-semibold placeholder-gray-400"
+                  id="destination"
+                  className={searchField}
+                  placeholder="LHR"
+                  maxLength={3}
                   value={destination}
-                  onChange={(e) => setDestination(e.target.value)}
+                  onChange={(e) => setDestination(e.target.value.toUpperCase())}
                 />
               </div>
             </div>
+            <p className="text-xs text-gray-500 mt-3">
+              Three-letter airport codes. We fly from ATH and SKG to LHR, CDG, FRA, MUC,
+              FCO and BCN.
+            </p>
           </div>
         </div>
       </div>
@@ -190,49 +226,72 @@ const Dashboard = () => {
 
             {flights.length === 0 ? (
               <div className="bg-white rounded-[12px] p-8 text-center text-gray-600 shadow-card">
-                No flights match that search. Try a different city.
+                No flights match that search. Try a different airport code.
               </div>
             ) : (
               <ul className="space-y-4">
-                {flights.map((flight) => (
-                  <li
-                    key={flight.unique_code}
-                    className="bg-white rounded-[12px] shadow-card p-6 flex flex-col sm:flex-row justify-between items-center hover:shadow-float transition-shadow border border-gray-100"
-                  >
-                    <div className="flex-1 w-full mb-4 sm:mb-0">
-                      <div className="flex items-center gap-4 mb-2">
-                        <span className="text-xl font-bold text-primary">{flight.departure}</span>
-                        <span aria-hidden="true" className="text-secondary">
-                          →
-                        </span>
-                        <span className="text-xl font-bold text-primary">
-                          {flight.destination}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-600 font-medium tabular">
-                        {formatFlightDate(flight.date)} · {flight.time} · {flight.duration}
-                      </p>
-                      {flight.availability <= 10 && (
-                        <p className="text-sm text-warning font-semibold mt-1">
-                          {flight.availability} seats remain at this fare
+                {flights.map((flight) => {
+                  const cheapest = flight.fares.reduce<number | null>(
+                    (min, f) =>
+                      min === null || Number(f.price_eur) < min ? Number(f.price_eur) : min,
+                    null,
+                  );
+                  return (
+                    <li
+                      key={flight.id}
+                      className="bg-white rounded-[12px] shadow-card p-6 flex flex-col sm:flex-row justify-between items-center hover:shadow-float transition-shadow border border-gray-100"
+                    >
+                      <div className="flex-1 w-full mb-4 sm:mb-0">
+                        <div className="flex items-center gap-3 mb-2 flex-wrap">
+                          <span className="text-xl font-bold text-primary tabular">
+                            {flight.origin_iata}
+                          </span>
+                          <span aria-hidden="true" className="text-secondary">
+                            →
+                          </span>
+                          <span className="text-xl font-bold text-primary tabular">
+                            {flight.destination_iata}
+                          </span>
+                          <span className="text-xs text-gray-500 font-semibold tabular">
+                            {flight.flight_number}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          {flight.origin_city} to {flight.destination_city}
                         </p>
-                      )}
-                    </div>
+                        <p className="text-sm text-gray-600 font-medium tabular mt-1">
+                          {formatFlightDate(flight.departure_date)} ·{' '}
+                          {formatTime(flight.scheduled_departure)} –{' '}
+                          {formatTime(flight.scheduled_arrival)} ·{' '}
+                          {formatDuration(flight.duration_minutes)}
+                        </p>
+                        {flight.seats_available <= 10 && (
+                          <p className="text-sm text-warning font-semibold mt-1">
+                            {flight.seats_available} seats remain
+                          </p>
+                        )}
+                      </div>
 
-                    <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto sm:ml-6 border-t sm:border-t-0 sm:border-l border-gray-100 pt-4 sm:pt-0 sm:pl-6 gap-4">
-                      <span className="text-section font-bold text-signal tabular">
-                        {formatFare(flight.cost)}
-                      </span>
-                      <button
-                        onClick={() => setBookingFlight(flight)}
-                        disabled={flight.availability === 0}
-                        className="bg-signal text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition-opacity shadow-md disabled:opacity-50"
-                      >
-                        {flight.availability === 0 ? 'Full' : 'Select'}
-                      </button>
-                    </div>
-                  </li>
-                ))}
+                      <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto sm:ml-6 border-t sm:border-t-0 sm:border-l border-gray-100 pt-4 sm:pt-0 sm:pl-6 gap-4">
+                        <div className="text-right">
+                          <div className="text-label uppercase tracking-[0.06em] text-gray-500 font-bold">
+                            From
+                          </div>
+                          <span className="text-section font-bold text-signal tabular">
+                            {cheapest === null ? '—' : formatFare(cheapest)}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => setBookingFlight(flight)}
+                          disabled={flight.seats_available === 0}
+                          className="bg-signal text-white px-6 py-2 rounded-full font-semibold hover:opacity-90 transition-opacity shadow-md disabled:opacity-50"
+                        >
+                          {flight.seats_available === 0 ? 'Full' : 'Select'}
+                        </button>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </section>
@@ -248,33 +307,48 @@ const Dashboard = () => {
                 <ul className="space-y-4">
                   {bookings.map((booking) => (
                     <li
-                      key={booking._id}
+                      key={booking.id}
                       className="bg-accent rounded-[6px] p-4 border border-gray-100"
                     >
                       <div className="flex justify-between items-start mb-2 gap-2">
                         <div>
-                          <p className="font-bold text-primary">
-                            {booking.departure} → {booking.destination}
+                          <p className="font-bold text-primary tabular">
+                            {booking.origin_iata} → {booking.destination_iata}
                           </p>
                           <p className="text-xs text-gray-600 mt-1 tabular">
-                            {formatFlightDate(booking.flight_date)}
+                            {booking.flight_number} ·{' '}
+                            {formatFlightDate(booking.scheduled_departure)}
                           </p>
                         </div>
-                        <span className="bg-green-50 text-success text-xs font-bold px-2 py-1 rounded whitespace-nowrap">
-                          Confirmed
+                        <span
+                          className={`text-xs font-bold px-2 py-1 rounded whitespace-nowrap ${
+                            booking.status === 'cancelled'
+                              ? 'bg-red-50 text-danger'
+                              : 'bg-green-50 text-success'
+                          }`}
+                        >
+                          {booking.status === 'cancelled' ? 'Cancelled' : 'Confirmed'}
                         </span>
                       </div>
                       <p className="text-xs text-gray-600 tabular">
-                        {formatFare(booking.cost)} · card ending {booking.card_last4}
+                        Ref <strong>{booking.booking_reference}</strong> ·{' '}
+                        {booking.fare_class_code}
+                        {booking.seat_numbers.length > 0 &&
+                          ` · seat ${booking.seat_numbers.join(', ')}`}
                       </p>
-                      <div className="mt-3 pt-3 border-t border-gray-200 text-right">
-                        <button
-                          onClick={() => cancelBooking(booking)}
-                          className="text-danger hover:underline text-sm font-semibold"
-                        >
-                          Cancel booking
-                        </button>
-                      </div>
+                      <p className="text-xs text-gray-600 tabular mt-1">
+                        {formatFare(booking.amount_eur)} · card ending {booking.card_last4}
+                      </p>
+                      {booking.status !== 'cancelled' && (
+                        <div className="mt-3 pt-3 border-t border-gray-200 text-right">
+                          <button
+                            onClick={() => cancelBooking(booking)}
+                            className="text-danger hover:underline text-sm font-semibold"
+                          >
+                            Cancel booking
+                          </button>
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -287,8 +361,8 @@ const Dashboard = () => {
       {bookingFlight && (
         <BookingDialog
           flight={bookingFlight}
-          defaultName={user?.fullname ?? ''}
-          defaultPassport={user?.passport_num ?? ''}
+          defaultName={user?.full_name ?? ''}
+          defaultPassport={user?.passport_number ?? ''}
           onCancel={() => setBookingFlight(null)}
           onConfirm={confirmBooking}
         />

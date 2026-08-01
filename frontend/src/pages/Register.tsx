@@ -3,12 +3,14 @@ import api from '../api';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+  // Field names match the API payload exactly (Phase 1 renamed fullname ->
+  // full_name and passport_num -> passport_number to match the schema).
   const [formData, setFormData] = useState({
-    fullname: '',
+    full_name: '',
     username: '',
     email: '',
     password: '',
-    passport_num: '',
+    passport_number: '',
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -35,11 +37,11 @@ const Register = () => {
 
   const renderFieldLabel = (key: string) => {
     const labels: Record<string, string> = {
-      fullname: 'Full Name',
+      full_name: 'Full Name',
       username: 'Username',
       email: 'Email Address',
       password: 'Password',
-      passport_num: 'Passport Number'
+      passport_number: 'Passport Number'
     };
     return labels[key] || key;
   };

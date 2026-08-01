@@ -1,134 +1,289 @@
-import re
-from datetime import datetime, timezone
-from typing import List, Optional
+from datetime import date, datetime, time, timezone
+from decimal import Decimal
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pymongo.errors import DuplicateKeyError
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.auth import get_current_admin
-from app.database import db
-from app.models.schemas import DEFAULT_SEAT_CAPACITY, FlightCreate, FlightModel, FlightUpdate
+from app.db import get_session
+from app.models.domain import (
+    Aircraft,
+    Airport,
+    FareClass,
+    Flight,
+    FlightSeat,
+    FlightStatus,
+    Route,
+    SeatMapEntry,
+    SeatStatus,
+    User,
+)
+from app.schemas import FareOption, FlightCreate, FlightSummary, FlightUpdate
 
 router = APIRouter()
 
-# "Athens (ATH)" -> "ATH". Falls back to letters of the city name.
-_IATA_PATTERN = re.compile(r"\(([A-Z]{3})\)")
+
+async def _seats_available(session: AsyncSession, flight_id: UUID) -> int:
+    return (
+        await session.scalar(
+            select(func.count())
+            .select_from(FlightSeat)
+            .where(
+                FlightSeat.flight_id == flight_id,
+                FlightSeat.status == SeatStatus.AVAILABLE,
+            )
+        )
+        or 0
+    )
 
 
-def _station_code(name: str) -> str:
-    match = _IATA_PATTERN.search(name or "")
-    if match:
-        return match.group(1)
-    letters = re.sub(r"[^A-Za-z]", "", name or "")[:3].upper()
-    return letters.ljust(3, "X")
+async def _to_summary(
+    session: AsyncSession, flight: Flight, fare_classes: list[FareClass]
+) -> FlightSummary:
+    available = await _seats_available(session, flight.id)
+    duration = flight.scheduled_arrival - flight.scheduled_departure
+
+    return FlightSummary(
+        id=flight.id,
+        flight_number=flight.flight_number,
+        origin_iata=flight.route.origin_iata,
+        origin_city=flight.route.origin.city,
+        destination_iata=flight.route.destination_iata,
+        destination_city=flight.route.destination.city,
+        departure_date=flight.departure_date,
+        scheduled_departure=flight.scheduled_departure,
+        scheduled_arrival=flight.scheduled_arrival,
+        duration_minutes=int(duration.total_seconds() // 60),
+        aircraft_type=flight.aircraft.aircraft_type.name,
+        seats_available=available,
+        fares=[
+            FareOption(
+                fare_class_code=fc.code,
+                name=fc.name,
+                # The branded fare is derived from the flight's base fare, so
+                # repricing a flight moves every fare with it rather than
+                # leaving classes inconsistent.
+                price_eur=(flight.base_fare_eur * fc.price_multiplier).quantize(
+                    Decimal("0.01")
+                ),
+                seats_available=available,
+                cabin_bag_included=fc.cabin_bag_included,
+                checked_bag_included=fc.checked_bag_included,
+                changeable=fc.changeable,
+                refundable=fc.refundable,
+            )
+            for fc in fare_classes
+        ],
+    )
 
 
-def _generate_flight_code(flight: FlightCreate) -> str:
-    """Build a flight designator from route, date and departure hour.
-
-    The original took only the first letter of each city name, so
-    Athens->Berlin and Amsterdam->Brussels on the same date and hour produced
-    an identical code and the second insert was rejected as a duplicate.
-    Using the IATA station code makes collisions between distinct routes
-    impossible.
-    """
-    date_part = flight.date.replace("-", "")[2:]  # YYMMDD
-    time_part = flight.time.replace(":", "")[:2]  # HH
-    return f"{_station_code(flight.departure)}{_station_code(flight.destination)}{date_part}{time_part}"
+def _flight_query():
+    return select(Flight).options(
+        selectinload(Flight.route).selectinload(Route.origin),
+        selectinload(Flight.route).selectinload(Route.destination),
+        selectinload(Flight.aircraft).selectinload(Aircraft.aircraft_type),
+    )
 
 
-@router.get("/", response_model=List[FlightModel])
+@router.get("/", response_model=list[FlightSummary])
 async def search_flights(
-    departure: Optional[str] = None,
-    destination: Optional[str] = None,
-    date: Optional[str] = None,
+    origin: str | None = Query(default=None, max_length=3),
+    destination: str | None = Query(default=None, max_length=3),
+    departure_date: date | None = None,
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
+    session: AsyncSession = Depends(get_session),
 ):
-    query: dict = {}
+    """Search scheduled flights.
 
-    # re.escape is load-bearing. These values reach an unauthenticated
-    # endpoint and were interpolated into $regex verbatim, so a caller could
-    # supply a pattern such as "(a+)+$" and pin a CPU core, or use lookahead
-    # to probe the collection.
-    if departure:
-        query["departure"] = {"$regex": re.escape(departure), "$options": "i"}
+    Origin and destination are IATA codes matched exactly against the
+    airports table. The previous implementation interpolated free text into a
+    MongoDB $regex, which allowed collection probing and catastrophic
+    backtracking from an unauthenticated endpoint (DEF-005). There is no
+    pattern matching here for that class of bug to live in.
+    """
+    query = _flight_query().where(Flight.status == FlightStatus.SCHEDULED)
+
+    if origin:
+        query = query.join(Flight.route).where(Route.origin_iata == origin.upper())
     if destination:
-        query["destination"] = {"$regex": re.escape(destination), "$options": "i"}
-    if date:
-        query["date"] = date
+        query = query.where(
+            Flight.route_id.in_(
+                select(Route.id).where(Route.destination_iata == destination.upper())
+            )
+        )
+    if departure_date:
+        query = query.where(Flight.departure_date == departure_date)
 
-    cursor = db.availableFlights.find(query).skip(offset).limit(limit)
-    return await cursor.to_list(length=limit)
+    query = query.order_by(Flight.scheduled_departure).limit(limit).offset(offset)
+    flights = (await session.scalars(query)).unique().all()
+
+    fare_classes = list(
+        (await session.scalars(select(FareClass).order_by(FareClass.sort_order))).all()
+    )
+    return [await _to_summary(session, f, fare_classes) for f in flights]
 
 
-@router.get("/{unique_code}", response_model=FlightModel)
-async def get_flight(unique_code: str):
-    flight = await db.availableFlights.find_one({"unique_code": unique_code})
+@router.get("/{flight_id}", response_model=FlightSummary)
+async def get_flight(flight_id: UUID, session: AsyncSession = Depends(get_session)):
+    flight = await session.scalar(_flight_query().where(Flight.id == flight_id))
     if not flight:
         raise HTTPException(status_code=404, detail="Flight not found")
-    return flight
+
+    fare_classes = list(
+        (await session.scalars(select(FareClass).order_by(FareClass.sort_order))).all()
+    )
+    return await _to_summary(session, flight, fare_classes)
 
 
-@router.post("/", response_model=FlightModel, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=FlightSummary, status_code=status.HTTP_201_CREATED)
 async def create_flight(
-    flight: FlightCreate, current_user: dict = Depends(get_current_admin)
+    payload: FlightCreate,
+    session: AsyncSession = Depends(get_session),
+    _: User = Depends(get_current_admin),
 ):
-    flight_dict = flight.model_dump()
-    flight_dict["unique_code"] = _generate_flight_code(flight)
-    flight_dict["availability"] = DEFAULT_SEAT_CAPACITY
-    flight_dict["created_at"] = datetime.now(timezone.utc)
+    route = await session.scalar(
+        select(Route).where(
+            Route.origin_iata == payload.origin_iata,
+            Route.destination_iata == payload.destination_iata,
+        )
+    )
+    if route is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No route {payload.origin_iata}–{payload.destination_iata} exists",
+        )
+
+    aircraft = await session.scalar(
+        select(Aircraft)
+        .options(selectinload(Aircraft.aircraft_type))
+        .where(Aircraft.registration == payload.aircraft_registration)
+    )
+    if aircraft is None:
+        raise HTTPException(status_code=404, detail="Aircraft not found")
+
+    hour, minute = (int(p) for p in payload.departure_time.split(":"))
+    departure = datetime.combine(
+        payload.departure_date, time(hour, minute), tzinfo=timezone.utc
+    )
+
+    flight = Flight(
+        flight_number=payload.flight_number,
+        route_id=route.id,
+        aircraft_id=aircraft.id,
+        departure_date=payload.departure_date,
+        scheduled_departure=departure,
+        scheduled_arrival=departure + route.scheduled_duration,
+        base_fare_eur=payload.base_fare_eur,
+        status=FlightStatus.SCHEDULED,
+    )
+    session.add(flight)
 
     try:
-        result = await db.availableFlights.insert_one(flight_dict)
-    except DuplicateKeyError:
+        await session.flush()
+    except IntegrityError:
+        await session.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="A flight already exists for this route, date and hour",
+            detail="That flight number already operates on that date",
         )
 
-    return await db.availableFlights.find_one({"_id": result.inserted_id})
+    # Materialise the cabin. Inventory is rows, not a counter, so every seat
+    # the aircraft has must exist before the flight can be sold.
+    seat_map = (
+        await session.scalars(
+            select(SeatMapEntry).where(
+                SeatMapEntry.aircraft_type_id == aircraft.aircraft_type_id
+            )
+        )
+    ).all()
+    if not seat_map:
+        raise HTTPException(
+            status_code=422,
+            detail=f"No seat map defined for aircraft type {aircraft.aircraft_type.name}",
+        )
+    session.add_all(
+        FlightSeat(flight_id=flight.id, seat_number=s.seat_number) for s in seat_map
+    )
+    await session.flush()
+
+    created = await session.scalar(_flight_query().where(Flight.id == flight.id))
+    fare_classes = list(
+        (await session.scalars(select(FareClass).order_by(FareClass.sort_order))).all()
+    )
+    return await _to_summary(session, created, fare_classes)
 
 
-@router.put("/{unique_code}", response_model=FlightModel)
+@router.patch("/{flight_id}", response_model=FlightSummary)
 async def update_flight(
-    unique_code: str,
-    flight_update: FlightUpdate,
-    current_user: dict = Depends(get_current_admin),
+    flight_id: UUID,
+    payload: FlightUpdate,
+    session: AsyncSession = Depends(get_session),
+    _: User = Depends(get_current_admin),
 ):
-    flight = await db.availableFlights.find_one({"unique_code": unique_code})
+    flight = await session.scalar(_flight_query().where(Flight.id == flight_id))
     if not flight:
         raise HTTPException(status_code=404, detail="Flight not found")
 
-    # Repricing a flight that already carries passengers would leave those
-    # bookings holding a fare that no longer exists.
-    if flight_update.cost is not None and flight["availability"] != DEFAULT_SEAT_CAPACITY:
-        raise HTTPException(
-            status_code=400, detail="Cannot change the fare of a flight with bookings"
+    if payload.base_fare_eur is not None:
+        sold = await session.scalar(
+            select(func.count())
+            .select_from(FlightSeat)
+            .where(
+                FlightSeat.flight_id == flight_id,
+                FlightSeat.status == SeatStatus.BOOKED,
+            )
         )
+        # Repricing a flight that already carries passengers would leave those
+        # bookings holding a fare that no longer exists. What they paid is
+        # recorded on the booking, but the flight's advertised fare must not
+        # drift away from it silently.
+        if sold:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Cannot reprice a flight with {sold} booked seat(s)",
+            )
+        flight.base_fare_eur = payload.base_fare_eur
 
-    update_data = flight_update.model_dump(exclude_unset=True)
-    if update_data:
-        await db.availableFlights.update_one(
-            {"unique_code": unique_code}, {"$set": update_data}
-        )
+    if payload.status is not None:
+        try:
+            flight.status = FlightStatus(payload.status)
+        except ValueError:
+            raise HTTPException(
+                status_code=422,
+                detail=f"status must be one of {[s.value for s in FlightStatus]}",
+            )
 
-    return await db.availableFlights.find_one({"unique_code": unique_code})
+    await session.flush()
+    fare_classes = list(
+        (await session.scalars(select(FareClass).order_by(FareClass.sort_order))).all()
+    )
+    return await _to_summary(session, flight, fare_classes)
 
 
-@router.delete("/{unique_code}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{flight_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_flight(
-    unique_code: str, current_user: dict = Depends(get_current_admin)
+    flight_id: UUID,
+    session: AsyncSession = Depends(get_session),
+    _: User = Depends(get_current_admin),
 ):
-    # Deleting a flight out from under its passengers orphans their bookings:
-    # the booking row survives with a flight_code that resolves to nothing.
-    booked = await db.bookings.count_documents({"flight_code": unique_code})
-    if booked:
+    flight = await session.get(Flight, flight_id)
+    if flight is None:
+        raise HTTPException(status_code=404, detail="Flight not found")
+
+    try:
+        await session.delete(flight)
+        await session.flush()
+    except IntegrityError:
+        await session.rollback()
+        # bookings.flight_id is ON DELETE RESTRICT, so this is refused by the
+        # database rather than by a count check that could race (DEF-019).
+        # Cancelling the flight is the correct operation; deletion is not.
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Cannot delete a flight with {booked} active booking(s)",
+            detail="Cannot delete a flight that has bookings — cancel it instead",
         )
-
-    result = await db.availableFlights.delete_one({"unique_code": unique_code})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Flight not found")

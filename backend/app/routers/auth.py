@@ -1,10 +1,11 @@
-import logging
 from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from pymongo.errors import DuplicateKeyError
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import (
     create_access_token,
@@ -13,58 +14,50 @@ from app.auth import (
     verify_password,
 )
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
-from app.database import db
-from app.models.schemas import Token, UserCreate, UserLogin, UserResponse
-
-logger = logging.getLogger(__name__)
+from app.db import get_session
+from app.models.domain import User
+from app.schemas import Token, UserCreate, UserLogin, UserResponse
 
 router = APIRouter()
 
-# Stored under a name that says what it is. The previous code wrote the
-# bcrypt digest to a field called `password`, while the admin router wrote
-# the same digest to `hashed_password` — so accounts created through the
-# admin endpoint hit a KeyError at login and returned 500 forever.
-PASSWORD_FIELD = "hashed_password"
 
-
-def _issue_token(user: dict) -> Token:
-    access_token = create_access_token(
-        data={"sub": user["email"]},
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+@router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def register(payload: UserCreate, session: AsyncSession = Depends(get_session)):
+    user = User(
+        email=payload.email,
+        username=payload.username,
+        full_name=payload.full_name,
+        passport_number=payload.passport_number,
+        hashed_password=get_password_hash(payload.password),
+        is_admin=False,  # never client-controlled
+        is_active=True,
     )
-    return Token(access_token=access_token, token_type="bearer")
-
-
-@router.post(
-    "/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED
-)
-async def register(user: UserCreate):
-    user_dict = user.model_dump()
-    user_dict[PASSWORD_FIELD] = get_password_hash(user_dict.pop("password"))
-    user_dict["is_admin"] = False  # never client-controlled
-    user_dict["is_active"] = True
+    session.add(user)
 
     try:
-        result = await db.users.insert_one(user_dict)
-    except DuplicateKeyError:
-        # Enforced by the unique indexes rather than a read-then-write check,
-        # which two concurrent registrations could both pass.
+        await session.flush()
+    except IntegrityError:
+        await session.rollback()
+        # Uniqueness is decided by the case-insensitive indexes, not by a
+        # read-then-write check that two concurrent requests could both pass.
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="Email or username is already registered",
         )
 
-    return await db.users.find_one({"_id": result.inserted_id})
+    return user
 
 
 @router.post("/login", response_model=Token)
-async def login(user_login: UserLogin):
-    user = await db.users.find_one({"username": user_login.username})
+async def login(payload: UserLogin, session: AsyncSession = Depends(get_session)):
+    user = await session.scalar(
+        select(User).where(func.lower(User.username) == payload.username.lower())
+    )
 
-    # Always run the hash comparison, even when the user does not exist, so
-    # that response time does not reveal which usernames are registered.
-    stored_hash = user.get(PASSWORD_FIELD, "") if user else ""
-    password_ok = verify_password(user_login.password, stored_hash)
+    # The hash comparison runs even when no such user exists, so response
+    # time does not reveal which usernames are registered.
+    stored_hash = user.hashed_password if user else ""
+    password_ok = verify_password(payload.password, stored_hash)
 
     if not user or not password_ok:
         raise HTTPException(
@@ -72,30 +65,37 @@ async def login(user_login: UserLogin):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    if not user.get("is_active", True):
+    if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Account is deactivated"
         )
 
-    return _issue_token(user)
+    return Token(
+        access_token=create_access_token(
+            data={"sub": user.email},
+            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        ),
+        token_type="bearer",
+    )
 
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: AsyncSession = Depends(get_session),
 ):
-    """OAuth2 password flow, used by the Swagger UI `Authorize` button."""
+    """OAuth2 password flow, used by the Swagger UI Authorize button."""
     return await login(
-        UserLogin(username=form_data.username, password=form_data.password)
+        UserLogin(username=form_data.username, password=form_data.password), session
     )
 
 
 @router.get("/me", response_model=UserResponse)
-async def read_current_user(current_user: dict = Depends(get_current_active_user)):
+async def read_current_user(current_user: User = Depends(get_current_active_user)):
     """The authenticated user's own profile.
 
-    Added because the frontend had no way to obtain it: AuthContext decoded
-    the JWT and filled the profile with placeholders, so every session
-    displayed the literal name "User".
+    The frontend had no way to obtain this: AuthContext decoded the JWT and
+    filled the rest with placeholders, so every session displayed the literal
+    name "User" (DEF-016).
     """
     return current_user

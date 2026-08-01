@@ -3,15 +3,15 @@
 # production-shaped stack.
 services:
   db:
-    # Convenient for inspecting data with a local mongosh / Compass.
+    # Convenient for inspecting data with a local psql client.
     ports:
-      - "27017:27017"
+      - "5432:5432"
 
   backend:
     # Bind-mount the source and enable the auto-reloader. Both belong here
     # rather than in the image: the mount shadows the code baked into the
-    # image, so a production container built from docker-compose.yml alone
-    # is self-contained.
+    # image, so a production container built from docker-compose.yml alone is
+    # self-contained. The entrypoint still runs the migrations first.
     volumes:
       - ./backend:/app
     command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

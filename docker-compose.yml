@@ -2,35 +2,37 @@
 # which layers on the developer conveniences (source bind-mount, hot reload).
 services:
   db:
-    # `mongo:latest` made builds unreproducible — the image silently changed
-    # major versions between builds. Pinned.
-    image: mongo:7.0
+    # PostgreSQL from Phase 1 — docs/adr/0001-postgresql-over-mongodb.md
+    image: postgres:17-alpine
     # Not published to the host: nothing outside the compose network needs to
-    # reach the database, and 27017 was previously exposed without auth.
+    # reach the database.
     expose:
-      - "27017"
+      - "5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dsairlines}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required — copy .env.example to .env}
+      POSTGRES_DB: ${POSTGRES_DB:-dsairlines}
     volumes:
-      - mongo_data:/data/db
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dsairlines} -d ${POSTGRES_DB:-dsairlines}"]
+      interval: 5s
       timeout: 5s
-      retries: 5
-      start_period: 20s
+      retries: 10
+      start_period: 10s
 
   backend:
     build: ./backend
     ports:
       - "8000:8000"
     environment:
-      MONGO_URL: mongodb://db:27017
-      DB_NAME: ${DB_NAME:-dsairlines}
-      # No fallback value: the app refuses to boot without a real key, which
-      # is deliberate. Set it in .env (see .env.example).
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-dsairlines}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-dsairlines}
+      # No fallback value: the app refuses to boot without a real key.
       SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required — copy .env.example to .env}
       SEED_ON_STARTUP: ${SEED_ON_STARTUP:-false}
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+      SQL_ECHO: ${SQL_ECHO:-false}
     depends_on:
       db:
         condition: service_healthy
@@ -40,7 +42,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 15s
+      start_period: 20s
 
   frontend:
     build:
@@ -54,4 +56,4 @@ services:
         condition: service_healthy
 
 volumes:
-  mongo_data:
+  pgdata:

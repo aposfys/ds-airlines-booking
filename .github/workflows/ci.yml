@@ -16,6 +16,25 @@ jobs:
     defaults:
       run:
         working-directory: backend
+
+    # A real PostgreSQL, not a stand-in. The Phase 0 suite ran against an
+    # in-memory fake, so passing tests were evidence about our logic and not
+    # about the database; ADR-001 retired it.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: dsairlines
+          POSTGRES_PASSWORD: dsairlines
+          POSTGRES_DB: dsairlines_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dsairlines"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
     steps:
       - uses: actions/checkout@v4
 
@@ -27,14 +46,23 @@ jobs:
 
       - run: pip install -r requirements.txt
 
-      # The suite runs against tests/fake_mongo.py, so no database service is
-      # needed. SECRET_KEY is still set explicitly: app.config refuses to
-      # import without one, and relying on the pytest fallback would mean CI
-      # exercised a different code path than a real deployment.
+      # The test fixtures build the schema by running the migrations, so this
+      # also proves the migration chain applies cleanly on every run.
       - name: Run tests
         env:
           SECRET_KEY: ci-secret-key-not-used-for-anything-real-000
+          TEST_DATABASE_URL: postgresql+asyncpg://dsairlines:dsairlines@localhost:5432/dsairlines_test
         run: pytest -q
+
+      # Guards the migration-drift risk named in ADR-001: if the models and
+      # the revision chain disagree, autogenerate would find work to do.
+      - name: Check for migration drift
+        env:
+          SECRET_KEY: ci-secret-key-not-used-for-anything-real-000
+          DATABASE_URL: postgresql+asyncpg://dsairlines:dsairlines@localhost:5432/dsairlines_test
+        run: |
+          alembic upgrade head
+          alembic check
 
   frontend:
     name: Frontend — lint, typecheck, build

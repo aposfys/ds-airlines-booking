@@ -1,0 +1,36 @@
+/* ══════════════════════════════════════════════════════════
+   Product-level corrections to the vendored AF token layer.
+
+   The files in tokens/ are byte-identical to AF and must stay that way, so
+   corrections live here instead. Everything below is a candidate to be
+   upstreamed into AF; when it is, delete it from this file.
+
+   Both corrections are in AF's LIGHT theme only. The dark theme — AF's
+   default, and what DS Airlines ships today — passes every pair in
+   docs/brand/contrast_check.py without help. They are fixed anyway rather
+   than deferred: the light theme is declared and therefore shippable, and a
+   token that fails only in the theme nobody has switched on yet is a trap
+   for whoever switches it on.
+   ══════════════════════════════════════════════════════════ */
+
+[data-theme="light"] {
+  /* AF: var(--warning-700) = oklch(0.5600 0.110 80) on the warning surface
+     measures 4.18:1 — under the 4.5:1 AA floor for the "N seats remain"
+     notice, which is body-size text. Darkened to 0.52 for 4.95:1.
+     The dark theme is unaffected and already passes at 11.39:1. */
+  --status-warning-fg: oklch(0.5200 0.110 80);
+
+  /* AF: oklch(0.1050 0.008 264 / 0.38) over paper measures 1.56:1. This
+     token is the outline of the secondary button — "Log out", "Cancel" —
+     and a transparent button's border is the only thing marking where the
+     control is. WCAG 2.2 SC 1.4.11 (Non-text Contrast) requires 3:1 for the
+     boundary of a user-interface component, so at 0.38 the control is not
+     reliably visible.
+
+     Raised to 0.75 alpha, which measures 3.45:1 and keeps the translucent
+     treatment rather than swapping in a solid ink. Note this is deliberately
+     NOT applied to --border-strong, which AF also sets to 0.38: that token
+     carries dividers and panel edges, and decorative separators are exempt
+     from 1.4.11. Only the component boundary is corrected. */
+  --action-secondary-border: oklch(0.1050 0.008 264 / 0.75);
+}

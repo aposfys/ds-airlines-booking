@@ -1,0 +1,209 @@
+/* AF colour — AF's own ramps in OKLCH + semantic roles. Deliberately independent of the
+   client brand carried by the imported source kit — see readme.md § 1.. Dark is the default theme.
+   Base ramps never appear directly in product code: always use a semantic alias. */
+:root{
+  /* ── INK (cool neutral, hue 264) ───────────────────────────── */
+  --ink-1000:oklch(0.1350 0.004 60);
+  --ink-950:oklch(0.1750 0.005 60);
+  --ink-900:oklch(0.2150 0.006 60);
+  --ink-800:oklch(0.2700 0.007 60);
+  --ink-700:oklch(0.3400 0.008 60);
+  --ink-600:oklch(0.4300 0.008 60);
+  --ink-500:oklch(0.5400 0.008 60);
+  --ink-400:oklch(0.6600 0.007 60);
+  --ink-300:oklch(0.7700 0.006 60);
+  --ink-200:oklch(0.8700 0.005 60);
+  --ink-100:oklch(0.9300 0.004 60);
+  --ink-50:oklch(0.9650 0.004 60);
+  --ink-0:oklch(1 0 0);
+  /* PAPER (warm off-white, light theme ground) */
+  --paper:oklch(0.9680 0.007 75);
+  --paper-2:oklch(0.9400 0.008 75);
+
+  /* ── SIGNAL — primary accent. Vermilion. AF's own, in OKLCH; nothing
+       here is derived from the client brand in the source kit. ───────── */
+  --brand-25:oklch(0.9840 0.010 32);
+  --brand-50:oklch(0.9700 0.022 32);
+  --brand-100:oklch(0.9400 0.045 32);
+  --brand-200:oklch(0.8900 0.085 32);
+  --brand-300:oklch(0.7900 0.150 30);
+  --brand-400:oklch(0.7000 0.196 29);
+  --brand-500:oklch(0.6200 0.215 28);
+  --brand-600:oklch(0.5400 0.200 26);
+  --brand-700:oklch(0.4500 0.170 25);
+  --brand-800:oklch(0.3500 0.130 25);
+  --brand-900:oklch(0.2500 0.090 25);
+  --brand-950:oklch(0.1700 0.060 25);
+
+  /* ── BRASS — secondary, editorial warmth. Never an action. ───────── */
+  --coral-100:oklch(0.9700 0.025 82);
+  --coral-200:oklch(0.9300 0.055 82);
+  --coral-300:oklch(0.8600 0.095 80);
+  --coral-400:oklch(0.7800 0.120 78);
+  --coral-500:oklch(0.7000 0.125 76);
+  --coral-600:oklch(0.6000 0.110 74);
+  --coral-700:oklch(0.4900 0.090 72);
+  --coral-800:oklch(0.3800 0.070 72);
+  --coral-900:oklch(0.2700 0.050 72);
+  --coral-950:oklch(0.1800 0.035 72);
+
+  /* ── SEMANTIC HUES ─────────────────────────────────────────── */
+  --positive-400:oklch(0.7900 0.150 150);
+  --positive-500:oklch(0.7000 0.150 150);
+  --positive-700:oklch(0.5000 0.110 150);
+  --positive-950:oklch(0.1900 0.040 150);
+  --warning-400:oklch(0.8500 0.140 85);
+  --warning-500:oklch(0.7800 0.140 82);
+  --warning-700:oklch(0.5600 0.110 80);
+  --warning-950:oklch(0.2000 0.045 82);
+  --critical-400:oklch(0.7000 0.180 18);
+  --critical-500:oklch(0.6100 0.200 18);
+  --critical-700:oklch(0.4500 0.165 18);
+  --critical-950:oklch(0.1900 0.055 18);
+}
+
+/* ── DARK THEME (default) ─────────────────────────────────────── */
+:root{
+  color-scheme:dark;
+  --bg-base:var(--ink-1000);
+  --bg-sunken:oklch(0.0850 0.006 264);
+  --bg-raised:var(--ink-950);
+  --surface-card:var(--ink-900);
+  --surface-card-hover:var(--ink-800);
+  --surface-inset:var(--ink-950);
+  --surface-overlay:oklch(0.1550 0.010 264 / 0.92);
+  --surface-scrim:oklch(0.0850 0.006 264 / 0.72);
+  --surface-invert:var(--ink-50);
+
+  --text-strong:var(--ink-0);
+  --text-body:var(--ink-200);
+  --text-muted:var(--ink-400);
+  --text-faint:var(--ink-500);
+  --text-invert:var(--ink-1000);
+  --text-accent:var(--brand-400);
+  --text-editorial:var(--coral-400);
+  --text-link:var(--brand-400);
+  --text-link-hover:var(--brand-300);
+
+  --border-hairline:oklch(0.9950 0.002 264 / 0.10);
+  --border-subtle:oklch(0.9950 0.002 264 / 0.16);
+  --border-strong:oklch(0.9950 0.002 264 / 0.32);
+  --border-accent:var(--brand-500);
+
+  --action-primary-bg:var(--brand-500);
+  --action-primary-fg:var(--ink-1000);      /* 6.9:1 — the file pairs white here, which is 2.96:1 and fails */
+  --action-primary-bg-hover:var(--brand-400);
+  --action-primary-bg-press:var(--brand-600);
+  --action-secondary-bg:transparent;
+  --action-secondary-fg:var(--ink-0);
+  --action-secondary-border:oklch(0.9950 0.002 264 / 0.32);
+  --action-secondary-bg-hover:oklch(0.9950 0.002 264 / 0.08);
+  --action-secondary-bg-press:oklch(0.9950 0.002 264 / 0.14);
+  --action-ghost-fg:var(--ink-200);
+  --action-ghost-bg-hover:oklch(0.9950 0.002 264 / 0.06);
+  --action-danger-bg:var(--critical-500);
+  --action-danger-fg:var(--ink-0);
+  --action-disabled-bg:oklch(0.9950 0.002 264 / 0.07);
+  --action-disabled-fg:var(--ink-500);
+
+  --focus-ring:var(--brand-400);
+  --focus-ring-offset:var(--bg-base);
+
+  --status-positive-fg:var(--positive-400);
+  --status-positive-bg:var(--positive-950);
+  --status-warning-fg:var(--warning-400);
+  --status-warning-bg:var(--warning-950);
+  --status-critical-fg:var(--critical-400);
+  --status-critical-bg:var(--critical-950);
+  --status-info-fg:var(--brand-300);
+  --status-info-bg:var(--brand-950);
+  --status-neutral-fg:var(--ink-300);
+  --status-neutral-bg:oklch(0.9950 0.002 264 / 0.08);
+
+  --chart-1:var(--brand-500);
+  --chart-2:var(--coral-400);
+  --chart-3:var(--warning-400);
+  --chart-4:var(--positive-500);
+  --chart-5:var(--ink-300);
+  --chart-6:var(--critical-400);
+  --glass-fill:oklch(1 0 0 / 0.055);
+  --glass-fill-strong:oklch(1 0 0 / 0.10);
+  --glass-border:oklch(1 0 0 / 0.14);
+  --glass-highlight:oklch(1 0 0 / 0.20);
+  --glass-tint:oklch(0.6200 0.215 28 / 0.10);
+  --chart-grid:oklch(0.9950 0.002 264 / 0.10);
+  --chart-track:oklch(0.9950 0.002 264 / 0.06);
+}
+
+/* ── LIGHT THEME (secondary) ──────────────────────────────────── */
+[data-theme="light"]{
+  color-scheme:light;
+  --bg-base:var(--paper);
+  --bg-sunken:var(--paper-2);
+  --bg-raised:oklch(1 0 0);
+  --surface-card:oklch(1 0 0);
+  --surface-card-hover:var(--brand-100);   /* blue-0025 — the file raises with pale blue */
+  --surface-inset:var(--paper-2);
+  --surface-overlay:oklch(1 0 0 / 0.96);
+  --surface-scrim:oklch(0.1050 0.008 264 / 0.48);
+  --surface-invert:var(--ink-950);
+
+  --text-strong:var(--ink-1000);
+  --text-body:var(--ink-800);
+  --text-muted:var(--ink-600);
+  --text-faint:var(--ink-500);
+  --text-invert:var(--ink-0);
+  --text-accent:var(--brand-700);
+  --text-editorial:var(--coral-700);
+  --text-link:var(--brand-700);
+  --text-link-hover:var(--brand-600);
+
+  --border-hairline:oklch(0.1050 0.008 264 / 0.12);
+  --border-subtle:oklch(0.1050 0.008 264 / 0.18);
+  --border-strong:oklch(0.1050 0.008 264 / 0.38);
+  --border-accent:var(--brand-700);
+
+  --action-primary-bg:var(--brand-700);
+  --action-primary-fg:var(--ink-0);         /* 5.5:1 */
+  --action-primary-bg-hover:var(--brand-600);
+  --action-primary-bg-press:var(--brand-800);
+  --action-secondary-bg:transparent;
+  --action-secondary-fg:var(--ink-1000);
+  --action-secondary-border:oklch(0.1050 0.008 264 / 0.38);
+  --action-secondary-bg-hover:oklch(0.1050 0.008 264 / 0.05);
+  --action-secondary-bg-press:oklch(0.1050 0.008 264 / 0.10);
+  --action-ghost-fg:var(--ink-800);
+  --action-ghost-bg-hover:oklch(0.1050 0.008 264 / 0.05);
+  --action-danger-bg:var(--critical-700);
+  --action-danger-fg:var(--ink-0);
+  --action-disabled-bg:oklch(0.1050 0.008 264 / 0.06);
+  --action-disabled-fg:var(--ink-500);
+
+  --focus-ring:var(--brand-700);
+  --focus-ring-offset:var(--bg-base);
+
+  --status-positive-fg:var(--positive-700);
+  --status-positive-bg:oklch(0.9550 0.040 155);
+  --status-warning-fg:var(--warning-700);
+  --status-warning-bg:oklch(0.9600 0.050 85);
+  --status-critical-fg:var(--critical-700);
+  --status-critical-bg:oklch(0.9550 0.035 25);
+  --status-info-fg:var(--brand-700);
+  --status-info-bg:var(--brand-100);
+  --status-neutral-fg:var(--ink-700);
+  --status-neutral-bg:oklch(0.1050 0.008 264 / 0.06);
+
+  --chart-1:var(--brand-700);
+  --chart-2:var(--coral-600);
+  --chart-3:var(--warning-700);
+  --chart-4:var(--positive-700);
+  --chart-5:var(--ink-500);
+  --chart-6:var(--critical-700);
+  --glass-fill:oklch(1 0 0 / 0.62);
+  --glass-fill-strong:oklch(1 0 0 / 0.80);
+  --glass-border:oklch(0.1350 0.004 60 / 0.10);
+  --glass-highlight:oklch(1 0 0 / 0.85);
+  --glass-tint:oklch(0.6200 0.215 28 / 0.07);
+  --chart-grid:oklch(0.1050 0.008 264 / 0.12);
+  --chart-track:oklch(0.1050 0.008 264 / 0.07);
+}

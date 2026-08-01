@@ -1,88 +1,161 @@
 /* ══════════════════════════════════════════════════════════
-   DS Airlines — design tokens
-   The single source of truth for the values in docs/brand/brandbook.md.
-   docs/brand/contrast_check.py parses this file in CI, so a colour change
-   that breaks WCAG AA fails the build.
-   Never write a hex literal in a component; add a token here instead.
+   DS Airlines — visual layer
+
+   The identity is AF (see src/design-system/README.md). This file bridges
+   AF's tokens into Tailwind's @theme so they are reachable as utilities, and
+   defines the three shapes this product repeats.
+
+   The token layer itself is imported by main.tsx, before this file, and
+   deliberately not with an @import here. Nested inside Tailwind's own
+   @import, Vite does not rebase the @font-face urls in AF's fonts.css: the
+   build emitted `../assets/fonts/…` verbatim, shipped no font files, and the
+   whole typographic identity silently fell back to Helvetica. Importing the
+   token entry as its own CSS module resolves the paths relative to the token
+   files, where they are correct.
+
+   There are no colour, type or spacing values defined here. A hex literal
+   anywhere in this application is a bug — the value belongs in AF's token
+   files, and it must be reached through a semantic alias, never a base ramp.
+   docs/brand/contrast_check.py reads the palette straight out of
+   design-system/tokens/color.css and fails CI below WCAG 2.2 AA.
    ══════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 @import "tailwindcss";
 
-@theme {
-  /* ── Core palette ─────────────────────────────────────── */
-  --color-primary: #002A5C;        /* Delos Navy        */
-  --color-secondary: #0072C6;      /* Meltemi Blue      */
-  --color-signal: #A8530C;         /* Kouros Ochre      — CTAs on light  */
-  --color-signal-light: #E0752D;   /* Kouros Ochre Light — CTAs on navy  */
-  --color-surface: #FFFFFF;        /* Cycladic White    */
-  --color-accent: #F0F4F8;         /* Aegean Mist       */
-  --color-dark: #1A1A1A;           /* Marble            */
+@theme inline {
+  /* ── Ground and surfaces ──────────────────────────────── */
+  --color-base: var(--bg-base);
+  --color-sunken: var(--bg-sunken);
+  --color-raised: var(--bg-raised);
+  --color-card: var(--surface-card);
+  --color-card-hover: var(--surface-card-hover);
+  --color-inset: var(--surface-inset);
+  --color-overlay: var(--surface-overlay);
+  --color-scrim: var(--surface-scrim);
 
-  /* ── Semantic ─────────────────────────────────────────── */
-  --color-success: #2E7D5B;        /* Olive  */
-  --color-warning: #A05F00;        /* Amber  */
-  --color-danger: #C62828;         /* Rust   */
+  /* ── Text ─────────────────────────────────────────────── */
+  --color-strong: var(--text-strong);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-faint: var(--text-faint);
+  --color-invert: var(--text-invert);
+  --color-editorial: var(--text-editorial);
 
-  /* ── Typography ───────────────────────────────────────── */
-  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* ── Action. Signal means "act" — one primary per view. ── */
+  --color-action: var(--action-primary-bg);
+  --color-action-hover: var(--action-primary-bg-hover);
+  --color-action-fg: var(--action-primary-fg);
+  --color-danger: var(--action-danger-bg);
+  --color-danger-fg: var(--action-danger-fg);
 
-  --text-display: 3rem;            /* 48px */
-  --text-display--line-height: 3.25rem;
-  --text-display--letter-spacing: -0.02em;
-  --text-display--font-weight: 700;
+  /* ── Status ───────────────────────────────────────────── */
+  --color-positive: var(--status-positive-fg);
+  --color-positive-bg: var(--status-positive-bg);
+  --color-warning: var(--status-warning-fg);
+  --color-warning-bg: var(--status-warning-bg);
+  --color-critical: var(--status-critical-fg);
+  --color-critical-bg: var(--status-critical-bg);
+  --color-info: var(--status-info-fg);
+  --color-info-bg: var(--status-info-bg);
 
-  --text-title: 2rem;              /* 32px */
-  --text-title--line-height: 2.375rem;
-  --text-title--letter-spacing: -0.01em;
+  /* ── Borders. Structure is hairlines, not shadows. ─────── */
+  --color-hairline: var(--border-hairline);
+  --color-subtle: var(--border-subtle);
+  --color-edge: var(--border-strong);
 
-  --text-section: 1.5rem;          /* 24px */
-  --text-section--line-height: 1.875rem;
+  /* ── Type ─────────────────────────────────────────────── */
+  --font-sans: var(--font-text);
+  --font-mono: var(--font-mono);
+  --font-display: var(--font-display);
 
-  --text-label: 0.75rem;           /* 12px */
-  --text-label--line-height: 1rem;
-  --text-label--letter-spacing: 0.06em;
-  --text-label--font-weight: 700;
+  --text-2xs: var(--text-2xs);
+  --text-xs: var(--text-xs);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-md: var(--text-md);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-d4: var(--display-4);
+  --text-d3: var(--display-3);
 
-  /* ── Shape and elevation ──────────────────────────────── */
-  --radius-control: 6px;
-  --radius-card: 12px;
+  /* ── Radius. 6px cards, 4px controls. ─────────────────── */
+  --radius-control: var(--radius-control);
+  --radius-card: var(--radius-card);
+  --radius-overlay: var(--radius-overlay);
+  --radius-pill: var(--radius-pill);
 
-  --shadow-card: 0 4px 6px -1px rgb(0 42 92 / 0.10), 0 2px 4px -1px rgb(0 42 92 / 0.06);
-  --shadow-float: 0 10px 15px -3px rgb(0 42 92 / 0.12), 0 4px 6px -2px rgb(0 42 92 / 0.05);
+  /* ── Space ────────────────────────────────────────────── */
+  --spacing-1: var(--space-1);
+  --spacing-2: var(--space-2);
+  --spacing-3: var(--space-3);
+  --spacing-4: var(--space-4);
+  --spacing-6: var(--space-6);
+  --spacing-7: var(--space-7);
+  --spacing-9: var(--space-9);
 }
 
-@layer base {
-  body {
-    background-color: var(--color-accent);
-    color: var(--color-dark);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+@layer components {
+  /* The three recurring shapes in this product. Defined once, in AF's
+     vocabulary, so no component reaches for a raw ramp. */
+  .ds-panel {
+    background: var(--surface-card);
+    border: var(--border-width) solid var(--border-hairline);
+    border-radius: var(--radius-card);
   }
 
-  /* Fares, times, dates and flight designators must align in columns and
-     must not reflow as they update. */
-  .tabular,
-  [data-numeric] {
-    font-variant-numeric: tabular-nums;
+  .ds-field {
+    width: 100%;
+    background: var(--surface-inset);
+    border: var(--border-width) solid var(--border-subtle);
+    border-radius: var(--radius-control);
+    color: var(--text-strong);
+    padding: var(--space-2) var(--space-3);
+    /* 44px minimum target — AF accessibility standard. */
+    min-height: 44px;
+    transition: border-color var(--dur-fast, 120ms) var(--ease-out, ease);
+  }
+  .ds-field::placeholder {
+    color: var(--text-faint);
+  }
+  .ds-field:hover {
+    border-color: var(--border-strong);
   }
 
-  /* A visible focus ring is a requirement, not a style preference — it is
-     the only way a keyboard user can tell where they are. */
-  :focus-visible {
-    outline: 2px solid var(--color-secondary);
-    outline-offset: 2px;
+  .ds-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-6);
+    border-radius: var(--radius-control);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    letter-spacing: var(--track-label);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background var(--dur-fast, 120ms) var(--ease-out, ease);
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
+  .ds-action--primary {
+    background: var(--action-primary-bg);
+    color: var(--action-primary-fg);
+    border: var(--border-width) solid transparent;
+  }
+  .ds-action--primary:hover:not(:disabled) {
+    background: var(--action-primary-bg-hover);
+  }
+  .ds-action--secondary {
+    background: var(--action-secondary-bg);
+    color: var(--action-secondary-fg);
+    border: var(--border-width) solid var(--action-secondary-border);
+  }
+  .ds-action--secondary:hover:not(:disabled) {
+    background: var(--action-secondary-bg-hover);
+  }
+  .ds-action:disabled {
+    background: var(--action-disabled-bg);
+    color: var(--action-disabled-fg);
+    cursor: not-allowed;
   }
 }

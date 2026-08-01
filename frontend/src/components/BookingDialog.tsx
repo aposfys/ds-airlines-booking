@@ -32,8 +32,7 @@ interface Props {
  *
  * Fare selection is new in Phase 1. The document model had one price per
  * flight with no way to express what it entitled the passenger to; the
- * relational model carries branded fares and their rules, so the passenger
- * can see what they differ on before choosing.
+ * relational model carries branded fares and their rules.
  */
 const BookingDialog = ({
   flight,
@@ -106,92 +105,100 @@ const BookingDialog = ({
     }
   };
 
-  const field =
-    'w-full px-4 py-2 bg-white border border-gray-300 rounded-[6px] focus:outline-none focus:border-secondary transition-colors';
-  const label = 'block text-primary text-label font-bold tracking-[0.06em] uppercase mb-1';
+  const labelClass = 'af-label block mb-2 text-muted';
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-dark/50 p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-4 overflow-y-auto"
+      style={{ background: 'var(--surface-scrim)' }}
       onClick={onCancel}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="booking-dialog-title"
-        className="bg-white rounded-[12px] shadow-float w-full max-w-lg p-6 md:p-8 my-8"
+        className="bg-raised border border-subtle w-full max-w-lg p-6 md:p-8 my-8"
+        style={{ borderRadius: 'var(--radius-overlay)' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="booking-dialog-title" className="text-section font-bold text-primary mb-1">
-          Confirm your booking
+        <span className="af-eyebrow">Confirm booking</span>
+        <h2
+          id="booking-dialog-title"
+          className="text-lg uppercase tracking-[-0.028em] mt-2"
+        >
+          {flight.origin_iata} → {flight.destination_iata}
         </h2>
-        <p className="text-sm text-gray-600 mb-6 tabular">
-          {flight.flight_number} · {flight.origin_iata} → {flight.destination_iata} ·{' '}
-          {formatFlightDate(flight.departure_date)} at {formatTime(flight.scheduled_departure)}{' '}
-          · {formatDuration(flight.duration_minutes)}
+        <p className="af-data text-sm text-muted mt-2 mb-6">
+          {flight.flight_number} · {formatFlightDate(flight.departure_date)} ·{' '}
+          {formatTime(flight.scheduled_departure)}–{formatTime(flight.scheduled_arrival)} ·{' '}
+          {formatDuration(flight.duration_minutes)}
         </p>
 
         {error && (
           <div
             role="alert"
-            className="bg-red-50 border-l-4 border-danger p-3 mb-5 text-danger text-sm font-medium"
+            className="border-l-2 border-critical bg-critical-bg text-critical text-sm p-3 mb-6"
           >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <fieldset>
-            <legend className={label}>Fare</legend>
+            <legend className={labelClass}>Fare</legend>
             <div className="space-y-2">
-              {flight.fares.map((fare) => (
-                <label
-                  key={fare.fare_class_code}
-                  className={`flex items-start gap-3 p-3 border rounded-[6px] cursor-pointer transition-colors ${
-                    fareCode === fare.fare_class_code
-                      ? 'border-signal bg-accent'
-                      : 'border-gray-300 hover:border-secondary'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="fare"
-                    value={fare.fare_class_code}
-                    checked={fareCode === fare.fare_class_code}
-                    onChange={() => setFareCode(fare.fare_class_code)}
-                    className="mt-1"
-                  />
-                  <span className="flex-1">
-                    <span className="flex justify-between items-baseline gap-2">
-                      <span className="font-bold text-primary">{fare.name}</span>
-                      <span className="font-bold text-signal tabular">
-                        {formatFare(fare.price_eur)}
+              {flight.fares.map((fare) => {
+                const selected = fareCode === fare.fare_class_code;
+                return (
+                  <label
+                    key={fare.fare_class_code}
+                    className={`flex items-start gap-3 p-3 border cursor-pointer transition-colors ${
+                      selected
+                        ? 'border-action bg-inset'
+                        : 'border-hairline hover:border-edge'
+                    }`}
+                    style={{ borderRadius: 'var(--radius-control)' }}
+                  >
+                    <input
+                      type="radio"
+                      name="fare"
+                      value={fare.fare_class_code}
+                      checked={selected}
+                      onChange={() => setFareCode(fare.fare_class_code)}
+                      className="mt-1 accent-[var(--action-primary-bg)]"
+                    />
+                    <span className="flex-1">
+                      <span className="flex justify-between items-baseline gap-2">
+                        <span className="af-label text-strong">{fare.name}</span>
+                        <span className="af-data text-sm text-strong">
+                          {formatFare(fare.price_eur)}
+                        </span>
+                      </span>
+                      <span className="block text-xs text-muted mt-1">
+                        {[
+                          fare.cabin_bag_included && 'cabin bag',
+                          fare.checked_bag_included && 'checked bag',
+                          fare.changeable && 'changeable',
+                          fare.refundable && 'refundable',
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
                       </span>
                     </span>
-                    <span className="block text-xs text-gray-600 mt-1">
-                      {[
-                        fare.cabin_bag_included && 'Cabin bag',
-                        fare.checked_bag_included && 'Checked bag',
-                        fare.changeable && 'Changeable',
-                        fare.refundable && 'Refundable',
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </span>
-                  </span>
-                </label>
-              ))}
+                  </label>
+                );
+              })}
             </div>
           </fieldset>
 
           <div>
-            <label className={label} htmlFor="passenger-name">
+            <label className={labelClass} htmlFor="passenger-name">
               Passenger name
             </label>
             <input
               id="passenger-name"
               ref={firstFieldRef}
-              className={field}
+              className="ds-field"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               autoComplete="name"
@@ -201,24 +208,24 @@ const BookingDialog = ({
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={label} htmlFor="passport">
+              <label className={labelClass} htmlFor="passport">
                 Passport number
               </label>
               <input
                 id="passport"
-                className={field}
+                className="ds-field af-data"
                 value={passport}
                 onChange={(e) => setPassport(e.target.value.toUpperCase())}
                 required
               />
             </div>
             <div>
-              <label className={label} htmlFor="seat">
-                Seat <span className="font-normal lowercase tracking-normal">(optional)</span>
+              <label className={labelClass} htmlFor="seat">
+                Seat (optional)
               </label>
               <input
                 id="seat"
-                className={`${field} tabular`}
+                className="ds-field af-data"
                 value={seat}
                 onChange={(e) => setSeat(e.target.value.toUpperCase())}
                 placeholder="12A"
@@ -228,12 +235,12 @@ const BookingDialog = ({
           </div>
 
           <div>
-            <label className={label} htmlFor="card">
+            <label className={labelClass} htmlFor="card">
               Card number
             </label>
             <input
               id="card"
-              className={`${field} tabular`}
+              className="ds-field af-data"
               value={card}
               onChange={(e) => setCard(groupCardDigits(e.target.value))}
               inputMode="numeric"
@@ -241,34 +248,33 @@ const BookingDialog = ({
               placeholder="4242 4242 4242 4242"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-2xs text-faint mt-2">
               We store only the last four digits.
             </p>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between gap-4 pt-5 border-t border-hairline">
             <div>
-              <div className="text-label uppercase tracking-[0.06em] text-gray-500 font-bold">
-                Total
-              </div>
-              <div className="text-section font-bold text-signal tabular">
+              <span className="af-label text-muted">Total</span>
+              <p className="af-data text-lg text-strong mt-1">
                 {selectedFare ? formatFare(selectedFare.price_eur) : '—'}
-              </div>
+              </p>
             </div>
             <div className="flex gap-3">
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-5 py-2.5 rounded-full font-semibold text-primary hover:bg-accent transition-colors"
+                className="ds-action ds-action--secondary"
               >
                 Cancel
               </button>
+              {/* The one primary action in this view. */}
               <button
                 type="submit"
                 disabled={submitting}
-                className="bg-signal text-white px-6 py-2.5 rounded-full font-semibold hover:opacity-90 transition-opacity shadow-md disabled:opacity-60"
+                className="ds-action ds-action--primary"
               >
-                {submitting ? 'Booking…' : 'Confirm booking'}
+                {submitting ? 'Booking…' : 'Confirm'}
               </button>
             </div>
           </div>

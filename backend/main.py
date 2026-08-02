@@ -45,7 +45,7 @@ app = FastAPI(
     description=(
         "Booking API for DS Airlines, a Greek short-haul carrier."
     ),
-    version="3.0.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 

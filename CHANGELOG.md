@@ -80,7 +80,8 @@ the interface is built on the AF design system.
 
 ## [0.1.0] — 2026-07-29 · Phase 0, Foundation
 
-An audit of the original coursework code, and the fixes it demanded. 30
+An audit of the original university project code, and the fixes it
+demanded. 30
 defects recorded — 4 Critical, 6 High.
 
 ### Fixed

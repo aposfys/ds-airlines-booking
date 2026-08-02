@@ -12,11 +12,11 @@ TypeScript · Tailwind v4 · Docker
 
 ## Why this repository exists
 
-It began as an MSc distributed-systems assignment: a Flask app that could
-list flights and take a booking. Restarting it as a product meant asking the
-questions coursework never does — who flies this airline, what does it
-promise, what happens when a payment fails, and how would anyone know if it
-broke.
+It began as a **BSc Digital Systems project**: a Flask app that could list
+flights and take a booking. Restarting it as a product meant asking the
+questions a university assignment never does — who flies this airline, what
+does it promise, what happens when a payment fails, and how would anyone know
+if it broke.
 
 The most useful document here is not the API reference. It is the
 [**current-state assessment**](docs/analysis/current-state-assessment.md): an

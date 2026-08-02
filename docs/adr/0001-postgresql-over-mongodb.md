@@ -2,7 +2,7 @@
 
 - **Status:** Accepted
 - **Date:** 2026-07-29
-- **Supersedes:** the MongoDB choice inherited from the original coursework
+- **Supersedes:** the MongoDB choice inherited from the original project
 - **Affects:** Phase 1 onward
 
 ---
@@ -10,8 +10,8 @@
 ## Context
 
 The original project stored everything in MongoDB. That was a reasonable
-choice for coursework — it needs no schema, no migrations, and no DDL to get
-a flight list on screen. It is the wrong choice for the product described in
+choice for a university project — it needs no schema, no migrations, and no
+DDL to get a flight list on screen. It is the wrong choice for the product described in
 the roadmap, and Phase 1 is the last cheap moment to change it.
 
 Three forces make the decision now rather than later.

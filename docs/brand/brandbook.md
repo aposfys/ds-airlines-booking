@@ -53,6 +53,30 @@ Written **DS Airlines** in prose and **DS** where the context is already the
 airline (a flight number, a fare code, a seat map). Never "D.S.", never
 "ds airlines".
 
+### 2.1.1 Why it stayed
+
+The name was reviewed against alternatives in August 2026 — Greek-rooted
+candidates including *Alkyon* (the halcyon; the calm windless days), *Meltemi*
+(the Aegean summer wind) and *Nefeli* (cloud). None was adopted.
+
+The initials come from the **Digital Systems** degree this project was
+originally built for. That is the honest origin, and it is a better reason to
+keep them than any invented one: the name records where the work came from,
+which is the same instinct that produced the defect register rather than a
+quiet rewrite.
+
+Two of the rejected candidates are worth recording, because the reasoning
+generalises. *Meltemi* was the most recognisable and the most unmistakably
+Greek — and wrong: the meltemi is the wind that grounds ferries and closes
+island airports every August. An airline whose entire promise is
+dependability should not be named after the regional cause of delay.
+*Halcyon* was semantically ideal and commercially crowded — a Cape Verde
+carrier traded under it until 2013, and several aviation businesses still do.
+
+If the name is ever revisited, the bar is the one this document already
+applies to a loyalty programme: a candidate needs to survive a trademark
+check and mean something the airline can actually deliver.
+
 ### 2.2 Positioning
 
 > **DS Airlines is the dependable Aegean connector: full-service reliability

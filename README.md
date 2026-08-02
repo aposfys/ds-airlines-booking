@@ -24,8 +24,8 @@ Tailwind v4 · Docker**
 
 ## Why this repository exists
 
-It began as a **BSc Digital Systems project**: a Flask app that could list
-flights and take a booking. Restarting it as a product meant asking the
+It began as a **BSc Digital Systems project** — which is where the DS comes
+from — a Flask app that could list flights and take a booking. Restarting it as a product meant asking the
 questions a university assignment never does — who flies this airline, what
 does it promise, what happens when a payment fails, and how would anyone know
 if it broke.

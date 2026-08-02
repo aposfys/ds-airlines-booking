@@ -1,8 +1,8 @@
 <h1>DS Airlines</h1>
 
 <p>
-  <a href="https://github.com/aposfys/DS-Airlines/actions/workflows/ci.yml">
-    <img alt="CI" src="https://github.com/aposfys/DS-Airlines/actions/workflows/ci.yml/badge.svg">
+  <a href="https://github.com/aposfys/ds-airlines-booking/actions/workflows/ci.yml">
+    <img alt="CI" src="https://github.com/aposfys/ds-airlines-booking/actions/workflows/ci.yml/badge.svg">
   </a>
   <img alt="tests" src="https://img.shields.io/badge/tests-175-brightgreen">
   <img alt="python" src="https://img.shields.io/badge/python-3.13-blue">
@@ -95,8 +95,8 @@ Each phase leaves the repository runnable and lands on its own branch.
 
 | Phase | Scope | Status |
 |---|---|---|
-| **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | **Complete** — [`v0.1.0`](https://github.com/aposfys/DS-Airlines/releases/tag/v0.1.0) |
-| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, AF design system, full test suites | **Complete** — [`v0.2.0`](https://github.com/aposfys/DS-Airlines/releases/tag/v0.2.0) |
+| **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | **Complete** — [`v0.1.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.1.0) |
+| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, AF design system, full test suites | **Complete** — [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
 | **2 · Booking engine** | Seat maps in the interface, holds with expiry, cancellation policy per fare | Next |
 | **3 · Payments & comms** | Provider-tokenised payment, email confirmations | Planned |
 | **4 · Operations** | An interface for the admin surface, which today is API-only | Planned |

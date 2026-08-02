@@ -58,6 +58,6 @@ Stated plainly rather than implied:
 ## Reporting
 
 If you find a vulnerability, open an issue at
-https://github.com/aposfys/DS-Airlines/issues — this is a demonstration
+https://github.com/aposfys/ds-airlines-booking/issues — this is a demonstration
 project, so there is no private disclosure process and nothing here is at
 risk in production.

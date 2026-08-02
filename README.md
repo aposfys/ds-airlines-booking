@@ -1,12 +1,24 @@
-# DS Airlines
+<h1>DS Airlines</h1>
+
+<p>
+  <a href="https://github.com/aposfys/DS-Airlines/actions/workflows/ci.yml">
+    <img alt="CI" src="https://github.com/aposfys/DS-Airlines/actions/workflows/ci.yml/badge.svg">
+  </a>
+  <img alt="tests" src="https://img.shields.io/badge/tests-175-brightgreen">
+  <img alt="python" src="https://img.shields.io/badge/python-3.13-blue">
+  <img alt="node" src="https://img.shields.io/badge/node-22-blue">
+  <img alt="licence" src="https://img.shields.io/badge/licence-MIT-lightgrey">
+</p>
 
 A flight booking platform for a fictional Greek short-haul carrier — built as
 a business, not just a codebase. Brand, product analysis, architecture
 decisions and test strategy are first-class artefacts here, alongside the API
 and the interface.
 
-**Stack:** FastAPI · PostgreSQL · SQLAlchemy 2.0 · Alembic · React 19 ·
-TypeScript · Tailwind v4 · Docker
+**FastAPI · PostgreSQL · SQLAlchemy 2.0 · Alembic · React 19 · TypeScript ·
+Tailwind v4 · Docker**
+
+![The dashboard: search, fare-priced results, and a confirmed itinerary](docs/images/dashboard-dark.jpg)
 
 ---
 
@@ -41,16 +53,39 @@ wrong is the point of the exercise.
 
 ---
 
+## The interface
+
+Built on **[AF](frontend/src/design-system/README.md)**, a design system of my
+own. DS Airlines owns the words; AF owns everything you can see.
+
+| Booking | Register |
+|---|---|
+| ![The booking dialog: three branded fares with their rules, and no card field](docs/images/booking-dialog.jpg) | ![The register page in the light theme](docs/images/register-light.jpg) |
+
+Both themes are token-complete and contrast-verified in CI.
+
+![The dashboard in the light theme](docs/images/dashboard-light.jpg)
+
+> **No payment is taken and no card details are collected.** The booking form
+> has no card field, and the API returns `422` to a request carrying one.
+> Do not enter real payment information.
+
+---
+
 ## Documentation
 
 | | |
 |---|---|
 | [Current-state assessment](docs/analysis/current-state-assessment.md) | The full defect register, with business impact and resolution |
 | [ADR-001 · PostgreSQL over MongoDB](docs/adr/0001-postgresql-over-mongodb.md) | Why the booking engine left the document model |
-| [Personas](docs/product/personas.md) · [User stories](docs/product/user-stories.md) | Who this is for, what it does for them, and a story→endpoint→test traceability matrix |
-| [Product brand](docs/brand/brandbook.md) | Positioning, network, fare architecture, voice. Defers to AF for anything visual |
+| [Personas](docs/product/personas.md) · [User stories](docs/product/user-stories.md) | Who this is for, and a story → endpoint → test traceability matrix |
+| [Product brand](docs/brand/brandbook.md) | Positioning, network, fare architecture, voice |
 | [AF design system](frontend/src/design-system/README.md) | The vendored token layer, and what was deliberately not vendored |
-| [Test strategy](docs/qa/test-strategy.md) | Layers, how to run everything, and a 42-case manual pass covering every page |
+| [Test strategy](docs/qa/test-strategy.md) | Layers, how to run everything, and a 42-case manual pass |
+| [Changelog](CHANGELOG.md) | What changed in each phase, including what was removed |
+| [Security](SECURITY.md) | Why this takes no payments, how to run it safely, and known limitations |
+
+Start at [`docs/`](docs/README.md), which orders these for a first read.
 
 ---
 
@@ -60,12 +95,15 @@ Each phase leaves the repository runnable and lands on its own branch.
 
 | Phase | Scope | Status |
 |---|---|---|
-| **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | **Complete** |
-| **1 · Domain** | PostgreSQL migration, airports/aircraft/routes/schedules, fare classes, seat maps, AF design system | **Complete** |
-| **2 · Booking engine** | Seat maps in the interface, holds with expiry, cancellation policy per fare, frontend and E2E tests | Next |
+| **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | **Complete** — [`v0.1.0`](https://github.com/aposfys/DS-Airlines/releases/tag/v0.1.0) |
+| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, AF design system, full test suites | **Complete** — [`v0.2.0`](https://github.com/aposfys/DS-Airlines/releases/tag/v0.2.0) |
+| **2 · Booking engine** | Seat maps in the interface, holds with expiry, cancellation policy per fare | Next |
 | **3 · Payments & comms** | Provider-tokenised payment, email confirmations | Planned |
-| **4 · Operations** | Admin interface, schedule management, load factor, revenue by route | Planned |
-| **5 · Presentation** | Published brand and analysis site, full story→endpoint→test traceability | Planned |
+| **4 · Operations** | An interface for the admin surface, which today is API-only | Planned |
+| **5 · Presentation** | Published brand and analysis site | Planned |
+
+Versions stay pre-1.0 deliberately: payment capture and the operations
+interface do not exist, and 1.0.0 would overclaim.
 
 ---
 
@@ -103,36 +141,37 @@ collide with any PostgreSQL you already run. `make db-reset` throws it away.
 Demo data is opt-in. Nothing is seeded unless you ask, and there are no
 default credentials — `make seed` supplies its own, for local use only.
 
+**The administrative surface has no interface.** Publishing flights,
+repricing and load factor all run through Swagger. That is Phase 4, and it is
+the largest gap between what the product does and what a person could use.
+
 ---
 
 ## Tests
 
 ```bash
-make check     # everything CI runs
+make check       # backend + component tests, lint, build, contrast
+make check-all   # the above plus end to end
 ```
 
 | | |
 |---|---|
-| `make test` | 89 backend tests against real PostgreSQL |
-| `make test-frontend` | 69 component tests (Vitest + Testing Library) |
-| `make e2e` | 17 end-to-end tests in a real browser (Playwright) |
-| `make lint` | eslint |
-| `make build` | tsc + vite |
-| `make contrast` | 34 colour pairs, WCAG 2.2 AA, both themes |
+| `make test` | **89** backend tests against real PostgreSQL |
+| `make test-frontend` | **69** component tests (Vitest + Testing Library) |
+| `make e2e` | **17** end-to-end tests in a real browser (Playwright) |
+| `make contrast` | 34 colour pairs, WCAG 2.2 AA, in both themes |
 
-**175 automated tests**, all in CI. `make check-all` runs everything including
-end-to-end.
+**175 automated tests**, all in CI.
 
-The suite runs against a **real PostgreSQL**, and the fixtures build the
-schema by running the Alembic migrations — so every run also proves the
+The backend suite runs against a **real PostgreSQL**, and the fixtures build
+the schema by running the Alembic migrations — so every run also proves the
 migration chain applies.
 
 That matters because of what it replaced. The original six tests all
 exercised the same two auth endpoints, since anything touching flights,
 bookings or authorization needed a database they had no way to provide —
 which is precisely why a completely dead admin surface sat in the repository
-alongside a green suite. Phase 0 bridged that with an in-memory fake, honest
-about being a bridge; Phase 1 retired it.
+alongside a green suite.
 
 The tests that matter most assert the defects stay fixed:
 
@@ -144,18 +183,14 @@ tests/test_bookings.py        payment details are refused outright,
 tests/test_flights.py         search does no pattern matching,
                               a flight with bookings cannot be deleted
 tests/test_constraints.py     the database itself refuses bad data
+e2e/interface.spec.ts         the webfonts actually load
 ```
 
-Appearance is covered by the end-to-end suite, which exists because four
-Phase 1 defects were invisible to a green unit suite. The worst was the
-webfonts: nested under Tailwind's `@import`, the production build shipped no
-`.woff2` at all and the whole typographic identity fell back to Helvetica
-**with no error of any kind**. So `e2e/interface.spec.ts` counts font
-responses and calls `document.fonts.check()`, and also asserts the focus ring
-is visible, targets clear 44px, both themes apply, and nothing 404s.
-
-The [42-case manual pass](docs/qa/test-strategy.md) remains for what is still
-not automated.
+That last one exists because they once did not. Nested under Tailwind's
+`@import`, the production build shipped **zero** `.woff2` files and the whole
+typographic identity fell back to Helvetica **with no error of any kind**.
+Four Phase 1 defects were invisible to a green unit suite; the end-to-end
+suite is the answer to that.
 
 ---
 
@@ -174,14 +209,13 @@ backend/
   scripts/seed.py     Explicit seeding, never a startup side effect
   tests/              89 tests against real PostgreSQL
 frontend/
-  e2e/                Playwright — the passenger journey, fonts, themes, a11y
+  e2e/                Playwright — the journey, fonts, themes, accessibility
   src/
     design-system/    Vendored AF tokens, fonts, accessibility standard
     index.css         AF tokens bridged into Tailwind
     components/       BookingDialog · ThemeToggle
     context/          AuthContext · ThemeContext
     pages/            Login · Register · Dashboard
-    test/             Vitest setup
                       *.test.tsx sit beside what they test
 docs/
   adr/                Architecture decisions
@@ -198,5 +232,4 @@ docs/
 [MIT](LICENSE) · Apostolos Fysekidis
 
 DS Airlines is a fictional carrier created for this project. It is not
-affiliated with any real airline or alliance. It takes no payments and
-collects no card details — do not enter real payment information.
+affiliated with any real airline or alliance.

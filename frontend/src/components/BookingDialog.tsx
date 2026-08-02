@@ -129,7 +129,13 @@ const BookingDialog = ({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* noValidate is deliberate. With native validation on, the browser
+            intercepts an empty required field first and shows its own
+            message — "Please fill out this field" — so the messages written
+            to the brand voice guide never appear. The fields keep `required`
+            for assistive technology; the checks in handleSubmit are what the
+            passenger actually reads. */}
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
           <div role="radiogroup" aria-labelledby="fare-legend">
             <p id="fare-legend" className={labelClass}>
               Fare

@@ -114,9 +114,14 @@ make check     # everything CI runs
 | | |
 |---|---|
 | `make test` | 89 backend tests against real PostgreSQL |
+| `make test-frontend` | 69 component tests (Vitest + Testing Library) |
+| `make e2e` | 17 end-to-end tests in a real browser (Playwright) |
 | `make lint` | eslint |
-| `make build` | tsc + vite — also proves the webfonts resolve |
+| `make build` | tsc + vite |
 | `make contrast` | 34 colour pairs, WCAG 2.2 AA, both themes |
+
+**175 automated tests**, all in CI. `make check-all` runs everything including
+end-to-end.
 
 The suite runs against a **real PostgreSQL**, and the fixtures build the
 schema by running the Alembic migrations — so every run also proves the
@@ -141,10 +146,16 @@ tests/test_flights.py         search does no pattern matching,
 tests/test_constraints.py     the database itself refuses bad data
 ```
 
-Appearance is covered by none of these. The
-[42-case manual pass](docs/qa/test-strategy.md) is the control until Phase 2
-adds Playwright — four Phase 1 defects, including webfonts silently failing
-to load in production, were found only by opening a browser.
+Appearance is covered by the end-to-end suite, which exists because four
+Phase 1 defects were invisible to a green unit suite. The worst was the
+webfonts: nested under Tailwind's `@import`, the production build shipped no
+`.woff2` at all and the whole typographic identity fell back to Helvetica
+**with no error of any kind**. So `e2e/interface.spec.ts` counts font
+responses and calls `document.fonts.check()`, and also asserts the focus ring
+is visible, targets clear 44px, both themes apply, and nothing 404s.
+
+The [42-case manual pass](docs/qa/test-strategy.md) remains for what is still
+not automated.
 
 ---
 
@@ -163,12 +174,15 @@ backend/
   scripts/seed.py     Explicit seeding, never a startup side effect
   tests/              89 tests against real PostgreSQL
 frontend/
+  e2e/                Playwright — the passenger journey, fonts, themes, a11y
   src/
     design-system/    Vendored AF tokens, fonts, accessibility standard
     index.css         AF tokens bridged into Tailwind
     components/       BookingDialog · ThemeToggle
     context/          AuthContext · ThemeContext
     pages/            Login · Register · Dashboard
+    test/             Vitest setup
+                      *.test.tsx sit beside what they test
 docs/
   adr/                Architecture decisions
   analysis/           Current-state assessment

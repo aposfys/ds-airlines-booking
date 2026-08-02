@@ -38,8 +38,11 @@ help:
 	@echo "    make seed          load demo flights and an admin account"
 	@echo
 	@echo "  Checks:"
-	@echo "    make check         tests + lint + build + contrast (what CI runs)"
-	@echo "    make test          backend suite only"
+	@echo "    make check         backend + frontend tests, lint, build, contrast"
+	@echo "    make check-all     the above plus the end-to-end suite"
+	@echo "    make test          backend suite only (89 tests)"
+	@echo "    make test-frontend frontend suite only (69 tests)"
+	@echo "    make e2e           Playwright against the real stack (17 tests)"
 	@echo "    make contrast      WCAG check on the AF palette"
 	@echo
 	@echo "  Database:"
@@ -129,12 +132,47 @@ seed: db-start migrate
 	@echo "Administrator: $(SEED_ADMIN_EMAIL) / $(SEED_ADMIN_PASSWORD)"
 
 # ── Checks ────────────────────────────────────────────────
-check: test lint build contrast
+# `check` is what CI runs, minus the end-to-end suite, which needs the API
+# running. `make check-all` includes it.
+check: test test-frontend lint build contrast
 	@echo
 	@echo "All checks passed."
 
+check-all: check e2e
+
 test: db-start
 	cd backend && ../$(VENV)/bin/python -m pytest -q
+
+test-frontend: frontend/node_modules
+	cd frontend && npm run test
+
+# Boots the API against the local cluster, runs Playwright against a
+# production build of the interface, and stops the API afterwards whatever
+# happens.
+# Boots the API against the local cluster, runs Playwright against a
+# production build of the interface, and stops the API afterwards whatever
+# happens. Reuses an API that is already healthy — otherwise running this
+# while `make dev` is up fails on a port clash and the wait loop never ends.
+e2e: db-start migrate seed frontend/node_modules
+	@if curl -sf http://localhost:8000/health >/dev/null 2>&1; then \
+		echo "Reusing the API already on :8000"; \
+		cd frontend && npx playwright test; \
+	else \
+		if lsof -ti :8000 >/dev/null 2>&1; then \
+			echo "Port 8000 is held by PID $$(lsof -ti :8000 | head -1) but is not answering /health."; \
+			echo "Stop it and try again."; exit 1; \
+		fi; \
+		echo "Starting the API (log: /tmp/ds-e2e-api.log)"; \
+		( cd backend && ../$(VENV)/bin/uvicorn main:app --port 8000 --log-level warning \
+			> /tmp/ds-e2e-api.log 2>&1 & echo $$! > /tmp/ds-e2e-api.pid ); \
+		trap 'kill $$(cat /tmp/ds-e2e-api.pid) 2>/dev/null; rm -f /tmp/ds-e2e-api.pid' EXIT; \
+		for i in $$(seq 1 60); do \
+			curl -sf http://localhost:8000/health >/dev/null 2>&1 && break; \
+			sleep 0.5; \
+			if [ $$i -eq 60 ]; then echo "API did not become healthy in 30s"; exit 1; fi; \
+		done; \
+		cd frontend && npx playwright test; \
+	fi
 
 lint:
 	cd frontend && npm run lint
@@ -149,4 +187,4 @@ clean:
 	rm -rf $(VENV) frontend/node_modules frontend/dist
 
 .PHONY: help up down setup db-start db-stop db-reset psql migrate dev seed \
-        check test lint build contrast clean
+        check check-all test test-frontend e2e lint build contrast clean

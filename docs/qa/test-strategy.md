@@ -35,8 +35,8 @@ browser — see §5.
 | **Integrity** | pytest | **Real PostgreSQL** | Constraints, asserted by attempting the violation |
 | **Accessibility** | `contrast_check.py` | The shipped token files | WCAG 2.2 AA, both themes |
 | **Manual** | A browser | Full stack | Everything in §4 |
-| **Component** *(Phase 2)* | Vitest + RTL | Mocked API | Forms, dialogs, error states |
-| **End-to-end** *(Phase 2)* | Playwright | Docker stack | Register → search → book → cancel |
+| **Component** | Vitest + RTL | Mocked API | Forms, dialogs, contexts, formatting |
+| **End-to-end** | Playwright | **The real stack** | The passenger journey, fonts, themes, routing, a11y |
 
 ### Why the fake is gone
 
@@ -55,7 +55,8 @@ takes its normal path and is still undone.
 ## 3 · Running everything
 
 ```bash
-make check      # tests + lint + build + contrast — what CI runs
+make check       # backend + component tests, lint, build, contrast
+make check-all   # the above plus the end-to-end suite
 ```
 
 Individually:
@@ -185,17 +186,45 @@ current suite. Until Phase 2 adds Playwright, §4 is the control.
 
 ---
 
-## 6 · Not covered yet
+## 6 · The automated suites
+
+**175 automated tests across three suites**, all running in CI.
+
+| Suite | Count | What it can see |
+|---|---|---|
+| Backend (pytest) | 89 | Endpoints, authorization, inventory, database constraints |
+| Component (Vitest) | 69 | Rendering, state, validation, formatting, contexts |
+| End-to-end (Playwright) | 17 | Everything only a real browser can observe |
+
+The end-to-end suite exists because of §5. It asserts the things that were
+silently broken while every other suite was green:
+
+- **Fonts actually load.** It counts `.woff2` responses and calls
+  `document.fonts.check()`. Nothing else catches the identity falling back
+  to Helvetica.
+- **Nothing 404s** on any page.
+- **Both themes apply**, persist across a reload, and follow the OS.
+- **The focus ring is visible**, targets clear 44px, every input has an
+  accessible name, and the page declares a language.
+- **The card field does not exist**, and the API returns 422 to one.
+
+---
+
+## 7 · Not covered yet
 
 Stated so the gaps are known rather than implied.
 
-- **No frontend tests.** Phase 2, with the booking-engine UI.
 - **No load or concurrency testing.** The seat guard uses `SELECT … FOR
   UPDATE` and is correct by construction, but it has not been tested under
-  real contention.
+  real contention. The end-to-end suite runs single-worker against one
+  database for the same reason.
 - **No admin interface**, so §4.5 runs through Swagger. Phase 4.
-- **No security scanning** in CI. Dependency and container scanning: Phase 1
-  follow-up.
+- **No automated axe scan.** The accessibility cases here are hand-written
+  checks of specific rules, not a full audit.
+- **One browser.** Playwright runs Chromium only; Firefox and WebKit are a
+  config change away but are not run.
+- **No security scanning** in CI. Dependency and container scanning: Phase 2.
 - **No contract testing** between frontend and API. The TypeScript types are
-  hand-written and can drift; generating them from the OpenAPI schema is the
-  intended fix.
+  hand-written and can drift — the `card_last4` type said `string` while the
+  API had started returning `null`, and only the build caught it. Generating
+  them from the OpenAPI schema is the intended fix.

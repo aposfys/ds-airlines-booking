@@ -49,7 +49,10 @@ export interface Booking {
   fare_class_code: string;
   passenger_full_name: string;
   seat_numbers: string[];
-  card_last4: string;
+  // Null for every booking this application creates — payment details are
+  // not accepted. The field exists for a future provider integration, which
+  // would supply the four digits it gets back.
+  card_last4: string | null;
   amount_eur: string;
   created_at: string;
 }

@@ -46,14 +46,21 @@ const Register = () => {
       <div className="af-grain hidden md:flex flex-col justify-between w-1/2 p-12 bg-sunken border-r border-hairline order-last md:order-first">
         <span className="af-eyebrow">DS Airlines</span>
         <div>
-          {/* Star Alliance and Miles+Bonus were removed here: a real alliance
-              DS does not belong to, and Aegean's registered programme. */}
+          {/* This panel advertised "A Star Alliance Member" and "Miles+Bonus"
+              — a real alliance DS does not belong to, and Aegean's registered
+              programme. Both were removed in Phase 0.
+
+              It then advertised "Meltemi Club", a loyalty programme invented
+              to fill the gap, promising points the product does not award and
+              cannot spend. Replacing one unbacked claim with another is not a
+              fix, so the copy now describes only what registering actually
+              does. */}
           <h1 className="af-hero" style={{ fontSize: 'var(--display-3)' }}>
-            Join<br />Meltemi Club
+            Book in<br />fewer steps
           </h1>
           <p className="af-prose mt-6 text-muted">
-            Collect points on every DS flight and spend them on fares, seats and bags.
-            Free to join.
+            Save your passport details once and they are filled in on every booking.
+            Your itineraries stay in one place.
           </p>
         </div>
         <span className="af-label text-faint">220 seats · one fleet · seven routes</span>

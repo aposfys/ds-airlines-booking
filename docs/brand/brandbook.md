@@ -116,7 +116,17 @@ registered loyalty programme of Aegean Airlines. A fictional carrier
 displaying either is trademark appropriation, and in a public repository it
 reads as copied rather than designed.
 
-DS Airlines belongs to no alliance. Its loyalty programme is **Meltemi Club**.
+DS Airlines belongs to no alliance.
+
+**It has no loyalty programme either.** The register page briefly advertised
+one — "Meltemi Club", invented to fill the space Miles+Bonus vacated,
+promising points on every flight. Nothing awarded them and nothing could
+spend them. Replacing a borrowed claim with a fabricated one is not a fix:
+the same reader who would have caught the trademark would catch a scheme
+that does not exist. The copy now describes only what registering does.
+
+If a programme is ever built, it needs an accrual model, an expiry policy and
+a redemption path before it gets a name.
 
 ---
 

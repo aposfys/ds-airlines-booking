@@ -182,7 +182,7 @@ Scenario: A seat already taken
 **Limitation:** a seat is requested by typing its number. There is no seat
 map, so a traveller cannot see which seats are free, or which are window,
 aisle or exit row — all of which the database already knows
-(`seat_map_entries`). Phase 2.
+(`seat_map_entries`). Not built.
 
 ### C3 · See my itineraries — P1, P2 · **Done**
 
@@ -223,8 +223,8 @@ Scenario: Someone else's booking
 
 **Limitation:** cancellation ignores the fare's refund rules. Light is
 non-refundable in data and in the brand, but cancelling it returns the seat
-and records nothing about money owed. Refund policy is Phase 2; charging and
-returning money is Phase 3.
+and records nothing about money owed. Neither refund policy nor payment
+capture was built.
 
 ---
 
@@ -283,9 +283,10 @@ Scenario: The operations summary
 
 > As revenue and operations, I want to do my job without Swagger.
 
-Phase 4. Everything in D1–D4 is reachable only through the API documentation
-page. This is the largest gap between what the product does and what a person
-could use.
+Not built. Everything in D1–D4 is reachable only through the API
+documentation page. This is the largest gap between what the product does and
+what a person could use, and it is left open deliberately — see the README on
+scope.
 
 ---
 
@@ -318,7 +319,7 @@ Scenario: Keyboard-only booking
 ```
 
 **Limitation:** verified by hand (TC-M41), not automated. Focus is not
-trapped inside the dialog — tabbing past the last control leaves it. Phase 2.
+trapped inside the dialog — tabbing past the last control leaves it.
 
 ### E3 · Not lose work to a failure — all · **Done**
 

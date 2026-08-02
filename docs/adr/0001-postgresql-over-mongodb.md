@@ -65,7 +65,7 @@ nothing keeping them consistent, and deleting a flight orphaned its bookings
 
 Ops questions are relational too. *Load factor by route this quarter.
 Revenue per available seat kilometre. Which flights are selling below
-forecast.* These are joins and aggregates. Phase 4 is built on them.
+forecast.* These are joins and aggregates, and cheap ones in SQL.
 
 ### 3. Integrity should be the database's job
 
@@ -90,7 +90,7 @@ transactions. Least disruptive: Motor stays, the data layer survives.
 
 Rejected. It solves only the first force. Modelling seat maps and fare rules
 in documents stays awkward, referential integrity stays unenforceable, and
-the ops queries in Phase 4 stay painful. It also adds real operational
+the operational reporting queries stay painful. It also adds real
 complexity — a replica set is not free to run or reason about — to buy back
 something a relational database has by default.
 
@@ -102,7 +102,7 @@ async support, Alembic for migrations.
 
 Costs: rewriting the data layer, learning Alembic, and losing the ability to
 change shape without a migration — which is a cost in Phase 1 and a benefit
-from Phase 2 on.
+from the second schema change onward.
 
 ### C. PostgreSQL plus Redis
 
@@ -137,7 +137,7 @@ measurement says otherwise.
   structurally impossible rather than fixed by a check.
 - Denormalised fields on bookings are replaced by joins, removing the
   consistency drift.
-- Phase 4's reporting becomes ordinary SQL.
+- Operational reporting becomes ordinary SQL.
 - Tests run against a real database. The `tests/fake_mongo.py` stand-in built
   in Phase 0 — honest about being a bridge — is retired. Its limitation was
   that passing tests were evidence about our logic, not about the database;

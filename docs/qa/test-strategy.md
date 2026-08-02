@@ -182,7 +182,8 @@ pages, after the automated suite was already green. Phase 1 alone:
   identity, silently absent.
 
 None of these are expressible as a passing or failing assertion in the
-current suite. Until Phase 2 adds Playwright, §4 is the control.
+unit suite. The end-to-end suite in §6 is the answer to most of them; §4
+remains the control for the rest.
 
 ---
 
@@ -218,12 +219,14 @@ Stated so the gaps are known rather than implied.
   UPDATE` and is correct by construction, but it has not been tested under
   real contention. The end-to-end suite runs single-worker against one
   database for the same reason.
-- **No admin interface**, so §4.5 runs through Swagger. Phase 4.
+- **No admin interface**, so §4.5 runs through Swagger. Not built — see the
+  README on scope.
 - **No automated axe scan.** The accessibility cases here are hand-written
   checks of specific rules, not a full audit.
 - **One browser.** Playwright runs Chromium only; Firefox and WebKit are a
   config change away but are not run.
-- **No security scanning** in CI. Dependency and container scanning: Phase 2.
+- **No security scanning** in CI. Dependency and container scanning were not
+  added.
 - **No contract testing** between frontend and API. The TypeScript types are
   hand-written and can drift — the `card_last4` type said `string` while the
   API had started returning `null`, and only the build caught it. Generating

@@ -150,8 +150,8 @@ request memory, and would have landed in anything logging the request body.
 nothing can quietly start posting card numbers again. `bookings.card_last4`
 is nullable and null for every booking the application creates.
 
-This is stronger than the Phase 3 plan, which was provider tokenisation, and
-arrived two phases earlier. Tokenisation is still what a real integration
+This is stronger than the original plan, which was provider tokenisation in a
+later phase, and it arrived earlier. Tokenisation is still what a real integration
 would use; it is no longer what closes this defect.
 
 ---
@@ -275,7 +275,7 @@ detail useful for probing.
 |---|---|---|
 | DEF-023 | `__pycache__/` and a stray `flask.log` from the 2022 Flask original committed | Fixed |
 | DEF-024 | Deprecated `@app.on_event` startup hooks | Fixed — lifespan |
-| DEF-025 | No CI; no frontend tests; the backend suite could not reach the booking domain | Fixed — CI added, 6 tests → 47. Frontend tests deferred to Phase 2 |
+| DEF-025 | No CI; no frontend tests; the backend suite could not reach the booking domain | Fixed — CI added; 6 tests → 175 across three suites |
 | DEF-026 | Hero images hotlinked from Unsplash on every render | Fixed |
 | DEF-027 | Calls to action were the same blue as links and headings | Fixed — see brandbook §3 |
 | DEF-028 | No LICENSE | Fixed |
@@ -292,9 +292,9 @@ PostgreSQL replaces the code they live in and fixing them twice is waste.
 | Finding | Why deferred |
 |---|---|
 | ~~No true transaction around booking~~ | **Resolved in Phase 1.** Seat lock, seat state change and booking insert are one transaction; the compensating write is deleted |
-| ~~No seat inventory model — only a scalar counter~~ | **Resolved in Phase 1.** `flight_seats` rows replace the counter; seat selection in the interface is Phase 2 |
+| ~~No seat inventory model — only a scalar counter~~ | **Resolved in Phase 1.** `flight_seats` rows replace the counter. A seat map in the interface was not built — see the README |
 | ~~No fare classes; one price per flight~~ | **Resolved in Phase 1.** Light, Standard and Flex, with their rules in data |
-| No frontend test suite | Phase 2, alongside the booking-engine UI it would cover |
+| ~~No frontend test suite~~ | **Resolved in Phase 1.** 69 component tests and 17 end-to-end |
 
 ## 7. Accepted
 

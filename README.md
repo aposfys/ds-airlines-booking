@@ -89,21 +89,47 @@ Start at [`docs/`](docs/README.md), which orders these for a first read.
 
 ---
 
-## Roadmap
+## Scope
 
-Each phase leaves the repository runnable and lands on its own branch.
+**Two phases, delivered.** The project is complete as scoped and stops here
+deliberately.
 
-| Phase | Scope | Status |
+| Phase | Scope | |
 |---|---|---|
-| **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | **Complete** — [`v0.1.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.1.0) |
-| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, AF design system, full test suites | **Complete** — [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
-| **2 · Booking engine** | Seat maps in the interface, holds with expiry, cancellation policy per fare | Next |
-| **3 · Payments & comms** | Provider-tokenised payment, email confirmations | Planned |
-| **4 · Operations** | An interface for the admin surface, which today is API-only | Planned |
-| **5 · Presentation** | Published brand and analysis site | Planned |
+| **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | [`v0.1.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.1.0) |
+| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, AF design system, three test suites | [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
 
-Versions stay pre-1.0 deliberately: payment capture and the operations
-interface do not exist, and 1.0.0 would overclaim.
+### What was not built, and why
+
+An earlier plan ran to five phases: seat selection in the interface, payment
+capture, an operations interface, a published brand site. They were dropped
+on purpose, and the reasoning is worth stating because the omissions are
+visible in the product.
+
+What this repository argues is about **judgement** — auditing inherited code
+and finding thirty defects in it, choosing a datastore and writing down what
+that cost, and building tests that catch what a green suite cannot see. A
+seat picker and a payment integration would demonstrate *craft*, which is not
+what is in question, and would take considerably longer than what they add.
+
+So the gaps stay, and they are named wherever they bite:
+
+- **The administrative surface has no interface.** Publishing flights,
+  repricing and load factor run through Swagger. This is the largest gap
+  between what the product does and what a person could use, and it has its
+  own empty row in the
+  [traceability matrix](docs/product/user-stories.md#traceability).
+- **No seat map.** A seat is requested by typing its number, though the
+  database already knows which are window, aisle and exit row.
+- **No payment capture**, by design — see [SECURITY.md](SECURITY.md).
+- **Cancellation ignores refund rules.** Light is non-refundable in data and
+  in the brand; cancelling it still returns the seat and records nothing
+  about money owed.
+- **No special-assistance booking.** A genuine passenger need this does not
+  meet — an omission, not a decision.
+
+Versions stay pre-1.0 for the same reason. 1.0.0 would claim the product is
+finished, and it is not; it is *scoped*, which is a different thing.
 
 ---
 
@@ -142,8 +168,8 @@ Demo data is opt-in. Nothing is seeded unless you ask, and there are no
 default credentials — `make seed` supplies its own, for local use only.
 
 **The administrative surface has no interface.** Publishing flights,
-repricing and load factor all run through Swagger. That is Phase 4, and it is
-the largest gap between what the product does and what a person could use.
+repricing and load factor all run through Swagger — see
+[Scope](#what-was-not-built-and-why).
 
 ---
 

@@ -1,9 +1,12 @@
 # Changelog
 
 Notable changes to DS Airlines. Format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions are
-pre-1.0 deliberately — payment capture and the operations interface do not
-exist yet, and 1.0.0 would overclaim.
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+**The project is complete at v0.2.0 and stops there deliberately.** Versions
+stay pre-1.0 because payment capture and the operations interface were never
+built; 1.0.0 would claim the product is finished rather than scoped. What was
+left out, and why, is in [the README](README.md#what-was-not-built-and-why).
 
 Defect identifiers (DEF-*) refer to
 [the current-state assessment](docs/analysis/current-state-assessment.md).

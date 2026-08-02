@@ -99,7 +99,7 @@ that could race. Booking is one transaction. Admin privilege is read from her
 record on every request, so revoking it takes effect immediately.
 
 **She is also the largest open gap in the product.** Sofia has no interface —
-every one of her tasks runs through Swagger. Phase 4.
+every one of her tasks runs through Swagger. Not built.
 
 ---
 
@@ -134,4 +134,4 @@ Naming these keeps scope honest.
 | **Families and groups** | One booking is one passenger in one seat. Group booking needs a party model and shared payment. |
 | **Corporate travel managers** | Needs policy enforcement, cost centres and consolidated invoicing. |
 | **Cabin crew and dispatch** | Crew rostering and weight-and-balance are airline operations, not booking. |
-| **Accessibility-assistance requests** | Wheelchair and special-assistance booking is a genuine passenger need this product does not yet meet — an omission, not a decision. It belongs in Phase 2 alongside seat selection. |
+| **Accessibility-assistance requests** | Wheelchair and special-assistance booking is a genuine passenger need this product does not yet meet — an omission, not a decision, and not built. |

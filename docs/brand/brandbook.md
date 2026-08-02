@@ -59,8 +59,8 @@ The name was reviewed against alternatives in August 2026 — Greek-rooted
 candidates including *Alkyon* (the halcyon; the calm windless days), *Meltemi*
 (the Aegean summer wind) and *Nefeli* (cloud). None was adopted.
 
-The initials come from the **Digital Systems** degree this project was
-originally built for. That is the honest origin, and it is a better reason to
+The initials come from the **Department of Digital Systems at the University
+of Piraeus**, where this project was originally built. That is the honest origin, and it is a better reason to
 keep them than any invented one: the name records where the work came from,
 which is the same instinct that produced the defect register rather than a
 quiet rewrite.

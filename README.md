@@ -10,10 +10,17 @@
   <img alt="licence" src="https://img.shields.io/badge/licence-MIT-lightgrey">
 </p>
 
-A flight booking platform for a fictional Greek short-haul carrier — built as
-a business, not just a codebase. Brand, product analysis, architecture
-decisions and test strategy are first-class artefacts here, alongside the API
-and the interface.
+<strong>A university assignment, taken apart and rebuilt as a product.</strong>
+
+DS Airlines started life in the **Department of Digital Systems at the
+University of Piraeus** — which is where the DS comes from. It was a Flask
+app that could list flights and take a booking, and it did what an assignment
+is supposed to do.
+
+This repository is what happened next: a flight booking platform for a
+fictional Greek short-haul carrier, built as a business rather than a
+codebase. Brand, product analysis, architecture decisions and test strategy
+are first-class artefacts here, alongside the API and the interface.
 
 **FastAPI · PostgreSQL · SQLAlchemy 2.0 · Alembic · React 19 · TypeScript ·
 Tailwind v4 · Docker**
@@ -22,16 +29,17 @@ Tailwind v4 · Docker**
 
 ---
 
-## Why this repository exists
+## From assignment to product
 
-It began as a **BSc Digital Systems project** — which is where the DS comes
-from — a Flask app that could list flights and take a booking. Restarting it as a product meant asking the
-questions a university assignment never does — who flies this airline, what
-does it promise, what happens when a payment fails, and how would anyone know
-if it broke.
+An assignment is finished when it is marked. A product is never asked whether
+it is finished — it is asked who flies this airline, what the airline
+promises, what happens when a payment fails, and how anyone would know if it
+broke.
 
-The most useful document here is not the API reference. It is the
-[**current-state assessment**](docs/analysis/current-state-assessment.md): an
+Answering those questions meant starting with an honest look at what was
+already there. The most useful document in this repository is not the API
+reference; it is the
+[**current-state assessment**](docs/analysis/current-state-assessment.md) — an
 audit of the original code recording all 30 defects found, what each would
 have cost the business, and where it was resolved.
 
@@ -48,8 +56,15 @@ Four were Critical:
 - **`docker-compose up --build` could not build**, because the frontend image
   pinned Node 18 against a toolchain requiring Node 20+.
 
-The previous README called this "production-ready". Recording why that was
-wrong is the point of the exercise.
+None of this reflects badly on the original. An assignment is judged on
+whether it demonstrates the concept, and it did. What it was never judged on
+is whether anyone could run it, sell a seat with it, or trust it with a card
+number — and those are the only questions that matter once you call something
+a product.
+
+The previous README called it "production-ready". Recording precisely why
+that was wrong, rather than quietly rewriting it, is the point of the
+exercise.
 
 ---
 

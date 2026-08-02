@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="DS Airlines API",
     description=(
-        "Booking API for DS Airlines (Delos Skyways), a Greek short-haul carrier."
+        "Booking API for DS Airlines, a Greek short-haul carrier."
     ),
     version="3.0.0",
     lifespan=lifespan,

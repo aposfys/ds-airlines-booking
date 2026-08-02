@@ -183,7 +183,6 @@ class TestRepricing:
                 "fare_class_code": "LIGHT",
                 "passenger_full_name": "Test Passenger",
                 "passenger_passport": "AB123456",
-                "credit_card": "4242424242424242",
             },
         )
         response = await client.patch(
@@ -225,7 +224,6 @@ class TestDeletion:
                 "fare_class_code": "LIGHT",
                 "passenger_full_name": "Test Passenger",
                 "passenger_passport": "AB123456",
-                "credit_card": "4242424242424242",
             },
         )
         response = await client.delete(f"/api/flights/{flight.id}", headers=admin_header)
@@ -253,7 +251,6 @@ class TestDeletion:
                 "fare_class_code": "LIGHT",
                 "passenger_full_name": "Test Passenger",
                 "passenger_passport": "AB123456",
-                "credit_card": "4242424242424242",
             },
         )
         assert response.status_code == 409

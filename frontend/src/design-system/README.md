@@ -2,8 +2,8 @@
 
 DS Airlines does not have its own visual identity. It is a product built on
 **AF**, the design system by Apostolos Fysekidis: AF supplies the visual
-system, and Delos Skyways supplies the verbal one — the name, the
-positioning, the fare names and the words on screen. See
+system, and DS Airlines supplies the verbal one — the positioning, the fare
+names and the words on screen. See
 [`docs/brand/brandbook.md`](../../../docs/brand/brandbook.md) for the split.
 
 ## What is here, and what is not

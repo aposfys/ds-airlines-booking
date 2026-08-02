@@ -8,7 +8,7 @@ from sqlalchemy import func, select
 
 from app.models.domain import Booking, BookingStatus, FlightSeat, SeatStatus
 
-VALID_CARD = "4242424242424242"  # passes Luhn
+A_REAL_LOOKING_CARD = "4242424242424242"
 
 
 def _payload(flight_id, **overrides) -> dict:
@@ -17,7 +17,6 @@ def _payload(flight_id, **overrides) -> dict:
         "fare_class_code": "LIGHT",
         "passenger_full_name": "Test Passenger",
         "passenger_passport": "AB123456",
-        "credit_card": VALID_CARD,
     }
     body.update(overrides)
     return body
@@ -32,40 +31,54 @@ async def _available(session, flight_id) -> int:
 
 
 class TestCardHandling:
-    """DEF-003 — the full PAN was persisted beside a passport number."""
+    """DEF-003, resolved in full.
 
-    async def test_full_card_number_is_never_persisted(
-        self, client, session, flight, passenger_header
+    Phase 0 stopped storing the PAN. Phase 1 stops accepting one: this is a
+    public demonstration with no payment provider, and an ordinary-looking
+    card field will eventually be given a real card.
+    """
+
+    async def test_a_booking_needs_no_payment_details(
+        self, client, flight, passenger_header
     ):
         response = await client.post(
             "/api/bookings/", headers=passenger_header, json=_payload(flight.id)
         )
         assert response.status_code == 201, response.text
 
+    async def test_a_card_number_is_refused_rather_than_ignored(
+        self, client, flight, passenger_header
+    ):
+        """The important half. Silently dropping an unexpected `credit_card`
+        would let a client keep posting live PANs to a server that merely
+        chose not to read them."""
+        response = await client.post(
+            "/api/bookings/",
+            headers=passenger_header,
+            json=_payload(flight.id, credit_card=A_REAL_LOOKING_CARD),
+        )
+        assert response.status_code == 422
+
+    async def test_no_card_data_reaches_the_database(
+        self, client, session, flight, passenger_header
+    ):
+        await client.post(
+            "/api/bookings/", headers=passenger_header, json=_payload(flight.id)
+        )
         booking = await session.scalar(select(Booking))
-        assert booking.card_last4 == "4242"
+        assert booking.card_last4 is None
 
-        # Nothing anywhere in the row may contain the full number.
         row = {c.name: str(getattr(booking, c.name)) for c in Booking.__table__.columns}
-        assert VALID_CARD not in " ".join(row.values())
+        assert A_REAL_LOOKING_CARD not in " ".join(row.values())
 
-    async def test_response_does_not_echo_the_card(
+    async def test_response_carries_no_card_field_value(
         self, client, flight, passenger_header
     ):
         response = await client.post(
             "/api/bookings/", headers=passenger_header, json=_payload(flight.id)
         )
-        assert VALID_CARD not in response.text
-
-    async def test_rejects_a_card_failing_the_luhn_checksum(
-        self, client, flight, passenger_header
-    ):
-        response = await client.post(
-            "/api/bookings/",
-            headers=passenger_header,
-            json=_payload(flight.id, credit_card="4242424242424243"),
-        )
-        assert response.status_code == 422
+        assert response.json()["card_last4"] is None
+        assert A_REAL_LOOKING_CARD not in response.text
 
 
 class TestBookingReference:

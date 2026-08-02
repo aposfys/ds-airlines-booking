@@ -156,46 +156,35 @@ class FlightUpdate(BaseModel):
 # ── Bookings ──────────────────────────────────────────────
 
 
-def _luhn_valid(digits: str) -> bool:
-    total, parity = 0, len(digits) % 2
-    for i, ch in enumerate(digits):
-        d = int(ch)
-        if i % 2 == parity:
-            d *= 2
-            if d > 9:
-                d -= 9
-        total += d
-    return total % 10 == 0
-
-
 class BookingCreate(BaseModel):
-    """The card is validated, reduced to its last four digits, and discarded.
+    """A booking request. It takes no payment details, deliberately.
 
-    It is never written to the database in any form (DEF-003). Phase 3 removes
-    the field entirely — the provider tokenises it in the browser and the
-    number never reaches this server.
+    Phase 0 stopped storing the full card number (DEF-003). Phase 1 stops
+    accepting one at all.
+
+    This is a public demonstration with no payment provider behind it, and a
+    field that looks like an ordinary card input will eventually be handed a
+    real card by someone who did not read the page. Validating and discarding
+    the number was an improvement, but it still meant a live PAN crossing the
+    network, sitting in request memory, and landing in whatever logged the
+    request body. The safest cardholder data is the kind that never arrives.
+
+    `model_config = extra="forbid"` is the load-bearing part: a client that
+    still sends `credit_card` gets a 422 rather than having it silently
+    ignored, so nothing can quietly start posting card numbers again.
+
+    A real integration would carry a provider token here — created in the
+    browser, never passing through this server — and the provider would
+    return the last four digits for display.
     """
+
+    model_config = ConfigDict(extra="forbid")
 
     flight_id: UUID
     fare_class_code: str = Field(min_length=2, max_length=16)
     passenger_full_name: str = Field(min_length=1, max_length=120)
     passenger_passport: str = Field(min_length=4, max_length=20)
-    credit_card: str = Field(min_length=12, max_length=25, exclude=True)
     seat_number: str | None = Field(default=None, max_length=4)
-
-    @field_validator("credit_card")
-    @classmethod
-    def card_is_plausible(cls, v: str) -> str:
-        digits = re.sub(r"[ -]", "", v)
-        if not digits.isdigit() or not 12 <= len(digits) <= 19:
-            raise ValueError("Card number must be 12–19 digits")
-        if not _luhn_valid(digits):
-            raise ValueError("Card number failed checksum validation")
-        return digits
-
-    @property
-    def card_last4(self) -> str:
-        return self.credit_card[-4:]
 
 
 class BookingResponse(BaseModel):
@@ -209,6 +198,6 @@ class BookingResponse(BaseModel):
     fare_class_code: str
     passenger_full_name: str
     seat_numbers: list[str]
-    card_last4: str
+    card_last4: str | None = None
     amount_eur: Decimal
     created_at: datetime

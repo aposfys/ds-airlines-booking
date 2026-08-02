@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import type { ReactNode } from 'react';
 
 const PrivateRoute = ({ children }: { children: ReactNode }) => {
@@ -13,7 +14,8 @@ const PrivateRoute = ({ children }: { children: ReactNode }) => {
 
 function App() {
   return (
-    <AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -29,7 +31,8 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>
       </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

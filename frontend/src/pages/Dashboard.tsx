@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import BookingDialog from '../components/BookingDialog';
+import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
 import { formatDuration, formatFare, formatFlightDate, formatTime } from '../lib/format';
 import type { Booking, Flight } from '../types';
@@ -81,7 +82,6 @@ const Dashboard = () => {
     fare_class_code: string;
     passenger_full_name: string;
     passenger_passport: string;
-    credit_card: string;
     seat_number?: string;
   }) => {
     if (!bookingFlight) return;
@@ -139,10 +139,10 @@ const Dashboard = () => {
             <span className="text-strong uppercase tracking-[-0.045em] font-black text-lg">
               DS Airlines
             </span>
-            <span className="af-eyebrow hidden sm:inline">Delos Skyways</span>
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted hidden sm:inline">{user?.full_name}</span>
+            <ThemeToggle />
             <button onClick={handleLogout} className="ds-action ds-action--secondary">
               Log out
             </button>
@@ -262,10 +262,17 @@ const Dashboard = () => {
                             {cheapest === null ? '—' : formatFare(cheapest)}
                           </span>
                         </div>
+                        {/* Secondary, deliberately. AF allows one primary
+                            action per view, and a list of N flights would
+                            otherwise put N Signal buttons on screen — which
+                            reads as N equally urgent choices and spends the
+                            colour that is supposed to mean "act". The single
+                            primary lives in the booking dialog, on Confirm,
+                            where the commitment actually happens. */}
                         <button
                           onClick={() => setBookingFlight(flight)}
                           disabled={flight.seats_available === 0}
-                          className="ds-action ds-action--primary"
+                          className="ds-action ds-action--secondary"
                         >
                           {flight.seats_available === 0 ? 'Full' : 'Select'}
                         </button>
@@ -321,10 +328,8 @@ const Dashboard = () => {
                           </dd>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <dt className="af-label text-faint">Paid</dt>
-                          <dd>
-                            {formatFare(booking.amount_eur)} · card {booking.card_last4}
-                          </dd>
+                          <dt className="af-label text-faint">Fare paid</dt>
+                          <dd>{formatFare(booking.amount_eur)}</dd>
                         </div>
                       </dl>
                       {!cancelled && (

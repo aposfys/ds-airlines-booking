@@ -1,12 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import {
-  formatDuration,
-  formatFare,
-  formatFlightDate,
-  formatTime,
-  groupCardDigits,
-  isLuhnValid,
-} from '../lib/format';
+import { formatDuration, formatFare, formatFlightDate, formatTime } from '../lib/format';
 import type { FareOption, Flight } from '../types';
 
 interface Props {
@@ -18,13 +11,13 @@ interface Props {
     fare_class_code: string;
     passenger_full_name: string;
     passenger_passport: string;
-    credit_card: string;
     seat_number?: string;
   }) => Promise<void>;
 }
 
 /**
- * Collects the fare, passenger and payment details for a booking.
+ * Collects the fare and passenger details for a booking. No payment details:
+ * see the note beside the demonstration notice below.
  *
  * The dashboard originally had no form at all: it posted the account holder's
  * name, a passport number that fell back to the string "N/A", and a hardcoded
@@ -45,7 +38,6 @@ const BookingDialog = ({
   const [fullName, setFullName] = useState(defaultName);
   const [passport, setPassport] = useState(defaultPassport);
   const [seat, setSeat] = useState('');
-  const [card, setCard] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const firstFieldRef = useRef<HTMLInputElement>(null);
@@ -79,18 +71,12 @@ const BookingDialog = ({
       setError('Enter the passport number exactly as printed, without spaces.');
       return;
     }
-    if (!isLuhnValid(card)) {
-      setError('Check the card number — some digits look wrong.');
-      return;
-    }
-
     setSubmitting(true);
     try {
       await onConfirm({
         fare_class_code: fareCode,
         passenger_full_name: fullName.trim(),
         passenger_passport: passport.trim().toUpperCase(),
-        credit_card: card.replace(/\s/g, ''),
         ...(seat.trim() ? { seat_number: seat.trim().toUpperCase() } : {}),
       });
     } catch (err) {
@@ -128,7 +114,7 @@ const BookingDialog = ({
         >
           {flight.origin_iata} → {flight.destination_iata}
         </h2>
-        <p className="af-data text-sm text-muted mt-2 mb-6">
+        <p className="af-data text-sm text-muted mt-2 mb-8">
           {flight.flight_number} · {formatFlightDate(flight.departure_date)} ·{' '}
           {formatTime(flight.scheduled_departure)}–{formatTime(flight.scheduled_arrival)} ·{' '}
           {formatDuration(flight.duration_minutes)}
@@ -144,8 +130,10 @@ const BookingDialog = ({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <fieldset>
-            <legend className={labelClass}>Fare</legend>
+          <div role="radiogroup" aria-labelledby="fare-legend">
+            <p id="fare-legend" className={labelClass}>
+              Fare
+            </p>
             <div className="space-y-2">
               {flight.fares.map((fare) => {
                 const selected = fareCode === fare.fare_class_code;
@@ -189,7 +177,7 @@ const BookingDialog = ({
                 );
               })}
             </div>
-          </fieldset>
+          </div>
 
           <div>
             <label className={labelClass} htmlFor="passenger-name">
@@ -234,22 +222,27 @@ const BookingDialog = ({
             </div>
           </div>
 
-          <div>
-            <label className={labelClass} htmlFor="card">
-              Card number
-            </label>
-            <input
-              id="card"
-              className="ds-field af-data"
-              value={card}
-              onChange={(e) => setCard(groupCardDigits(e.target.value))}
-              inputMode="numeric"
-              autoComplete="cc-number"
-              placeholder="4242 4242 4242 4242"
-              required
-            />
-            <p className="text-2xs text-faint mt-2">
-              We store only the last four digits.
+          {/* No card field, deliberately. This is a public demonstration with
+              no payment provider behind it, and an ordinary-looking card
+              input will eventually be handed a real card by someone who did
+              not read the page. The API refuses payment details outright
+              (422) rather than accepting and discarding them. */}
+          <div
+            className="border-l-2 p-3"
+            style={{
+              // Not --status-info-*: AF derives those from the Signal ramp,
+              // so an "info" panel renders vermilion and reads as an error.
+              borderColor: 'var(--border-strong)',
+              background: 'var(--status-neutral-bg)',
+              borderRadius: 'var(--radius-control)',
+            }}
+          >
+            <p className="af-label" style={{ color: 'var(--text-muted)' }}>
+              Demonstration
+            </p>
+            <p className="text-xs text-muted mt-2">
+              No payment is taken and no card details are collected. Do not enter real
+              payment information anywhere in this application.
             </p>
           </div>
 

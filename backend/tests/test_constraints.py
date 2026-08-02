@@ -184,7 +184,14 @@ class TestBookingConstraints:
             setattr(booking, key, value)
         return booking
 
-    async def test_card_last4_must_be_four_digits(self, session, flight, passenger):
+    async def test_card_last4_may_be_null(self, session, flight, passenger):
+        """Null is the normal case — nothing in this application writes it."""
+        session.add(await self._booking(flight, user_id=passenger.id, card_last4=None))
+        await session.flush()
+
+    async def test_card_last4_must_be_four_digits_when_present(
+        self, session, flight, passenger
+    ):
         await _expect_violation(
             session,
             await self._booking(flight, user_id=passenger.id, card_last4="42a4"),

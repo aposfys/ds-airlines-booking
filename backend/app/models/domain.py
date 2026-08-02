@@ -389,9 +389,17 @@ class Booking(Base, TimestampMixin):
     passenger_full_name: Mapped[str] = mapped_column(String(120), nullable=False)
     passenger_passport: Mapped[str] = mapped_column(String(20), nullable=False)
 
-    # Four digits, for display only. The full number is never accepted into
-    # persistence (DEF-003); Phase 3 removes it from our servers entirely.
-    card_last4: Mapped[str] = mapped_column(String(4), nullable=False)
+    # Nullable, and null for every booking this application creates.
+    #
+    # Phase 0 stopped *storing* the full card number (DEF-003). Phase 1 stops
+    # accepting one: this is a public demonstration with no payment provider
+    # behind it, and a field that looks like a normal card input will
+    # eventually be given a real card by someone who did not read the page.
+    # The safest cardholder data is the kind that never reaches the process.
+    #
+    # The column is kept so that a real payment integration has somewhere to
+    # put the last four digits it is given back by the provider.
+    card_last4: Mapped[str | None] = mapped_column(String(4))
 
     amount_eur: Mapped[Decimal] = mapped_column(Numeric(10, 2), nullable=False)
     status: Mapped[BookingStatus] = mapped_column(
@@ -408,7 +416,10 @@ class Booking(Base, TimestampMixin):
 
     __table_args__ = (
         CheckConstraint("amount_eur >= 0", name="ck_booking_amount_non_negative"),
-        CheckConstraint("card_last4 ~ '^[0-9]{4}$'", name="ck_booking_card_last4_digits"),
+        CheckConstraint(
+            "card_last4 IS NULL OR card_last4 ~ '^[0-9]{4}$'",
+            name="ck_booking_card_last4_digits",
+        ),
         CheckConstraint(
             "booking_reference ~ '^[A-Z0-9]{6}$'", name="ck_booking_reference_format"
         ),

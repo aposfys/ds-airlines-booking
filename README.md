@@ -1,4 +1,4 @@
-# DS Airlines · Delos Skyways
+# DS Airlines
 
 A flight booking platform for a fictional Greek short-haul carrier — built as
 a business, not just a codebase. Brand, product analysis, user stories and
@@ -180,5 +180,5 @@ docs/
 
 [MIT](LICENSE) · Apostolos Fysekidis
 
-DS Airlines / Delos Skyways is a fictional carrier created for this project.
+DS Airlines is a fictional carrier created for this project.
 It is not affiliated with any real airline or alliance.

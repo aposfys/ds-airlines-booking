@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import ThemeToggle from '../components/ThemeToggle';
 
 // Field names match the API payload exactly.
 const FIELDS = [
@@ -43,7 +44,7 @@ const Register = () => {
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
       <div className="af-grain hidden md:flex flex-col justify-between w-1/2 p-12 bg-sunken border-r border-hairline order-last md:order-first">
-        <span className="af-eyebrow">Delos Skyways</span>
+        <span className="af-eyebrow">DS Airlines</span>
         <div>
           {/* Star Alliance and Miles+Bonus were removed here: a real alliance
               DS does not belong to, and Aegean's registered programme. */}
@@ -60,7 +61,10 @@ const Register = () => {
 
       <div className="flex items-center justify-center w-full md:w-1/2 p-6 md:p-12">
         <div className="w-full max-w-md">
-          <span className="af-eyebrow md:hidden">Delos Skyways</span>
+          <div className="flex justify-end mb-4">
+            <ThemeToggle />
+          </div>
+          <span className="af-eyebrow md:hidden">DS Airlines</span>
           <h2 className="text-xl md:text-2xl uppercase tracking-[-0.028em] mt-2 md:mt-0">
             Create account
           </h2>

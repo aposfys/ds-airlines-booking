@@ -23,7 +23,7 @@ screen.
 
 | Owned by AF | Owned here |
 |---|---|
-| Colour, and every semantic alias | The name, and what DS stands for |
+| Colour, and every semantic alias | The name, and how it is written |
 | Type: Archivo and IBM Plex Mono | Positioning and the competitive wager |
 | Space, radius, elevation, motion | Network, fleet, currency |
 | Component behaviour and states | Fare architecture and what each fare promises |
@@ -37,27 +37,30 @@ be read, this document decides.**
 
 ## 2 · The airline
 
-### 2.1 What DS stands for
+### 2.1 The name
 
-**DS Airlines** trades as **Delos Skyways**.
+**DS Airlines.** One name, used everywhere — on the aircraft, in the flight
+numbers (`DS1040`), in the API, and in every string a passenger reads.
 
-Delos is the Cycladic island Greek myth names as Apollo's birthplace, and for
-centuries it sat at the commercial centre of the Aegean — a small island
-whose entire significance came from being the place everything passed
-through. That is the airline: not the largest carrier in the market, the one
-the Aegean routes through.
+**DS is not expanded.** There is no trading name behind the initials and no
+backronym to reveal; the two letters are the carrier's designator and the
+brand at once. An earlier draft of this document invented a trading name and
+an origin story for it, which added a second thing to say the airline's name
+and gave the interface two labels where it needed one. Airlines are known by
+their designator — the expansion, where one exists at all, is trivia.
 
-The initials carry the operating history. Delos Skyways is the trading name;
-DS is the designator on the aircraft, in the flight numbers, and in the API.
+Written **DS Airlines** in prose and **DS** where the context is already the
+airline (a flight number, a fare code, a seat map). Never "D.S.", never
+"ds airlines".
 
 ### 2.2 Positioning
 
-> **Delos Skyways is the dependable Aegean connector: full-service
-> reliability on short-haul European routes, without the full-service price.**
+> **DS Airlines is the dependable Aegean connector: full-service reliability
+> on short-haul European routes, without the full-service price.**
 
 The market splits in two and serves the middle badly.
 
-| | Legacy full-service | **Delos Skyways** | Ultra-low-cost |
+| | Legacy full-service | **DS Airlines** | Ultra-low-cost |
 |---|---|---|---|
 | Fare | Premium | **Mid** | Lowest headline |
 | Cabin bag | Included | **Included, every fare** | Paid extra |

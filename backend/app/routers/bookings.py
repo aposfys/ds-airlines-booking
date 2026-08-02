@@ -124,7 +124,6 @@ async def create_booking(
         fare_class_code=fare_class.code,
         passenger_full_name=payload.passenger_full_name,
         passenger_passport=payload.passenger_passport,
-        card_last4=payload.card_last4,  # the full number is never persisted
         amount_eur=(flight.base_fare_eur * fare_class.price_multiplier).quantize(
             Decimal("0.01")
         ),

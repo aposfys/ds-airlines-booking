@@ -1,6 +1,7 @@
 # Current-State Assessment
 
 **DS Airlines · assessed 29 July 2026 against commit `f1f732d`**
+**Resolution status updated 2 August 2026, after Phase 1.**
 
 An audit of the codebase as it stood before Phase 0, recording every defect
 found, its business consequence, and where it was resolved.
@@ -134,11 +135,24 @@ notification threshold.
 Compounding it, the database port was published to the host without
 authentication (DEF-021).
 
-**Resolved:** Phase 0 as far as this architecture allows. The PAN is
-validated and discarded; only `card_last4` is stored. **Phase 3 removes the
-field entirely** — the card is tokenised by the payment provider in the
-browser and never reaches our servers, which is the only genuinely
-compliant answer.
+**Resolved: fully, in Phase 1.** Phase 0 stopped *storing* the PAN —
+validated, reduced to four digits, discarded. Phase 1 stopped *accepting*
+one.
+
+The Phase 0 fix was an improvement that left the real problem standing: this
+is a public demonstration with no payment provider behind it, and an
+ordinary-looking card field will eventually be handed a real card by someone
+who did not read the page. A live PAN still crossed the network, sat in
+request memory, and would have landed in anything logging the request body.
+
+`BookingCreate` now declares `extra="forbid"`, so a client sending
+`credit_card` receives a 422 rather than having the field silently ignored —
+nothing can quietly start posting card numbers again. `bookings.card_last4`
+is nullable and null for every booking the application creates.
+
+This is stronger than the Phase 3 plan, which was provider tokenisation, and
+arrived two phases earlier. Tokenisation is still what a real integration
+would use; it is no longer what closes this defect.
 
 ---
 
@@ -277,10 +291,9 @@ PostgreSQL replaces the code they live in and fixing them twice is waste.
 
 | Finding | Why deferred |
 |---|---|
-| No true transaction around booking | Single-node MongoDB cannot provide one. Phase 1 makes it an ACID transaction; the Phase 0 compensating write narrows the window without closing it |
-| No seat inventory model — only a scalar counter | Phase 1 introduces seat maps; seat selection is Phase 2 |
-| No fare classes; one price per flight | Phase 1 |
-| Card data still transits our server | Phase 3 tokenises at the provider. The Phase 0 fix stops storage, not transit |
+| ~~No true transaction around booking~~ | **Resolved in Phase 1.** Seat lock, seat state change and booking insert are one transaction; the compensating write is deleted |
+| ~~No seat inventory model — only a scalar counter~~ | **Resolved in Phase 1.** `flight_seats` rows replace the counter; seat selection in the interface is Phase 2 |
+| ~~No fare classes; one price per flight~~ | **Resolved in Phase 1.** Light, Standard and Flex, with their rules in data |
 | No frontend test suite | Phase 2, alongside the booking-engine UI it would cover |
 
 ## 7. Accepted

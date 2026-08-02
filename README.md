@@ -1,12 +1,12 @@
 # DS Airlines
 
 A flight booking platform for a fictional Greek short-haul carrier — built as
-a business, not just a codebase. Brand, product analysis, user stories and
-test strategy are first-class artefacts here, alongside the API and the
-interface.
+a business, not just a codebase. Brand, product analysis, architecture
+decisions and test strategy are first-class artefacts here, alongside the API
+and the interface.
 
-**Stack:** FastAPI · MongoDB (PostgreSQL from Phase 1) · React 19 · TypeScript
-· Tailwind v4 · Docker
+**Stack:** FastAPI · PostgreSQL · SQLAlchemy 2.0 · Alembic · React 19 ·
+TypeScript · Tailwind v4 · Docker
 
 ---
 
@@ -19,17 +19,16 @@ promise, what happens when a payment fails, and how would anyone know if it
 broke.
 
 The most useful document here is not the API reference. It is the
-[**current-state assessment**](docs/analysis/current-state-assessment.md):
-an audit of the original code recording all 30 defects found, what each one
-would have cost the business, and where it was resolved.
+[**current-state assessment**](docs/analysis/current-state-assessment.md): an
+audit of the original code recording all 30 defects found, what each would
+have cost the business, and where it was resolved.
 
-Four of them were Critical, and they are worth stating plainly:
+Four were Critical:
 
 - **The entire admin surface was unreachable.** Tokens never carried the
   `is_admin` claim that every authorisation check read, so flight creation,
   repricing and withdrawal returned 403 to everyone — including the
-  administrator the app seeded for itself. For an airline that is revenue
-  management, gone.
+  administrator the app seeded for itself.
 - **Full card numbers were stored in cleartext**, in the same record as the
   passenger's passport number.
 - **Every deployment shipped the same known admin password**, hardcoded, next
@@ -46,106 +45,106 @@ wrong is the point of the exercise.
 
 | | |
 |---|---|
-| [Brand book](docs/brand/brandbook.md) | Positioning, palette, typography, voice and tone. Its tokens are wired into `frontend/src/index.css`, and [`contrast_check.py`](docs/brand/contrast_check.py) fails CI if a colour drops below WCAG 2.2 AA |
 | [Current-state assessment](docs/analysis/current-state-assessment.md) | The full defect register, with business impact and resolution |
-| Product & user stories | Phase 1 |
-| [Test strategy](docs/qa/test-strategy.md) | Layers, entry/exit criteria, 27 mapped automated cases, 7 manual cases, and what is not covered yet |
+| [ADR-001 · PostgreSQL over MongoDB](docs/adr/0001-postgresql-over-mongodb.md) | Why the booking engine left the document model |
+| [Personas](docs/product/personas.md) · [User stories](docs/product/user-stories.md) | Who this is for, what it does for them, and a story→endpoint→test traceability matrix |
+| [Product brand](docs/brand/brandbook.md) | Positioning, network, fare architecture, voice. Defers to AF for anything visual |
+| [AF design system](frontend/src/design-system/README.md) | The vendored token layer, and what was deliberately not vendored |
+| [Test strategy](docs/qa/test-strategy.md) | Layers, how to run everything, and a 42-case manual pass covering every page |
 
 ---
 
 ## Roadmap
 
-Each phase leaves the repository in a coherent, runnable state, and lands on
-its own branch via pull request.
+Each phase leaves the repository runnable and lands on its own branch.
 
 | Phase | Scope | Status |
 |---|---|---|
-| **0 · Foundation** | Brand identity, defect register, critical fixes, CI, repo hygiene | **Complete** |
-| **1 · Domain** | PostgreSQL migration, airports/aircraft/routes/schedules, fare classes, seat maps | Next |
-| **2 · Booking engine** | Fare-priced search, seat selection with holds, atomic booking, PNRs, cancellation policy | Planned |
-| **3 · Payments & comms** | Provider-tokenised cards, email confirmations | Planned |
-| **4 · Operations** | Schedule management, load factor, revenue by route | Planned |
+| **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | **Complete** |
+| **1 · Domain** | PostgreSQL migration, airports/aircraft/routes/schedules, fare classes, seat maps, AF design system | **Complete** |
+| **2 · Booking engine** | Seat maps in the interface, holds with expiry, cancellation policy per fare, frontend and E2E tests | Next |
+| **3 · Payments & comms** | Provider-tokenised payment, email confirmations | Planned |
+| **4 · Operations** | Admin interface, schedule management, load factor, revenue by route | Planned |
 | **5 · Presentation** | Published brand and analysis site, full story→endpoint→test traceability | Planned |
-
-Phase 1 migrates off MongoDB. Seat holds, payment capture and PNR issuance
-have to be atomic, and a single-node MongoDB cannot provide a transaction.
-The reasoning will be recorded as an ADR.
 
 ---
 
 ## Running it
 
-**Requirements:** Docker and Docker Compose. Without Docker: Python 3.13+ and
-Node 22+.
+### Docker — needs nothing else installed
 
 ```bash
-git clone https://github.com/aposfys/DS-Airlines.git
-cd DS-Airlines
-
 cp .env.example .env
-# SECRET_KEY is required — the app refuses to start without one:
+# SECRET_KEY and POSTGRES_PASSWORD are required; the app refuses to start without them
 python -c "import secrets; print(secrets.token_urlsafe(48))"
 
-docker compose up --build
+make up
 ```
+
+### Natively
+
+Needs `postgresql@17`, Python 3.13 and Node 22.
+
+```bash
+make setup   # venv, npm ci, a database cluster in .pgdata, migrations
+make seed    # demo flights and an administrator
+make dev     # API on :8000, interface on :5173
+```
+
+The cluster lives in `.pgdata` inside the repo on port 55432, so it cannot
+collide with any PostgreSQL you already run. `make db-reset` throws it away.
 
 | | |
 |---|---|
-| Interface | http://localhost:3000 |
+| Interface | http://localhost:5173 (`make dev`) or :3000 (`make up`) |
 | API | http://localhost:8000 |
 | Swagger UI | http://localhost:8000/docs |
 
-`docker compose up` also applies `docker-compose.override.yml`, which adds
-the source bind-mount and hot reload. For a production-shaped stack, run
-`docker compose -f docker-compose.yml up`.
-
-To load demo flights and an administrator, set `SEED_ON_STARTUP=true` and
-supply `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD`. There are no defaults —
-if either is missing the administrator is not created.
-
-### Without Docker
-
-```bash
-# Backend
-cd backend
-pip install -r requirements.txt
-export SECRET_KEY=$(python -c "import secrets; print(secrets.token_urlsafe(48))")
-uvicorn main:app --reload
-
-# Frontend
-cd frontend
-npm ci
-npm run dev
-```
+Demo data is opt-in. Nothing is seeded unless you ask, and there are no
+default credentials — `make seed` supplies its own, for local use only.
 
 ---
 
 ## Tests
 
 ```bash
-cd backend && pytest              # 47 tests
-cd frontend && npm run lint && npm run build
-python docs/brand/contrast_check.py
+make check     # everything CI runs
 ```
 
-The backend suite runs against `tests/fake_mongo.py`, an in-memory stand-in
-for the Motor collection API, so **no database is required**.
+| | |
+|---|---|
+| `make test` | 89 backend tests against real PostgreSQL |
+| `make lint` | eslint |
+| `make build` | tsc + vite — also proves the webfonts resolve |
+| `make contrast` | 34 colour pairs, WCAG 2.2 AA, both themes |
 
-That fake is a direct response to the audit. The original six tests all
-exercised the same two auth endpoints, because anything touching flights,
-bookings or authorization needed a live MongoDB they had no way to provide —
+The suite runs against a **real PostgreSQL**, and the fixtures build the
+schema by running the Alembic migrations — so every run also proves the
+migration chain applies.
+
+That matters because of what it replaced. The original six tests all
+exercised the same two auth endpoints, since anything touching flights,
+bookings or authorization needed a database they had no way to provide —
 which is precisely why a completely dead admin surface sat in the repository
-alongside a green suite. The suite is now 47 tests, and the ones that matter
-most assert the defects stay fixed:
+alongside a green suite. Phase 0 bridged that with an in-memory fake, honest
+about being a bridge; Phase 1 retired it.
+
+The tests that matter most assert the defects stay fixed:
 
 ```
 tests/test_authorization.py   an admin gets 200, a passenger gets 403,
                               revoking admin takes effect before expiry
-tests/test_bookings.py        the card number is never persisted,
+tests/test_bookings.py        payment details are refused outright,
                               cancelling twice cannot credit a seat back
-tests/test_flights.py         regex metacharacters are treated literally,
-                              distinct routes cannot collide
+tests/test_flights.py         search does no pattern matching,
+                              a flight with bookings cannot be deleted
+tests/test_constraints.py     the database itself refuses bad data
 ```
+
+Appearance is covered by none of these. The
+[42-case manual pass](docs/qa/test-strategy.md) is the control until Phase 2
+adds Playwright — four Phase 1 defects, including webfonts silently failing
+to load in production, were found only by opening a browser.
 
 ---
 
@@ -154,24 +153,28 @@ tests/test_flights.py         regex metacharacters are treated literally,
 ```
 backend/
   app/
-    config.py         Validated settings; refuses weak or missing SECRET_KEY
-    auth.py           JWT issuance, password hashing, authorization dependencies
-    database.py       Motor client and index definitions
-    models/schemas.py Pydantic models and validation
+    config.py         Validated settings; refuses a weak or missing SECRET_KEY
+    db.py             Engine and one-session-per-request
+    auth.py           JWT issuance, hashing, authorization dependencies
+    models/domain.py  The relational domain — ten tables
+    schemas.py        API request and response models
     routers/          auth · flights · bookings · admin
-  tests/
-    fake_mongo.py     In-memory Motor stand-in
+  migrations/         Alembic revisions
+  scripts/seed.py     Explicit seeding, never a startup side effect
+  tests/              89 tests against real PostgreSQL
 frontend/
   src/
-    index.css         Design tokens — the brand book's single source of truth
-    components/       BookingDialog
-    context/          AuthContext
-    lib/format.ts     EUR formatting, Luhn
+    design-system/    Vendored AF tokens, fonts, accessibility standard
+    index.css         AF tokens bridged into Tailwind
+    components/       BookingDialog · ThemeToggle
+    context/          AuthContext · ThemeContext
     pages/            Login · Register · Dashboard
 docs/
-  brand/              Brand book, logo, contrast check
+  adr/                Architecture decisions
   analysis/           Current-state assessment
-  qa/                 Test strategy and manual cases
+  brand/              Product brand, contrast check
+  product/            Personas, user stories, traceability
+  qa/                 Test strategy and the manual pass
 ```
 
 ---
@@ -180,5 +183,6 @@ docs/
 
 [MIT](LICENSE) · Apostolos Fysekidis
 
-DS Airlines is a fictional carrier created for this project.
-It is not affiliated with any real airline or alliance.
+DS Airlines is a fictional carrier created for this project. It is not
+affiliated with any real airline or alliance. It takes no payments and
+collects no card details — do not enter real payment information.

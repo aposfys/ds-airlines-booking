@@ -21,6 +21,9 @@ dist/
 .env.*
 !.env.example
 
+# ── Local database cluster (make db-start) ────────────────
+.pgdata/
+
 # ── Logs ──────────────────────────────────────────────────
 *.log
 

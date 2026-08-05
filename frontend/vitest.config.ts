@@ -11,7 +11,7 @@ export default defineConfig({
     // different `test` and must not be collected here.
     include: ['src/**/*.test.{ts,tsx}'],
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
-    // The AF token layer is 300+ lines of CSS custom properties that jsdom
+    // The VANE token layer is 250+ lines of CSS custom properties that jsdom
     // cannot evaluate and no assertion here depends on. Colour and contrast
     // are covered by docs/brand/contrast_check.py against the real files.
     css: false,

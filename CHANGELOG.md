@@ -13,6 +13,51 @@ Defect identifiers (DEF-*) refer to
 
 ---
 
+## [Unreleased]
+
+The interface is rebuilt on **VANE** (also called Atlas), replacing AF. Same
+relationship as before — the design system owns everything visual, DS
+Airlines owns only the words — different system: "rounded glass" over navy
+and chartreuse, Gabarito and Spline Sans Mono in place of Archivo and IBM
+Plex Mono. No domain, API or test behaviour changed; this is the visual
+layer and its documentation only.
+
+### Changed
+- **Token layer** — `tokens/{color,typography,space,elevation,motion,base}.css`
+  (AF, six files) replaced with `tokens/{tokens,base}.css` (VANE, two files),
+  vendored byte-identical to source. Webfonts switched from self-hosted
+  Archivo / IBM Plex Mono / Instrument Serif `.woff2` files to `@fontsource`
+  packages for Gabarito and Spline Sans Mono.
+- **Every component re-skinned** — Login, Register, Dashboard, BookingDialog
+  and ThemeToggle now use VANE's three devices (the index label, the glass
+  panel, mono figures) instead of AF's utility classes. Phosphor icons
+  (regular weight only) added where they support a label, never replacing
+  one: the theme toggle, the nav wordmark, search fields, the demonstration
+  notice.
+- **`contrast_check.py` rewritten** for VANE's hex/rgba tokens in place of
+  AF's OKLCH, and re-based on 14 pairs that reflect what this product
+  actually renders (28 checks total across both themes, down from 34 — some
+  AF-specific pairs no longer apply; see `docs/brand/brandbook.md` §4 for
+  what replaced them).
+
+### Fixed
+- **Four WCAG 2.2 AA failures**, found the same way AF's were: two in the
+  dark theme (`--tint-danger` 3.73:1, `--tint-info` 4.48:1), two in the light
+  theme (`--tint-success` 4.50:1 — at the floor, not over it —
+  `--border-accent` 1.37:1, functionally invisible as the selected-fare
+  card's outline). Corrected in `overrides.css`, all candidates to upstream.
+  Full measurements in `docs/brand/brandbook.md` §4.
+- **Index-label text on a glass panel** measured 3.10:1 in the dark theme — a
+  real pair, correctly flagged, but the fix was in the application, not the
+  palette: those instances now use `--text-secondary` instead of
+  `--text-tertiary`, which clears AA on glass.
+- **The selected-fare border was wired to the wrong token** — `--fill-accent`
+  (the solid button colour) instead of `--border-accent`, measuring 1.16:1 in
+  the light theme. Solid chartreuse on a near-white ground is not a visible
+  line.
+
+---
+
 ## [0.2.0] — 2026-08-02 · Phase 1, Domain
 
 The document model is gone. The booking engine now runs on PostgreSQL, and

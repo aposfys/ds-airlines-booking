@@ -244,7 +244,7 @@ describe('BookingDialog', () => {
 
     it('offers exactly one primary action', () => {
       setup();
-      // AF allows one primary action per view; Confirm is it.
+      // VANE allows one primary action per view; Confirm is it.
       const primaries = document.querySelectorAll('.ds-action--primary');
       expect(primaries).toHaveLength(1);
       expect(primaries[0]).toHaveTextContent(/confirm/i);

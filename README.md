@@ -70,16 +70,27 @@ exercise.
 
 ## The interface
 
-Built on **[AF](frontend/src/design-system/README.md)**, a design system of my
-own. DS Airlines owns the words; AF owns everything you can see.
+Built on **[VANE](frontend/src/design-system/README.md)**, also called Atlas,
+a design system of my own — rounded glass over navy and chartreuse. DS
+Airlines owns the words; VANE owns everything you can see. Both themes are
+token-complete and contrast-verified in CI: 28 pairs, WCAG 2.2 AA, on every
+push.
 
-| Booking | Register |
+**Web**
+
+| Log in | Register |
 |---|---|
-| ![The booking dialog: three branded fares with their rules, and no card field](docs/images/booking-dialog.jpg) | ![The register page in the light theme](docs/images/register-light.jpg) |
+| ![The login page in the light theme, split-panel editorial layout](docs/images/login-light.jpg) | ![The register page in the dark theme](docs/images/register-dark.jpg) |
 
-Both themes are token-complete and contrast-verified in CI.
+| Dashboard | Confirm booking |
+|---|---|
+| ![The dashboard in the light theme: search, fare-priced results, confirmed itineraries](docs/images/dashboard-light.jpg) | ![The booking dialog: three branded fares with their rules, and no card field](docs/images/booking-dialog.jpg) |
 
-![The dashboard in the light theme](docs/images/dashboard-light.jpg)
+**Mobile**
+
+| Log in | Dashboard | Confirm booking |
+|---|---|---|
+| ![The login page on a phone-width viewport](docs/images/mobile-login.jpg) | ![The dashboard on a phone-width viewport, single column](docs/images/mobile-dashboard.jpg) | ![The booking dialog on a phone-width viewport](docs/images/mobile-booking-dialog.jpg) |
 
 > **No payment is taken and no card details are collected.** The booking form
 > has no card field, and the API returns `422` to a request carrying one.
@@ -95,7 +106,7 @@ Both themes are token-complete and contrast-verified in CI.
 | [ADR-001 · PostgreSQL over MongoDB](docs/adr/0001-postgresql-over-mongodb.md) | Why the booking engine left the document model |
 | [Personas](docs/product/personas.md) · [User stories](docs/product/user-stories.md) | Who this is for, and a story → endpoint → test traceability matrix |
 | [Product brand](docs/brand/brandbook.md) | Positioning, network, fare architecture, voice |
-| [AF design system](frontend/src/design-system/README.md) | The vendored token layer, and what was deliberately not vendored |
+| [VANE design system](frontend/src/design-system/README.md) | The vendored token layer, and what was deliberately not vendored |
 | [Test strategy](docs/qa/test-strategy.md) | Layers, how to run everything, and a 42-case manual pass |
 | [Changelog](CHANGELOG.md) | What changed in each phase, including what was removed |
 | [Security](SECURITY.md) | Why this takes no payments, how to run it safely, and known limitations |
@@ -112,7 +123,7 @@ deliberately.
 | Phase | Scope | |
 |---|---|---|
 | **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | [`v0.1.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.1.0) |
-| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, AF design system, three test suites | [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
+| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, VANE design system, three test suites | [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
 
 ### What was not built, and why
 
@@ -200,7 +211,7 @@ make check-all   # the above plus end to end
 | `make test` | **89** backend tests against real PostgreSQL |
 | `make test-frontend` | **69** component tests (Vitest + Testing Library) |
 | `make e2e` | **17** end-to-end tests in a real browser (Playwright) |
-| `make contrast` | 34 colour pairs, WCAG 2.2 AA, in both themes |
+| `make contrast` | 28 colour pairs, WCAG 2.2 AA, in both themes |
 
 **175 automated tests**, all in CI.
 
@@ -252,8 +263,8 @@ backend/
 frontend/
   e2e/                Playwright — the journey, fonts, themes, accessibility
   src/
-    design-system/    Vendored AF tokens, fonts, accessibility standard
-    index.css         AF tokens bridged into Tailwind
+    design-system/    Vendored VANE tokens, fonts, accessibility standard
+    index.css         VANE tokens bridged into Tailwind
     components/       BookingDialog · ThemeToggle
     context/          AuthContext · ThemeContext
     pages/            Login · Register · Dashboard

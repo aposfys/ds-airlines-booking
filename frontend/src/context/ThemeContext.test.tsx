@@ -52,7 +52,7 @@ describe('ThemeProvider', () => {
       expect(screen.getByTestId('theme')).toHaveTextContent('light');
     });
 
-    it("falls back to AF's dark default when the OS expresses no preference", () => {
+    it("falls back to VANE's dark default when the OS expresses no preference", () => {
       prefersLight(false);
       renderProbe();
       expect(screen.getByTestId('theme')).toHaveTextContent('dark');
@@ -70,7 +70,7 @@ describe('ThemeProvider', () => {
     it('sets data-theme on the document element', () => {
       prefersLight(true);
       renderProbe();
-      // AF's color.css keys the light palette off [data-theme="light"].
+      // VANE's tokens.css keys the light palette off [data-theme="light"].
       expect(document.documentElement.dataset.theme).toBe('light');
     });
 

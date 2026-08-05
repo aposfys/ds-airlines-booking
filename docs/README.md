@@ -38,10 +38,10 @@ carry their limitation.
 
 **[Product brand](brand/brandbook.md)** — positioning, network, fare
 architecture and voice. It owns only the words: the visual system belongs to
-[AF](../frontend/src/design-system/README.md).
+[VANE](../frontend/src/design-system/README.md).
 
 **[contrast_check.py](brand/contrast_check.py)** — reads the palette out of
-the token files the application actually loads, converts OKLCH to linear
+the token files the application actually loads, converts hex/rgba to linear
 sRGB, and fails CI if any pair drops below WCAG 2.2 AA in either theme.
 
 ```bash

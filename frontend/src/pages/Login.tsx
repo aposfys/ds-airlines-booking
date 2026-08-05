@@ -26,19 +26,19 @@ const Login = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
-      {/* Editorial side. Grain over full-bleed colour, per AF. */}
-      <div className="af-grain hidden md:flex flex-col justify-between w-1/2 p-12 bg-sunken border-r border-hairline">
-        <span className="af-eyebrow">DS Airlines</span>
+      {/* Editorial side. Glass over the bloom, per VANE. */}
+      <div className="ds-editorial hidden md:flex flex-col justify-between w-1/2 p-12 border-r border-hairline">
+        <span className="ds-eyebrow">DS Airlines</span>
         <div>
-          <h1 className="af-hero" style={{ fontSize: 'var(--display-3)' }}>
+          <h1 className="ds-hero">
             Your journey<br />begins here
           </h1>
-          <p className="af-prose mt-6 text-muted">
+          <p className="mt-6 text-muted text-base">
             Short-haul across Europe from Athens and Thessaloniki. Cabin bag included,
             in every fare.
           </p>
         </div>
-        <span className="af-label text-faint">ATH · SKG · LHR · CDG · FRA · MUC · FCO · BCN</span>
+        <span className="ds-label text-muted">ATH · SKG · LHR · CDG · FRA · MUC · FCO · BCN</span>
       </div>
 
       {/* Form side */}
@@ -47,8 +47,8 @@ const Login = () => {
           <div className="flex justify-end mb-4">
             <ThemeToggle />
           </div>
-          <span className="af-eyebrow md:hidden">DS Airlines</span>
-          <h2 className="text-xl md:text-2xl uppercase tracking-[-0.028em] mt-2 md:mt-0">
+          <span className="ds-eyebrow md:hidden">DS Airlines</span>
+          <h2 className="text-xl md:text-2xl tracking-[-0.03em] mt-2 md:mt-0 font-semibold">
             Log in
           </h2>
           <p className="text-muted text-sm mt-2 mb-8">
@@ -66,7 +66,7 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="af-label block mb-2 text-muted" htmlFor="username">
+              <label className="ds-label block mb-2 text-muted" htmlFor="username">
                 Username
               </label>
               <input
@@ -80,7 +80,7 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="af-label block mb-2 text-muted" htmlFor="password">
+              <label className="ds-label block mb-2 text-muted" htmlFor="password">
                 Password
               </label>
               <input

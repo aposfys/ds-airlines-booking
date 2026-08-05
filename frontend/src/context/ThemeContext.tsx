@@ -13,13 +13,13 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const STORAGE_KEY = 'ds-theme';
 
 /**
- * AF ships both themes token-complete and defaults to dark. Nothing exposed a
- * switch, so the light theme was unreachable — and unreachable styling is
- * where accessibility regressions hide, which is exactly what
- * docs/brand/contrast_check.py found in it.
+ * VANE ships both themes token-complete and defaults to dark. Nothing
+ * exposed a switch, so the light theme was unreachable — and unreachable
+ * styling is where accessibility regressions hide, which is exactly what
+ * docs/brand/contrast_check.py checks for.
  *
  * Resolution order: an explicit stored choice, then the operating system's
- * preference, then AF's dark default.
+ * preference, then VANE's dark default.
  */
 const resolveInitialTheme = (): Theme => {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -31,7 +31,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(resolveInitialTheme);
 
   useEffect(() => {
-    // AF's color.css keys the light palette off [data-theme="light"] and
+    // VANE's tokens.css keys the light palette off [data-theme="light"] and
     // treats anything else as dark, but the attribute is set explicitly in
     // both directions so the state is legible in the DOM.
     document.documentElement.dataset.theme = theme;

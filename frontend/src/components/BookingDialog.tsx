@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Info } from '@phosphor-icons/react';
 import { formatDuration, formatFare, formatFlightDate, formatTime } from '../lib/format';
 import type { FareOption, Flight } from '../types';
 
@@ -91,30 +92,29 @@ const BookingDialog = ({
     }
   };
 
-  const labelClass = 'af-label block mb-2 text-muted';
+  const labelClass = 'ds-label block mb-2 text-muted';
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-start md:items-center justify-center p-4 overflow-y-auto"
-      style={{ background: 'var(--surface-scrim)' }}
+      style={{ background: 'var(--overlay)' }}
       onClick={onCancel}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="booking-dialog-title"
-        className="bg-raised border border-subtle w-full max-w-lg p-6 md:p-8 my-8"
-        style={{ borderRadius: 'var(--radius-overlay)' }}
+        className="v-glass v-glass-frame v-glass-lg w-full max-w-lg p-6 md:p-8 my-8"
         onClick={(e) => e.stopPropagation()}
       >
-        <span className="af-eyebrow">Confirm booking</span>
+        <span className="ds-eyebrow">Confirm booking</span>
         <h2
           id="booking-dialog-title"
-          className="text-lg uppercase tracking-[-0.028em] mt-2"
+          className="text-lg tracking-[-0.03em] mt-2 font-semibold"
         >
           {flight.origin_iata} → {flight.destination_iata}
         </h2>
-        <p className="af-data text-sm text-muted mt-2 mb-8">
+        <p className="v-num text-sm text-muted mt-2 mb-8">
           {flight.flight_number} · {formatFlightDate(flight.departure_date)} ·{' '}
           {formatTime(flight.scheduled_departure)}–{formatTime(flight.scheduled_arrival)} ·{' '}
           {formatDuration(flight.duration_minutes)}
@@ -148,7 +148,7 @@ const BookingDialog = ({
                     key={fare.fare_class_code}
                     className={`flex items-start gap-3 p-3 border cursor-pointer transition-colors ${
                       selected
-                        ? 'border-action bg-inset'
+                        ? 'border-action-line bg-inset'
                         : 'border-hairline hover:border-edge'
                     }`}
                     style={{ borderRadius: 'var(--radius-control)' }}
@@ -159,12 +159,12 @@ const BookingDialog = ({
                       value={fare.fare_class_code}
                       checked={selected}
                       onChange={() => setFareCode(fare.fare_class_code)}
-                      className="mt-1 accent-[var(--action-primary-bg)]"
+                      className="mt-1 accent-[var(--fill-accent)]"
                     />
                     <span className="flex-1">
                       <span className="flex justify-between items-baseline gap-2">
-                        <span className="af-label text-strong">{fare.name}</span>
-                        <span className="af-data text-sm text-strong">
+                        <span className="ds-label text-strong">{fare.name}</span>
+                        <span className="v-num text-sm text-strong">
                           {formatFare(fare.price_eur)}
                         </span>
                       </span>
@@ -207,7 +207,7 @@ const BookingDialog = ({
               </label>
               <input
                 id="passport"
-                className="ds-field af-data"
+                className="ds-field v-num"
                 value={passport}
                 onChange={(e) => setPassport(e.target.value.toUpperCase())}
                 required
@@ -219,7 +219,7 @@ const BookingDialog = ({
               </label>
               <input
                 id="seat"
-                className="ds-field af-data"
+                className="ds-field v-num"
                 value={seat}
                 onChange={(e) => setSeat(e.target.value.toUpperCase())}
                 placeholder="12A"
@@ -234,28 +234,23 @@ const BookingDialog = ({
               not read the page. The API refuses payment details outright
               (422) rather than accepting and discarding them. */}
           <div
-            className="border-l-2 p-3"
-            style={{
-              // Not --status-info-*: AF derives those from the Signal ramp,
-              // so an "info" panel renders vermilion and reads as an error.
-              borderColor: 'var(--border-strong)',
-              background: 'var(--status-neutral-bg)',
-              borderRadius: 'var(--radius-control)',
-            }}
+            className="border-l-2 border-info bg-info-bg p-3 flex gap-2"
+            style={{ borderRadius: 'var(--radius-control)' }}
           >
-            <p className="af-label" style={{ color: 'var(--text-muted)' }}>
-              Demonstration
-            </p>
-            <p className="text-xs text-muted mt-2">
-              No payment is taken and no card details are collected. Do not enter real
-              payment information anywhere in this application.
-            </p>
+            <Info aria-hidden="true" weight="regular" className="v-icon text-info flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="ds-label text-info">Demonstration</p>
+              <p className="text-xs text-muted mt-2">
+                No payment is taken and no card details are collected. Do not enter real
+                payment information anywhere in this application.
+              </p>
+            </div>
           </div>
 
           <div className="flex items-center justify-between gap-4 pt-5 border-t border-hairline">
             <div>
-              <span className="af-label text-muted">Total</span>
-              <p className="af-data text-lg text-strong mt-1">
+              <span className="ds-label text-muted">Total</span>
+              <p className="v-num text-lg text-strong mt-1">
                 {selectedFare ? formatFare(selectedFare.price_eur) : '—'}
               </p>
             </div>

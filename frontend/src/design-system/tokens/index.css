@@ -1,10 +1,21 @@
-/* AF token entry point. Mirrors the import order of AF's own styles.css,
-   minus components.css — this application builds its own components against
-   the tokens rather than vendoring AF's. See ../README.md. */
+/* VANE (Atlas) token entry point. Mirrors the vendor's own styles.css import
+   order — tokens.css then base.css — with fonts.css pulled in first so the
+   family names it declares exist before anything renders.
+
+   base.css is imported plain, unlayered, as the vendor ships it — deliberately
+   not wrapped in a Tailwind `@layer` block. `@import url(...)` nested inside
+   `@layer name { }` reliably made the Vite/Lightning CSS production build
+   drop the imported file's content outright (sometimes just its `::before`
+   rules, sometimes the whole file — verified by inspecting the built CSS
+   directly, not just the rendered page), regardless of the layer's name.
+   Unlayered is what actually ships correctly.
+
+   The one real conflict this creates — base.css's plain `h1 { font-weight:
+   var(--w-600) }` versus this product's `.ds-hero` — is resolved the other
+   way: `.ds-hero` is declared unlayered too, in ../../index.css, outside
+   Tailwind's `@layer components`. A class selector (0,1,0) beats an element
+   selector (0,0,1) regardless of source order, so it wins without needing
+   a layer at all. See the comment there. */
 @import url("./fonts.css");
-@import url("./color.css");
-@import url("./typography.css");
-@import url("./space.css");
-@import url("./elevation.css");
-@import url("./motion.css");
+@import url("./tokens.css");
 @import url("./base.css");

@@ -43,8 +43,8 @@ const Register = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
-      <div className="af-grain hidden md:flex flex-col justify-between w-1/2 p-12 bg-sunken border-r border-hairline order-last md:order-first">
-        <span className="af-eyebrow">DS Airlines</span>
+      <div className="ds-editorial hidden md:flex flex-col justify-between w-1/2 p-12 border-r border-hairline order-last md:order-first">
+        <span className="ds-eyebrow">DS Airlines</span>
         <div>
           {/* This panel advertised "A Star Alliance Member" and "Miles+Bonus"
               — a real alliance DS does not belong to, and Aegean's registered
@@ -55,15 +55,15 @@ const Register = () => {
               cannot spend. Replacing one unbacked claim with another is not a
               fix, so the copy now describes only what registering actually
               does. */}
-          <h1 className="af-hero" style={{ fontSize: 'var(--display-3)' }}>
+          <h1 className="ds-hero">
             Book in<br />fewer steps
           </h1>
-          <p className="af-prose mt-6 text-muted">
+          <p className="mt-6 text-muted text-base">
             Save your passport details once and they are filled in on every booking.
             Your itineraries stay in one place.
           </p>
         </div>
-        <span className="af-label text-faint">220 seats · one fleet · seven routes</span>
+        <span className="ds-label text-muted">220 seats · one fleet · seven routes</span>
       </div>
 
       <div className="flex items-center justify-center w-full md:w-1/2 p-6 md:p-12">
@@ -71,8 +71,8 @@ const Register = () => {
           <div className="flex justify-end mb-4">
             <ThemeToggle />
           </div>
-          <span className="af-eyebrow md:hidden">DS Airlines</span>
-          <h2 className="text-xl md:text-2xl uppercase tracking-[-0.028em] mt-2 md:mt-0">
+          <span className="ds-eyebrow md:hidden">DS Airlines</span>
+          <h2 className="text-xl md:text-2xl tracking-[-0.03em] mt-2 md:mt-0 font-semibold">
             Create account
           </h2>
           <p className="text-muted text-sm mt-2 mb-8">
@@ -91,7 +91,7 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {FIELDS.map((field) => (
               <div key={field.name}>
-                <label className="af-label block mb-2 text-muted" htmlFor={field.name}>
+                <label className="ds-label block mb-2 text-muted" htmlFor={field.name}>
                   {field.label}
                 </label>
                 <input

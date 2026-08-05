@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Airplane, MagnifyingGlass, SignOut } from '@phosphor-icons/react';
 import api from '../api';
 import BookingDialog from '../components/BookingDialog';
 import ThemeToggle from '../components/ThemeToggle';
@@ -120,7 +121,7 @@ const Dashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="af-label text-muted" role="status">
+        <p className="ds-label text-muted" role="status">
           Loading flights
         </p>
       </div>
@@ -129,14 +130,15 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen">
-      <a className="af-skip-link" href="#flights">
+      <a className="ds-skip-link" href="#flights">
         Skip to flights
       </a>
 
       <nav className="border-b border-hairline">
         <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center gap-4">
-          <div className="flex items-baseline gap-3">
-            <span className="text-strong uppercase tracking-[-0.045em] font-black text-lg">
+          <div className="flex items-center gap-3">
+            <Airplane aria-hidden="true" weight="regular" className="v-icon text-accent" style={{ fontSize: '1.4em' }} />
+            <span className="text-strong tracking-[-0.03em] font-bold text-lg">
               DS Airlines
             </span>
           </div>
@@ -144,16 +146,17 @@ const Dashboard = () => {
             <span className="text-sm text-muted hidden sm:inline">{user?.full_name}</span>
             <ThemeToggle />
             <button onClick={handleLogout} className="ds-action ds-action--secondary">
+              <SignOut aria-hidden="true" weight="regular" className="v-icon" />
               Log out
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Search. Grain over full-bleed colour, per AF. */}
-      <header className="af-grain border-b border-hairline bg-sunken">
+      {/* Search. Glass over the bloom, per VANE. */}
+      <header className="ds-editorial border-b border-hairline">
         <div className="max-w-7xl mx-auto px-6 py-12">
-          <h1 className="af-hero" style={{ fontSize: 'var(--display-4)' }}>
+          <h1 className="ds-hero">
             Where to next
           </h1>
           <p className="text-muted text-sm mt-3">
@@ -162,33 +165,51 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mt-8">
             <div>
-              <label htmlFor="origin" className="af-label block mb-2 text-muted">
+              <label htmlFor="origin" className="ds-label block mb-2 text-muted">
                 From
               </label>
-              <input
-                id="origin"
-                className="ds-field af-data uppercase"
-                placeholder="ATH"
-                maxLength={3}
-                value={origin}
-                onChange={(e) => setOrigin(e.target.value.toUpperCase())}
-              />
+              <div className="relative">
+                <MagnifyingGlass
+                  aria-hidden="true"
+                  weight="regular"
+                  className="v-icon text-faint absolute top-1/2 -translate-y-1/2"
+                  style={{ left: 'var(--sp-3)' }}
+                />
+                <input
+                  id="origin"
+                  className="ds-field v-num uppercase"
+                  style={{ paddingLeft: 'var(--sp-8)' }}
+                  placeholder="ATH"
+                  maxLength={3}
+                  value={origin}
+                  onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+                />
+              </div>
             </div>
             <div>
-              <label htmlFor="destination" className="af-label block mb-2 text-muted">
+              <label htmlFor="destination" className="ds-label block mb-2 text-muted">
                 To
               </label>
-              <input
-                id="destination"
-                className="ds-field af-data uppercase"
-                placeholder="LHR"
-                maxLength={3}
-                value={destination}
-                onChange={(e) => setDestination(e.target.value.toUpperCase())}
-              />
+              <div className="relative">
+                <MagnifyingGlass
+                  aria-hidden="true"
+                  weight="regular"
+                  className="v-icon text-faint absolute top-1/2 -translate-y-1/2"
+                  style={{ left: 'var(--sp-3)' }}
+                />
+                <input
+                  id="destination"
+                  className="ds-field v-num uppercase"
+                  style={{ paddingLeft: 'var(--sp-8)' }}
+                  placeholder="LHR"
+                  maxLength={3}
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value.toUpperCase())}
+                />
+              </div>
             </div>
           </div>
-          <p className="text-2xs text-faint mt-3">
+          <p className="text-2xs text-muted mt-3">
             Three-letter airport codes. We fly from ATH and SKG to LHR, CDG, FRA, MUC, FCO
             and BCN.
           </p>
@@ -211,10 +232,10 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           <section id="flights" className="lg:col-span-2">
-            <h2 className="af-label text-muted mb-5">Available flights</h2>
+            <h2 className="v-idx mb-5">Available flights</h2>
 
             {flights.length === 0 ? (
-              <div className="ds-panel p-8 text-center text-muted text-sm">
+              <div className="v-glass p-8 text-center text-muted text-sm">
                 No flights match that search. Try a different airport code.
               </div>
             ) : (
@@ -228,28 +249,28 @@ const Dashboard = () => {
                   return (
                     <li
                       key={flight.id}
-                      className="ds-panel p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5"
+                      className="v-glass p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5"
                     >
                       <div className="flex-1">
                         <div className="flex items-baseline gap-3 flex-wrap">
-                          <span className="af-data text-lg text-strong">
+                          <span className="v-num text-lg text-strong">
                             {flight.origin_iata} → {flight.destination_iata}
                           </span>
-                          <span className="af-label text-faint">
+                          <span className="ds-label text-muted">
                             {flight.flight_number}
                           </span>
                         </div>
                         <p className="text-sm text-muted mt-1">
                           {flight.origin_city} to {flight.destination_city}
                         </p>
-                        <p className="af-data text-xs text-muted mt-2">
+                        <p className="v-num text-xs text-muted mt-2">
                           {formatFlightDate(flight.departure_date)} ·{' '}
                           {formatTime(flight.scheduled_departure)}–
                           {formatTime(flight.scheduled_arrival)} ·{' '}
                           {formatDuration(flight.duration_minutes)}
                         </p>
                         {flight.seats_available <= 10 && (
-                          <p className="af-label text-warning mt-2">
+                          <p className="ds-label text-warning mt-2">
                             {flight.seats_available} seats remain
                           </p>
                         )}
@@ -257,18 +278,19 @@ const Dashboard = () => {
 
                       <div className="flex items-center sm:flex-col sm:items-end justify-between gap-4 sm:border-l sm:border-hairline sm:pl-5">
                         <div className="sm:text-right">
-                          <span className="af-label text-faint block">From</span>
-                          <span className="af-data text-lg text-strong">
+                          <span className="ds-label text-muted block">From</span>
+                          <span className="v-num text-lg text-strong">
                             {cheapest === null ? '—' : formatFare(cheapest)}
                           </span>
                         </div>
-                        {/* Secondary, deliberately. AF allows one primary
+                        {/* Secondary, deliberately. VANE allows one primary
                             action per view, and a list of N flights would
-                            otherwise put N Signal buttons on screen — which
-                            reads as N equally urgent choices and spends the
-                            colour that is supposed to mean "act". The single
-                            primary lives in the booking dialog, on Confirm,
-                            where the commitment actually happens. */}
+                            otherwise put N chartreuse buttons on screen —
+                            which reads as N equally urgent choices and
+                            spends the colour that is supposed to mean "act".
+                            The single primary lives in the booking dialog,
+                            on Confirm, where the commitment actually
+                            happens. */}
                         <button
                           onClick={() => setBookingFlight(flight)}
                           disabled={flight.seats_available === 0}
@@ -285,9 +307,9 @@ const Dashboard = () => {
           </section>
 
           <section className="lg:col-span-1">
-            <h2 className="af-label text-muted mb-5">My itineraries</h2>
+            <h2 className="v-idx mb-5">My itineraries</h2>
             {bookings.length === 0 ? (
-              <div className="ds-panel p-8 text-center text-muted text-sm">
+              <div className="v-glass p-8 text-center text-muted text-sm">
                 You have not booked any flights yet.
               </div>
             ) : (
@@ -295,32 +317,33 @@ const Dashboard = () => {
                 {bookings.map((booking) => {
                   const cancelled = booking.status === 'cancelled';
                   return (
-                    <li key={booking.id} className="ds-panel p-4">
+                    <li key={booking.id} className="v-glass p-4">
                       <div className="flex justify-between items-start gap-2">
-                        <span className="af-data text-strong">
+                        <span className="v-num text-strong">
                           {booking.origin_iata} → {booking.destination_iata}
                         </span>
                         <span
-                          className={`af-label px-2 py-1 ${
+                          className={`ds-label px-2 py-1 ${
                             cancelled
                               ? 'bg-critical-bg text-critical'
                               : 'bg-positive-bg text-positive'
                           }`}
+                          style={{ borderRadius: 'var(--r-sm)' }}
                         >
                           {cancelled ? 'Cancelled' : 'Confirmed'}
                         </span>
                       </div>
-                      <p className="af-data text-xs text-muted mt-2">
+                      <p className="v-num text-xs text-muted mt-2">
                         {booking.flight_number} ·{' '}
                         {formatFlightDate(booking.scheduled_departure)}
                       </p>
-                      <dl className="af-data text-xs text-muted mt-3 pt-3 border-t border-hairline space-y-1">
+                      <dl className="v-num text-xs text-muted mt-3 pt-3 border-t border-hairline space-y-1">
                         <div className="flex justify-between gap-2">
-                          <dt className="af-label text-faint">Ref</dt>
+                          <dt className="ds-label text-muted">Ref</dt>
                           <dd className="text-strong">{booking.booking_reference}</dd>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <dt className="af-label text-faint">Fare</dt>
+                          <dt className="ds-label text-muted">Fare</dt>
                           <dd>
                             {booking.fare_class_code}
                             {booking.seat_numbers.length > 0 &&
@@ -328,14 +351,14 @@ const Dashboard = () => {
                           </dd>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <dt className="af-label text-faint">Fare paid</dt>
+                          <dt className="ds-label text-muted">Fare paid</dt>
                           <dd>{formatFare(booking.amount_eur)}</dd>
                         </div>
                       </dl>
                       {!cancelled && (
                         <button
                           onClick={() => cancelBooking(booking)}
-                          className="af-label text-critical mt-3 hover:underline"
+                          className="ds-label text-critical mt-3 hover:underline"
                         >
                           Cancel booking
                         </button>

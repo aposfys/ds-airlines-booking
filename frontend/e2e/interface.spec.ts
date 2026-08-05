@@ -9,7 +9,9 @@ import { expect, test } from '@playwright/test';
  */
 
 test.describe('the typographic identity actually loads', () => {
-  test('Archivo and Plex Mono are served, not silently substituted', async ({ page }) => {
+  test('Gabarito and Spline Sans Mono are served, not silently substituted', async ({
+    page,
+  }) => {
     const fonts: string[] = [];
     page.on('response', (r) => {
       if (r.url().endsWith('.woff2')) fonts.push(`${r.url()} ${r.status()}`);
@@ -19,12 +21,17 @@ test.describe('the typographic identity actually loads', () => {
     await page.waitForLoadState('networkidle');
 
     // The build once emitted "../assets/fonts/…" verbatim and shipped no
-    // .woff2 at all, so everything fell back to Helvetica without a warning.
+    // .woff2 at all under the previous design system, so everything fell
+    // back to Helvetica without a warning. Fonts are self-hosted via
+    // @fontsource now, but the failure mode this guards against is the
+    // same class of bug.
     expect(fonts.length).toBeGreaterThan(0);
     expect(fonts.every((f) => f.endsWith('200'))).toBe(true);
 
-    const loaded = await page.evaluate(() =>
-      document.fonts.check('800 48px "AF Archivo"'),
+    const loaded = await page.evaluate(
+      () =>
+        document.fonts.check('700 46px "Gabarito"') &&
+        document.fonts.check('500 13px "Spline Sans Mono"'),
     );
     expect(loaded).toBe(true);
   });
@@ -132,7 +139,7 @@ test.describe('accessibility', () => {
       const s = getComputedStyle(el);
       return { width: s.outlineWidth, style: s.outlineStyle };
     });
-    // AF makes the focus ring non-negotiable; it is the only way a keyboard
+    // VANE makes the focus ring non-negotiable; it is the only way a keyboard
     // user can tell where they are.
     expect(outline.style).not.toBe('none');
     expect(parseFloat(outline.width)).toBeGreaterThan(0);

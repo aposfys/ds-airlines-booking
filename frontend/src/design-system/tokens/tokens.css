@@ -1,0 +1,341 @@
+/* VANE — tokens.
+
+   Inherited from the Condos DS: its density (12–14px carries the interface),
+   its 1.75px base grid, and mono numerics. Everything visual is new.
+
+   Structure is two layers:
+
+     1. PRIMITIVES   raw values, per theme. Never referenced by a component.
+     2. SEMANTIC     role names. This is the only layer components may use.
+
+   A component that reaches past the semantic layer will break when the theme
+   flips, which is exactly what happened to the accent before it was split into
+   --fill-accent (a background) and --text-accent (type). */
+
+:root {
+  /* ============ scale: shared by both themes ============ */
+
+  /* grid — 1.75px unit, inherited */
+  --sp-1: 3.5px;
+  --sp-2: 7px;
+  --sp-3: 10.5px;
+  --sp-4: 14px;
+  --sp-5: 21px;
+  --sp-6: 28px;
+  --sp-7: 42px;
+  --sp-8: 56px;
+  --sp-9: 84px;
+
+  /* type */
+  --f-ui: "Gabarito", system-ui, sans-serif;
+  --f-num: "Spline Sans Mono", ui-monospace, monospace;
+
+  --t-10: 10px;
+  --t-11: 11px;
+  --t-12: 12px;
+  --t-13: 13px;
+  --t-14: 14px;
+  --t-16: 16px;
+  --t-19: 19px;
+  --t-25: 25px;
+  --t-33: 33px;
+  --t-46: 46px;
+
+  --w-400: 400;
+  --w-500: 500;
+  --w-600: 600;
+  --w-700: 700;
+
+  --ls-tight: -0.03em;
+  --ls-label: 0.1em;
+
+  /* geometry — inner 6, panels and controls 10, frames 14 */
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 14px;
+  --r-pill: 999px;
+  --r-0: 0;
+
+  /* controls */
+  --h-sm: 28px;
+  --h-md: 34px;
+  --h-lg: 42px;
+  --touch: 44px;
+
+  /* blur */
+  --blur: blur(18px) saturate(150%);
+  --blur-lg: blur(30px) saturate(160%);
+
+  /* motion */
+  --d-1: 90ms;
+  --d-2: 170ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ==========================================================================
+   DARK — the theme the system was designed in.
+   ========================================================================== */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* ---------- 1. primitives ---------- */
+  --navy-950: #061220;
+  --navy-900: #0A1A2F;
+  --navy-800: #0E2440;
+  --navy-700: #16304F;
+
+  --slate-100: #EEF3F8;
+  --slate-300: #A9BACB;
+  --slate-400: #8698AC;
+  --slate-500: #74889D;
+
+  --lime-400: #D4FF4F;
+  --lime-300: #E2FF7D;
+  --lime-500: #BEEB33;
+  --lime-950: #1B2405;
+
+  --green-400: #4ADE80;
+  --amber-400: #FBBF24;
+  --red-400: #FF6B6B;
+  --azure-400: #7FC4FF;
+
+  --w-05: rgba(255, 255, 255, 0.045);
+  --w-06: rgba(255, 255, 255, 0.055);
+  --w-09: rgba(255, 255, 255, 0.085);
+  --w-13: rgba(255, 255, 255, 0.125);
+  --w-10: rgba(255, 255, 255, 0.10);
+  --w-17: rgba(255, 255, 255, 0.17);
+  --w-26: rgba(255, 255, 255, 0.26);
+  --w-22: rgba(255, 255, 255, 0.22);
+
+  /* ---------- 2. semantic ---------- */
+
+  /* ground — the page itself, and the light behind the glass */
+  --ground: var(--navy-900);
+  --ground-deep: var(--navy-950);
+  --ground-raised: var(--navy-800);
+  --bloom:
+    radial-gradient(720px 520px at 12% -6%, rgba(212, 255, 79, 0.16), transparent 62%),
+    radial-gradient(880px 620px at 92% 8%, rgba(64, 132, 255, 0.20), transparent 64%),
+    radial-gradient(640px 640px at 68% 96%, rgba(212, 255, 79, 0.09), transparent 60%),
+    linear-gradient(180deg, #0A1A2F 0%, #061220 100%);
+
+  /* surface — glass. Translucent white over the navy. */
+  --surface-weak: var(--w-05);
+  --surface: var(--w-06);
+  --surface-hover: var(--w-09);
+  --surface-active: var(--w-13);
+  --surface-sheen: var(--w-22);
+  /* opaque fallback for menus and overlays, where blur cannot be relied on */
+  --surface-solid: var(--navy-800);
+
+  /* border */
+  --border-subtle: var(--w-10);
+  --border: var(--w-17);
+  --border-strong: var(--w-26);
+
+  /* text — every value clears AA at 10px on --ground, the size the mono
+     labels run at, with headroom for the blooms.
+     primary 15.3:1 · secondary 8.8:1 · tertiary 5.9:1 · placeholder 4.8:1 */
+  --text-primary: var(--slate-100);
+  --text-secondary: var(--slate-300);
+  --text-tertiary: var(--slate-400);
+  --text-placeholder: var(--slate-500);
+  --text-inverse: var(--navy-950);
+  --text-accent: var(--lime-400);
+  --text-on-accent: var(--lime-950);
+  --text-link: var(--lime-400);
+  --text-link-hover: var(--lime-300);
+
+  /* action */
+  --fill-accent: var(--lime-400);
+  --fill-accent-hover: var(--lime-300);
+  --fill-accent-active: var(--lime-500);
+  --tint-accent: rgba(212, 255, 79, 0.14);
+  --border-accent: rgba(212, 255, 79, 0.34);
+  --glow-accent: rgba(212, 255, 79, 0.30);
+  --focus-ring: var(--lime-400);
+
+  /* status — text tone, background tint, border, in that order */
+  --text-success: var(--green-400);
+  --tint-success: rgba(74, 222, 128, 0.13);
+  --border-success: rgba(74, 222, 128, 0.34);
+  --text-warning: var(--amber-400);
+  --tint-warning: rgba(251, 191, 36, 0.13);
+  --border-warning: rgba(251, 191, 36, 0.34);
+  --text-danger: var(--red-400);
+  --tint-danger: rgba(255, 107, 107, 0.13);
+  --border-danger: rgba(255, 107, 107, 0.34);
+  --text-info: var(--azure-400);
+  --tint-info: rgba(127, 196, 255, 0.13);
+  --border-info: rgba(127, 196, 255, 0.34);
+
+  --overlay: rgba(6, 18, 32, 0.66);
+  --disabled-opacity: 0.34;
+
+  /* the lit field used to demonstrate glass depth */
+  --demo-field:
+    radial-gradient(400px 260px at 22% 30%, rgba(212, 255, 79, 0.42), transparent 60%),
+    radial-gradient(420px 300px at 78% 74%, rgba(64, 132, 255, 0.50), transparent 62%),
+    var(--ground-deep);
+}
+
+/* ==========================================================================
+   LIGHT — a remap, not an inversion. Three things change beyond luminance:
+   hairlines go dark (white-on-white has no edge), glass opacity climbs an
+   order of magnitude (5.5% white over pale grey is invisible), and the accent
+   splits (chartreuse as type on a pale ground is 1.3:1).
+   ========================================================================== */
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* ---------- 1. primitives ---------- */
+  --pale-50: #FFFFFF;
+  --pale-100: #F2F5F8;
+  --pale-200: #E7ECF1;
+
+  --slate-950: #0D1A26;
+  --slate-700: #46596A;
+  --slate-600: #56697E;
+  --slate-550: #596B80;
+
+  --lime-400: #C9F53C;
+  --lime-300: #D8FF62;
+  --lime-500: #B2DE1F;
+  --lime-700: #4A6606;
+  --lime-800: #3E5A05;
+  --lime-950: #1B2405;
+
+  --green-700: #10794B;
+  --amber-700: #8A5B04;
+  --red-700: #C0271F;
+  --azure-700: #14568C;
+
+  --n-52: rgba(255, 255, 255, 0.52);
+  --n-58: rgba(255, 255, 255, 0.58);
+  --n-74: rgba(255, 255, 255, 0.74);
+  --n-90: rgba(255, 255, 255, 0.90);
+  --n-sheen: rgba(255, 255, 255, 0.85);
+
+  --d-10: rgba(12, 32, 51, 0.10);
+  --d-16: rgba(12, 32, 51, 0.16);
+  --d-26: rgba(12, 32, 51, 0.26);
+
+  /* ---------- 2. semantic ---------- */
+
+  --ground: var(--pale-100);
+  --ground-deep: var(--pale-200);
+  --ground-raised: var(--pale-50);
+  /* Same blooms, lower amplitude — faint enough not to tint the content,
+     strong enough that the blur still has something to do. */
+  --bloom:
+    radial-gradient(720px 520px at 12% -6%, rgba(180, 224, 40, 0.30), transparent 62%),
+    radial-gradient(880px 620px at 92% 8%, rgba(64, 132, 255, 0.18), transparent 64%),
+    radial-gradient(640px 640px at 68% 96%, rgba(180, 224, 40, 0.16), transparent 60%),
+    linear-gradient(180deg, #F2F5F8 0%, #E7ECF1 100%);
+
+  --surface-weak: var(--n-52);
+  --surface: var(--n-58);
+  --surface-hover: var(--n-74);
+  --surface-active: var(--n-90);
+  --surface-sheen: var(--n-sheen);
+  --surface-solid: var(--pale-50);
+
+  --border-subtle: var(--d-10);
+  --border: var(--d-16);
+  --border-strong: var(--d-26);
+
+  /* primary 15.1:1 · secondary 6.6:1 · tertiary 5.1:1 · placeholder 5.0:1 */
+  --text-primary: var(--slate-950);
+  --text-secondary: var(--slate-700);
+  --text-tertiary: var(--slate-600);
+  --text-placeholder: var(--slate-550);
+  --text-inverse: var(--pale-50);
+  --text-accent: var(--lime-700);       /* 5.9:1 — chartreuse itself is 1.3:1 */
+  --text-on-accent: var(--lime-950);
+  --text-link: var(--lime-700);
+  --text-link-hover: var(--lime-800);
+
+  --fill-accent: var(--lime-400);
+  --fill-accent-hover: var(--lime-300);
+  --fill-accent-active: var(--lime-500);
+  --tint-accent: rgba(155, 200, 20, 0.20);
+  --border-accent: rgba(120, 160, 10, 0.42);
+  --glow-accent: rgba(155, 200, 20, 0.45);
+  --focus-ring: var(--lime-800);
+
+  --text-success: var(--green-700);     /* 5.0:1 */
+  --tint-success: rgba(16, 121, 75, 0.12);
+  --border-success: rgba(16, 121, 75, 0.34);
+  --text-warning: var(--amber-700);     /* 5.2:1 */
+  --tint-warning: rgba(138, 91, 4, 0.12);
+  --border-warning: rgba(138, 91, 4, 0.32);
+  --text-danger: var(--red-700);        /* 5.4:1 */
+  --tint-danger: rgba(192, 39, 31, 0.10);
+  --border-danger: rgba(192, 39, 31, 0.30);
+  --text-info: var(--azure-700);
+  --tint-info: rgba(20, 86, 140, 0.10);
+  --border-info: rgba(20, 86, 140, 0.30);
+
+  --overlay: rgba(12, 32, 51, 0.34);
+  --disabled-opacity: 0.4;
+
+  /* held well back: dark type sits on this field, so it cannot saturate */
+  --demo-field:
+    radial-gradient(400px 260px at 22% 30%, rgba(180, 224, 40, 0.34), transparent 60%),
+    radial-gradient(420px 300px at 78% 74%, rgba(64, 132, 255, 0.20), transparent 62%),
+    var(--ground-deep);
+}
+
+/* ==========================================================================
+   Short aliases. Kept so existing markup keeps working; new work should use
+   the semantic names above. Every one of these is a pointer, not a value.
+   ========================================================================== */
+
+:root, [data-theme="dark"], [data-theme="light"] {
+  --g-base: var(--ground);
+  --g-deep: var(--ground-deep);
+  --g-lift: var(--ground-raised);
+
+  --glass-weak: var(--surface-weak);
+  --glass: var(--surface);
+  --glass-2: var(--surface-hover);
+  --glass-3: var(--surface-active);
+  --glass-sheen: var(--surface-sheen);
+  --glass-line: var(--border-subtle);
+  --glass-line-2: var(--border);
+  --glass-line-3: var(--border-strong);
+
+  --ink: var(--text-primary);
+  --ink-2: var(--text-secondary);
+  --ink-3: var(--text-tertiary);
+  --ink-4: var(--text-placeholder);
+  --ink-inv: var(--text-inverse);
+
+  --ac: var(--fill-accent);
+  --ac-hover: var(--fill-accent-hover);
+  --ac-press: var(--fill-accent-active);
+  --ac-text: var(--text-accent);
+  --ac-ink: var(--text-on-accent);
+  --ac-tint: var(--tint-accent);
+  --ac-line: var(--border-accent);
+  --ac-glow: var(--glow-accent);
+  --focus: var(--focus-ring);
+
+  --ok: var(--text-success);
+  --ok-tint: var(--tint-success);
+  --ok-line: var(--border-success);
+  --wa: var(--text-warning);
+  --wa-tint: var(--tint-warning);
+  --wa-line: var(--border-warning);
+  --er: var(--text-danger);
+  --er-tint: var(--tint-danger);
+  --er-line: var(--border-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --d-1: 1ms; --d-2: 1ms; }
+}

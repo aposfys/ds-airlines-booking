@@ -139,7 +139,7 @@ test.describe('accessibility', () => {
       const s = getComputedStyle(el);
       return { width: s.outlineWidth, style: s.outlineStyle };
     });
-    // VANE makes the focus ring non-negotiable; it is the only way a keyboard
+    // Atlas makes the focus ring non-negotiable; it is the only way a keyboard
     // user can tell where they are.
     expect(outline.style).not.toBe('none');
     expect(parseFloat(outline.width)).toBeGreaterThan(0);

@@ -26,7 +26,7 @@ const Login = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
-      {/* Editorial side. Glass over the bloom, per VANE. */}
+      {/* Editorial side. Glass over the bloom, per Atlas. */}
       <div className="ds-editorial hidden md:flex flex-col justify-between w-1/2 p-12 border-r border-hairline">
         <span className="ds-eyebrow">DS Airlines</span>
         <div>

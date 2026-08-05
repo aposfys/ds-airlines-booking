@@ -1,13 +1,13 @@
 /* ══════════════════════════════════════════════════════════
-   Product-level corrections to the vendored VANE token layer.
+   Product-level corrections to the vendored Atlas token layer.
 
    tokens.css and base.css are byte-identical to source and must stay that
    way, so corrections live here instead. Everything below is a candidate to
-   be upstreamed into VANE; when it is, delete it from this file.
+   be upstreamed into Atlas; when it is, delete it from this file.
 
-   VANE's own readme measures its status-text pairs against each colour's
+   Atlas's own readme measures its status-text pairs against each colour's
    *own* tint background, same as this file does — but the measurements
-   there were taken at the tint alphas VANE ships, which land three status
+   there were taken at the tint alphas Atlas ships, which land three status
    pairs under AA once actually composited in this product's dark or light
    theme (docs/brand/contrast_check.py catches this in CI). Each fix below
    only lowers the tint's alpha, not the text colour — a paler background
@@ -18,19 +18,19 @@
    ══════════════════════════════════════════════════════════ */
 
 [data-theme="dark"] {
-  /* VANE: rgba(255, 107, 107, 0.13) under --text-danger (#FF6B6B) measures
+  /* Atlas: rgba(255, 107, 107, 0.13) under --text-danger (#FF6B6B) measures
      3.73:1 on the cancelled badge and error banners — under the 4.5:1 AA
      floor. --red-400 is lighter than the ground it sits on, so a *fainter*
      tint (closer to --ground) raises contrast rather than a stronger one.
      Lowered to 0.06 for 4.78:1. */
   --tint-danger: rgba(255, 107, 107, 0.06);
 
-  /* VANE: rgba(127, 196, 255, 0.13) under --text-info (#7FC4FF) measures
+  /* Atlas: rgba(127, 196, 255, 0.13) under --text-info (#7FC4FF) measures
      4.48:1 on the booking dialog's demonstration notice — just under AA.
      Same direction as above: lowered to 0.10 for 5.10:1. */
   --tint-info: rgba(127, 196, 255, 0.10);
 
-  /* VANE: rgba(212, 255, 79, 0.34) measures 3.05:1 against a glass panel
+  /* Atlas: rgba(212, 255, 79, 0.34) measures 3.05:1 against a glass panel
      (the selected-fare card sits inside the booking dialog, itself a glass
      panel) — technically over the 3:1 floor for SC 1.4.11, but by 0.05
      with no room for a rounding difference. Raised to 0.40 for 3.50:1. */
@@ -38,13 +38,13 @@
 }
 
 [data-theme="light"] {
-  /* VANE: rgba(16, 121, 75, 0.12) under --text-success (#10794B) measures
+  /* Atlas: rgba(16, 121, 75, 0.12) under --text-success (#10794B) measures
      4.50:1 on the confirmed booking badge — right at the floor, not over
      it. Lowered to 0.09 for 4.62:1, keeping headroom rather than shipping a
      value CI would flag on the next rounding difference. */
   --tint-success: rgba(16, 121, 75, 0.09);
 
-  /* VANE: rgba(120, 160, 10, 0.42) measures 1.37:1 against the page ground
+  /* Atlas: rgba(120, 160, 10, 0.42) measures 1.37:1 against the page ground
      and 1.45:1 against a glass panel — the selected-fare card's border is
      close to invisible in the light theme, an SC 1.4.11 failure. The base
      hue is too pale to reach 3:1 at any alpha against a ground this light

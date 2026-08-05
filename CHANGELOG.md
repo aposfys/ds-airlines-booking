@@ -15,26 +15,30 @@ Defect identifiers (DEF-*) refer to
 
 ## [Unreleased]
 
-The interface is rebuilt on **VANE** (also called Atlas), replacing AF. Same
-relationship as before — the design system owns everything visual, DS
-Airlines owns only the words — different system: "rounded glass" over navy
-and chartreuse, Gabarito and Spline Sans Mono in place of Archivo and IBM
-Plex Mono. No domain, API or test behaviour changed; this is the visual
-layer and its documentation only.
+The interface is rebuilt on **Atlas**, replacing AF. Same relationship as
+before — the design system owns everything visual, DS Airlines owns only the
+words — different system: "rounded glass" over navy and chartreuse, Gabarito
+and Spline Sans Mono in place of Archivo and IBM Plex Mono. No domain, API or
+test behaviour changed; this is the visual layer and its documentation only.
+
+Internally, the vendored token files carry the codename `VANE` in their own
+header comments — that's the vendor's own working title, kept because
+`tokens.css` and `base.css` are byte-identical to source. The design system's
+name is Atlas throughout this product's own docs and code.
 
 ### Changed
 - **Token layer** — `tokens/{color,typography,space,elevation,motion,base}.css`
-  (AF, six files) replaced with `tokens/{tokens,base}.css` (VANE, two files),
-  vendored byte-identical to source. Webfonts switched from self-hosted
-  Archivo / IBM Plex Mono / Instrument Serif `.woff2` files to `@fontsource`
-  packages for Gabarito and Spline Sans Mono.
+  (AF, six files) replaced with `tokens/{tokens,base}.css` (Atlas, two
+  files), vendored byte-identical to source. Webfonts switched from
+  self-hosted Archivo / IBM Plex Mono / Instrument Serif `.woff2` files to
+  `@fontsource` packages for Gabarito and Spline Sans Mono.
 - **Every component re-skinned** — Login, Register, Dashboard, BookingDialog
-  and ThemeToggle now use VANE's three devices (the index label, the glass
+  and ThemeToggle now use Atlas's three devices (the index label, the glass
   panel, mono figures) instead of AF's utility classes. Phosphor icons
   (regular weight only) added where they support a label, never replacing
   one: the theme toggle, the nav wordmark, search fields, the demonstration
   notice.
-- **`contrast_check.py` rewritten** for VANE's hex/rgba tokens in place of
+- **`contrast_check.py` rewritten** for Atlas's hex/rgba tokens in place of
   AF's OKLCH, and re-based on 14 pairs that reflect what this product
   actually renders (28 checks total across both themes, down from 34 — some
   AF-specific pairs no longer apply; see `docs/brand/brandbook.md` §4 for
@@ -55,6 +59,15 @@ layer and its documentation only.
   (the solid button colour) instead of `--border-accent`, measuring 1.16:1 in
   the light theme. Solid chartreuse on a near-white ground is not a visible
   line.
+- **The README's mobile login screenshot was a desktop screenshot.** The
+  browser automation used to capture it silently failed to resize the
+  viewport for that one shot — same pixel dimensions as the desktop login
+  image, byte-for-byte the wrong picture, caught on review rather than by
+  anything automated. Re-captured at a verified narrow viewport
+  (`window.innerWidth` checked directly, not inferred from the tool's
+  success message) along with the other two mobile shots, which were
+  already correct.
+- **A stale "AF" comment** survived the sweep in `vitest.config.ts`.
 
 ---
 

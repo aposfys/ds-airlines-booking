@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
-"""Verify that the VANE palette, as this product uses it, meets WCAG 2.2 AA.
+"""Verify that the Atlas palette, as this product uses it, meets WCAG 2.2 AA.
 
 Run from CI. Exits non-zero if any shipped pair regresses, so an
 accessibility failure breaks the build rather than reaching a passenger.
 
 The palette is read from the vendored token file the application actually
 loads — frontend/src/design-system/tokens/tokens.css — so this cannot drift
-from what is rendered. VANE states 44px targets and a non-negotiable focus
+from what is rendered. Atlas states 44px targets and a non-negotiable focus
 ring as its own accessibility floor; this is the part of it a machine can
 hold.
 
 Colours here are hex and rgba(), not AF's OKLCH, so this is a hex/rgba ->
 linear sRGB converter rather than an OKLCH one. Semantic aliases are `var()`
 chains (--text-primary -> --slate-100), which are resolved before
-conversion. Where a colour is translucent — VANE's glass surfaces are
+conversion. Where a colour is translucent — Atlas's glass surfaces are
 rgba() over the page ground by design — it is composited over --ground
 before its luminance is taken, since an alpha value alone is not a
 renderable colour.
 
-Both themes are checked. Dark is VANE's default (declared under a
+Both themes are checked. Dark is Atlas's default (declared under a
 ":root, [data-theme=\"dark\"]" selector, so it is also what an unset
 attribute renders); light is declared under "[data-theme=\"light\"]" and is
 equally shippable, so a pair that passes in one and fails in the other is
@@ -53,7 +53,7 @@ _VAR = re.compile(r"var\(\s*(--[a-z0-9-]+)\s*\)", re.I)
 def parse_themes(css: str) -> tuple[dict[str, str], dict[str, str]]:
     """Split the file into the dark (default) and light token sets.
 
-    VANE's tokens.css has four kinds of top-level block, told apart by which
+    Atlas's tokens.css has four kinds of top-level block, told apart by which
     of "dark" / "light" appear in the selector:
 
       - neither  (plain ":root")                    — shared scale, both themes
@@ -145,7 +145,7 @@ def opaque_rgb(
 ) -> tuple[float, float, float] | None:
     """Resolve a token to a fully opaque linear-sRGB colour.
 
-    VANE's glass surfaces are rgba() overlays by design — a panel's actual
+    Atlas's glass surfaces are rgba() overlays by design — a panel's actual
     rendered colour depends on what is behind it. This composites over
     --ground once, which is where most of this product's panels sit; it is
     an approximation (the real backdrop is the bloom gradient, which is
@@ -214,7 +214,7 @@ def main() -> int:
     themes = dict(zip(("dark", "light"), parse_themes(css)))
 
     failures = 0
-    print(f"VANE palette contrast — {len(REQUIRED)} pairs x 2 themes, WCAG 2.2 AA")
+    print(f"Atlas palette contrast — {len(REQUIRED)} pairs x 2 themes, WCAG 2.2 AA")
 
     for theme_name, palette in themes.items():
         print(f"\n  {theme_name} theme")

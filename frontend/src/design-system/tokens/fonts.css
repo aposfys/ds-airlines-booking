@@ -1,8 +1,8 @@
-/* VANE — webfonts. Gabarito (UI) and Spline Sans Mono (numerics), self-hosted
+/* Atlas — webfonts. Gabarito (UI) and Spline Sans Mono (numerics), self-hosted
    via @fontsource rather than the CDN links in the vendor readme's "Using
    it" section — the vendor's own "Open" notes flag CDN fonts as something to
    fix "before production", so this project does it up front. Only the
-   weights VANE's tokens.css declares (400/500/600/700 UI, 400/500 mono) are
+   weights Atlas's tokens.css declares (400/500/600/700 UI, 400/500 mono) are
    pulled in. Family names match --f-ui / --f-num in tokens.css exactly. */
 @import "@fontsource/gabarito/400.css";
 @import "@fontsource/gabarito/500.css";

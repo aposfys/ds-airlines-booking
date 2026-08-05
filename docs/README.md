@@ -38,7 +38,7 @@ carry their limitation.
 
 **[Product brand](brand/brandbook.md)** — positioning, network, fare
 architecture and voice. It owns only the words: the visual system belongs to
-[VANE](../frontend/src/design-system/README.md).
+[Atlas](../frontend/src/design-system/README.md).
 
 **[contrast_check.py](brand/contrast_check.py)** — reads the palette out of
 the token files the application actually loads, converts hex/rgba to linear

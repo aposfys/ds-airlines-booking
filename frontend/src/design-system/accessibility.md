@@ -1,8 +1,8 @@
-# VANE Accessibility Standard
+# Atlas Accessibility Standard
 
 **Target: WCAG 2.2 Level AA.** Adapted from the vendored system's own readme
 (`Atlas design system setup/readme.md`, § Accessibility), plus how this
-product applies it. AA is the floor: VANE's signature 10px mono label is what
+product applies it. AA is the floor: Atlas's signature 10px mono label is what
 forced most pairs well past it, since that label was never going to be
 enlarged and the colours had to carry it instead.
 
@@ -39,13 +39,13 @@ carry a word, not just a border colour.
 
 ## 4 · Touch targets
 
-Floor at 44px (`--touch`). The 34px control height VANE also defines is for
+Floor at 44px (`--touch`). The 34px control height Atlas also defines is for
 pointer surfaces only and is not used anywhere in this product — every
 button and field here uses `--touch`, matching AF's standard before it.
 
 ## 5 · Motion
 
-`prefers-reduced-motion: reduce` collapses both VANE durations (`--d-1`,
+`prefers-reduced-motion: reduce` collapses both Atlas durations (`--d-1`,
 `--d-2`) to 1ms, defined once in `tokens/tokens.css`.
 
 ## 6 · Icons (Phosphor, regular weight)
@@ -73,11 +73,11 @@ defines the boundary, not the fill.
    as *text* on a pale ground measures 1.3:1; `--text-accent` on light drops
    to a deep lime instead. Reaching for the wrong one of the pair is the
    fastest way to fail 1.4.3 in the light theme specifically.
-2. **Hairlines invert between themes**, and VANE's semantic layer already
+2. **Hairlines invert between themes**, and Atlas's semantic layer already
    does this (`--border-subtle` etc.) — a raw white/navy literal in product
    code would not.
 3. **Never nest a blurred panel inside another blurred panel.** Beyond the
-   GPU cost VANE's readme flags, a second blur compounds the contrast loss
+   GPU cost Atlas's readme flags, a second blur compounds the contrast loss
    the first one already spent.
 
 ## 9 · Not yet done — needs a real audit

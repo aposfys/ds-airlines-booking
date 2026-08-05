@@ -3,9 +3,9 @@
 **Version 3.0 · August 2026**
 
 DS Airlines has no visual identity of its own. It is a product built on
-**[VANE](../../frontend/src/design-system/README.md)**, also called Atlas, a
-design system by Apostolos Fysekidis, and VANE owns everything you can see:
-colour, type, space, motion, elevation, the accessibility floor.
+**[Atlas](../../frontend/src/design-system/README.md)**, a design system by
+Apostolos Fysekidis, and Atlas owns everything you can see: colour, type,
+space, motion, elevation, the accessibility floor.
 
 This document owns the other half — what the airline *is* and what it *says*.
 Name, positioning, network, fare architecture, voice, and the words on
@@ -17,17 +17,19 @@ screen.
 >
 > **Version 2.0 built on AF** — a dark-first system with a vermilion signal
 > colour, Archivo and IBM Plex Mono, hairlines and 6px radii. AF was replaced
-> by VANE on 5 August 2026: same relationship (a house system applied
+> by Atlas on 5 August 2026: same relationship (a house system applied
 > wholesale, the product supplying only the words), different system —
 > "rounded glass" over navy and chartreuse, Gabarito and Spline Sans Mono.
 > Nothing in this document's split changed, only which system sits on the
-> other side of it.
+> other side of it. (The vendored token files carry the codename `VANE` in
+> their own header comments — the vendor's own working title, kept because
+> those two files are byte-identical to source. The system's name is Atlas.)
 
 ---
 
 ## 1 · The split
 
-| Owned by VANE | Owned here |
+| Owned by Atlas | Owned here |
 |---|---|
 | Colour, and every semantic alias | The name, and how it is written |
 | Type: Gabarito and Spline Sans Mono | Positioning and the competitive wager |
@@ -36,7 +38,7 @@ screen.
 | WCAG 2.2 AA floor | Voice, tone, and every string on screen |
 | Dark ground by default, chartreuse accent | Naming of passenger-facing concepts |
 
-The rule for anything not listed: **if it can be seen, VANE decides; if it
+The rule for anything not listed: **if it can be seen, Atlas decides; if it
 can be read, this document decides.**
 
 ---
@@ -163,7 +165,7 @@ a redemption path before it gets a name.
 ## 3 · Voice
 
 This document's own content rules apply — short declarative sentences,
-concrete nouns, no salesmanship, no emoji, no Title Case. VANE, unlike AF
+concrete nouns, no salesmanship, no emoji, no Title Case. Atlas, unlike AF
 before it, ships no copy guidance of its own; it is tokens and glass, not
 words. What follows is what these rules sound like when an airline says
 them.
@@ -207,7 +209,7 @@ written on paper; those four are where transcription goes wrong.
 
 ## 4 · Accessibility
 
-VANE's standard — [`accessibility.md`](../../frontend/src/design-system/accessibility.md),
+Atlas's standard — [`accessibility.md`](../../frontend/src/design-system/accessibility.md),
 WCAG 2.2 AA, non-negotiable — is inherited whole. Two things are enforced
 mechanically rather than by review:
 
@@ -229,7 +231,7 @@ candidates to upstream:
   difference cannot flip it.
 - `--border-accent`, in the **light** theme, measured **1.37:1** on the
   selected-fare card's outline — close to invisible, and SC 1.4.11 requires
-  3:1 for a control boundary. No alpha of VANE's own hue clears 3:1 against
+  3:1 for a control boundary. No alpha of Atlas's own hue clears 3:1 against
   a ground this pale; re-based on `--lime-700`, the same deep lime already
   used for `--text-accent` in this theme, for 3.6:1.
 
@@ -239,15 +241,15 @@ margin for a rounding difference, so it was raised the same way to 3.5:1.
 
 Two further findings were fixed in the application rather than the palette,
 because the palette pair itself was fine — the product was reaching for the
-wrong one. Index-label text (VANE's `--text-tertiary`) measures 3.10:1 on a
+wrong one. Index-label text (Atlas's `--text-tertiary`) measures 3.10:1 on a
 glass panel in the dark theme; every place that combination occurred now
 reads `--text-secondary` instead, which clears 4.6:1 there. And the
 selected-fare border was wired to `--fill-accent` (the solid button colour)
 rather than `--border-accent`, which is 1.16:1 in light — solid chartreuse on
 a near-white ground.
 
-**Targets and focus.** Controls are 44px minimum; the focus ring is VANE's,
-2px, and never removed. `prefers-reduced-motion` collapses motion in VANE's
+**Targets and focus.** Controls are 44px minimum; the focus ring is Atlas's,
+2px, and never removed. `prefers-reduced-motion` collapses motion in Atlas's
 base layer.
 
 ### Open items
@@ -255,8 +257,8 @@ base layer.
 - **Theme switching** is not exposed. Both themes are token-complete and both
   pass contrast, but nothing in the interface toggles `data-theme`.
 - **Photography** direction is unwritten. The pages once hotlinked a stock
-  photograph from Unsplash on every render; that is gone, and VANE's glass
+  photograph from Unsplash on every render; that is gone, and Atlas's glass
   over the bloom stands in until owned or licensed assets exist.
-- **No logo.** VANE ships no mark by design, and DS Airlines has not been
+- **No logo.** Atlas ships no mark by design, and DS Airlines has not been
   given one. The name is set in type — Gabarito 700 — wherever a mark would
   go.

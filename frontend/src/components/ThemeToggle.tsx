@@ -2,13 +2,13 @@ import { Sun, MoonStars } from '@phosphor-icons/react';
 import { useTheme } from '../context/ThemeContext';
 
 /**
- * Switches between VANE's dark and light themes.
+ * Switches between Atlas's dark and light themes.
  *
  * Icon-only, so it carries an aria-label and a title rather than relying on
  * the glyph. The label states the action ("Switch to light") rather than the
  * current state, which is what a screen-reader user needs to hear from a
  * button. The icon is decorative and repeats what the label already says,
- * per VANE's iconography rule that a glyph never carries meaning alone.
+ * per Atlas's iconography rule that a glyph never carries meaning alone.
  */
 const ThemeToggle = () => {
   const { theme, toggle } = useTheme();

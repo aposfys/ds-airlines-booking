@@ -1,14 +1,19 @@
-# VANE (Atlas) — vendored token layer
+# Atlas — vendored token layer
 
 DS Airlines does not have its own visual identity. It is a product built on
-**VANE**, a personal design system by Apostolos Fysekidis also referred to as
-Atlas — a "rounded glass" interface language over a navy-and-chartreuse
-palette. VANE supplies the visual system, and DS Airlines supplies the verbal
-one — the positioning, the fare names and the words on screen. See
+**Atlas**, a personal design system by Apostolos Fysekidis — a "rounded
+glass" interface language over a navy-and-chartreuse palette. Atlas supplies
+the visual system, and DS Airlines supplies the verbal one — the
+positioning, the fare names and the words on screen. See
 [`docs/brand/brandbook.md`](../../../docs/brand/brandbook.md) for the split.
 
-VANE replaced this project's first design system, AF, on 5 August 2026. AF's
-28-component kit was never vendored here in the first place — this
+The vendored token files carry the codename `VANE` in their own header
+comments — the vendor's own working title for this system, kept because
+`tokens.css` and `base.css` below are byte-identical to source. The design
+system's name, used throughout this product's own docs and code, is Atlas.
+
+Atlas replaced this project's first design system, AF, on 5 August 2026.
+AF's 28-component kit was never vendored here in the first place — this
 application always built its own components against a token layer — so the
 swap is a token-layer replacement plus a re-skin of the four components that
 reach for it, not a component migration.
@@ -19,25 +24,25 @@ reach for it, not a component migration.
 webfont imports (`tokens/fonts.css`), and the accessibility standard
 (`accessibility.md`, adapted from the vendor's own readme).
 
-**Not vendored:** VANE ships no component set at all — its own readme states
-this plainly ("No components built. This is the language and the token
-system."). Every product-level shape (`ds-field`, `ds-action`, `ds-hero`,
-`ds-label`, `ds-eyebrow`, `ds-skip-link`) is this application's own, built in
-`src/index.css` against VANE's semantic tokens and its three vendored
-devices — `.v-idx` (the index label), `.v-glass` (the panel), `.v-num` (mono
-figures) — rather than reimplemented differently.
+**Not vendored:** Atlas ships no component set at all — its own readme
+states this plainly ("No components built. This is the language and the
+token system."). Every product-level shape (`ds-field`, `ds-action`,
+`ds-hero`, `ds-label`, `ds-eyebrow`, `ds-skip-link`) is this application's
+own, built in `src/index.css` against Atlas's semantic tokens and its three
+vendored devices — `.v-idx` (the index label), `.v-glass` (the panel),
+`.v-num` (mono figures) — rather than reimplemented differently.
 
 ## Provenance
 
 | | |
 |---|---|
-| Source | `Atlas design system setup` (codename VANE), local working copy |
+| Source | `Atlas design system setup`, local working copy |
 | Vendored | 5 August 2026 |
 | Files | `tokens/{tokens,base,fonts}.css`, `accessibility.md` |
 | Modifications | `tokens.css` and `base.css` are byte-identical to source; `overrides.css` carries this product's corrections on top, same as AF before it. `fonts.css` is new — the source ships CDN font links; this vendors the same families via `@fontsource` instead, matching how AF's fonts were self-hosted here previously. |
 
 `tokens.css` and `base.css` are unmodified deliberately, so they can be
-re-copied over the top when VANE changes without a merge. Re-syncing means
+re-copied over the top when Atlas changes without a merge. Re-syncing means
 re-copying those two files and re-running
 `python docs/brand/contrast_check.py`, which reads the palette from
 `tokens/tokens.css` **and** `overrides.css` in that order and fails CI on any
@@ -65,7 +70,20 @@ risks Vite not rebasing the `@font-face` urls the same way — this broke
 silently under AF and is why the entry point is still kept as its own CSS
 module rather than folded in.
 
-Two rules from VANE's brief that the review checks for:
+**`base.css` stays unlayered, deliberately — as does `.ds-hero`.** Wrapping
+`base.css`'s import in a Tailwind `@layer` block, so its plain `h1 { }` rule
+would lose to `.ds-hero` on layer order instead of specificity, reliably
+made the Vite/Lightning CSS production build drop the imported file's
+content outright — sometimes just its `::before` rules (the bloom behind the
+glass, the sheen on every panel), sometimes the whole file. Left unlayered,
+as the vendor ships it, `base.css` bundles correctly. The one real
+conflict this creates — `base.css`'s `h1 { font-weight: 600 }` versus this
+product's `.ds-hero` at 700 — is resolved the other way instead: `.ds-hero`
+is declared unlayered too, so a class selector beats an element selector on
+plain CSS specificity, no layer required. See the comments in
+`tokens/index.css` and `../../index.css`.
+
+Two rules from Atlas's brief that the review checks for:
 
 1. **Never use a primitive directly.** `--navy-900` and `--lime-400` do not
    belong in component code; use the semantic alias — `--surface`,

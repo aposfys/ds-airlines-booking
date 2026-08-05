@@ -70,11 +70,10 @@ exercise.
 
 ## The interface
 
-Built on **[VANE](frontend/src/design-system/README.md)**, also called Atlas,
-a design system of my own — rounded glass over navy and chartreuse. DS
-Airlines owns the words; VANE owns everything you can see. Both themes are
-token-complete and contrast-verified in CI: 28 pairs, WCAG 2.2 AA, on every
-push.
+Built on **[Atlas](frontend/src/design-system/README.md)**, a design system
+of my own — rounded glass over navy and chartreuse. DS Airlines owns the
+words; Atlas owns everything you can see. Both themes are token-complete and
+contrast-verified in CI: 28 pairs, WCAG 2.2 AA, on every push.
 
 **Web**
 
@@ -106,7 +105,7 @@ push.
 | [ADR-001 · PostgreSQL over MongoDB](docs/adr/0001-postgresql-over-mongodb.md) | Why the booking engine left the document model |
 | [Personas](docs/product/personas.md) · [User stories](docs/product/user-stories.md) | Who this is for, and a story → endpoint → test traceability matrix |
 | [Product brand](docs/brand/brandbook.md) | Positioning, network, fare architecture, voice |
-| [VANE design system](frontend/src/design-system/README.md) | The vendored token layer, and what was deliberately not vendored |
+| [Atlas design system](frontend/src/design-system/README.md) | The vendored token layer, and what was deliberately not vendored |
 | [Test strategy](docs/qa/test-strategy.md) | Layers, how to run everything, and a 42-case manual pass |
 | [Changelog](CHANGELOG.md) | What changed in each phase, including what was removed |
 | [Security](SECURITY.md) | Why this takes no payments, how to run it safely, and known limitations |
@@ -123,7 +122,7 @@ deliberately.
 | Phase | Scope | |
 |---|---|---|
 | **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | [`v0.1.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.1.0) |
-| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, VANE design system, three test suites | [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
+| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, AF design system, three test suites | [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
 
 ### What was not built, and why
 
@@ -263,8 +262,8 @@ backend/
 frontend/
   e2e/                Playwright — the journey, fonts, themes, accessibility
   src/
-    design-system/    Vendored VANE tokens, fonts, accessibility standard
-    index.css         VANE tokens bridged into Tailwind
+    design-system/    Vendored Atlas tokens, fonts, accessibility standard
+    index.css         Atlas tokens bridged into Tailwind
     components/       BookingDialog · ThemeToggle
     context/          AuthContext · ThemeContext
     pages/            Login · Register · Dashboard

@@ -153,7 +153,7 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      {/* Search. Glass over the bloom, per VANE. */}
+      {/* Search. Glass over the bloom, per Atlas. */}
       <header className="ds-editorial border-b border-hairline">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <h1 className="ds-hero">
@@ -283,7 +283,7 @@ const Dashboard = () => {
                             {cheapest === null ? '—' : formatFare(cheapest)}
                           </span>
                         </div>
-                        {/* Secondary, deliberately. VANE allows one primary
+                        {/* Secondary, deliberately. Atlas allows one primary
                             action per view, and a list of N flights would
                             otherwise put N chartreuse buttons on screen —
                             which reads as N equally urgent choices and

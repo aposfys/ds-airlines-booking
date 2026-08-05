@@ -1,4 +1,4 @@
-/* VANE (Atlas) token entry point. Mirrors the vendor's own styles.css import
+/* Atlas token entry point. Mirrors the vendor's own styles.css import
    order — tokens.css then base.css — with fonts.css pulled in first so the
    family names it declares exist before anything renders.
 

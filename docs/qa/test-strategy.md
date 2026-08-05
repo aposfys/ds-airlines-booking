@@ -118,7 +118,7 @@ is a real gap, not an oversight in this document.
 | TC-M13 | Type `.*` in From | **No results.** Not "everything". Search takes IATA codes and does no pattern matching (DEF-005) |
 | TC-M14 | Type `ath` lowercase | Same results as `ATH` |
 | TC-M15 | Check fares on a card | A "from" price showing the cheapest fare, in **EUR** — never `$` (DEF-015) |
-| TC-M16 | Count primary buttons | Exactly zero chartreuse buttons in the list. Row actions are secondary; VANE allows one primary per view |
+| TC-M16 | Count primary buttons | Exactly zero chartreuse buttons in the list. Row actions are secondary; Atlas allows one primary per view |
 
 ### 4.4 · `/dashboard` — booking and itineraries
 

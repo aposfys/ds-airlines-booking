@@ -142,7 +142,7 @@ describe('Dashboard', () => {
       mockGet();
       await renderDashboard();
       await screen.findByText('ATH → LHR');
-      // VANE allows one primary per view; N flights must not mean N of them.
+      // Atlas allows one primary per view; N flights must not mean N of them.
       expect(document.querySelectorAll('.ds-action--primary')).toHaveLength(0);
     });
 

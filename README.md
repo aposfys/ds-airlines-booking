@@ -133,14 +133,17 @@ break.
 |---|---|
 | ![The prototype dashboard on a phone](docs/screenshots/mobile-dashboard.jpg) | ![The prototype sign-in screen on a phone](docs/screenshots/mobile-login.jpg) |
 
-A 25-second recording of the same prototype — creating an account, signing
-in, browsing the carousel and the destination cards, and running an ATH → LHR
-search:
+A 24-second loop of the same prototype — creating an account, signing in,
+browsing the carousel and the destination cards, and running an ATH → LHR
+search. It plays by itself; click it for the full-resolution recording.
 
-https://github.com/aposfys/ds-airlines-booking/raw/main/docs/media/usage.mp4
+[![The Airy Sky prototype: registration, sign-in, the destination carousel and an ATH → LHR search](docs/media/usage.webp)](docs/media/usage.mp4)
 
-<sup>If the player does not load, the file is
-[`docs/media/usage.mp4`](docs/media/usage.mp4) — H.264 MP4, 1280×800, 25s.</sup>
+<sup>Animated WebP — 900×562, 23.8s, 1.1 MB — so it autoplays and loops
+inline with no player and no sound. GitHub strips `autoplay`, `loop` and
+`muted` from hand-written `<video>` tags, so an animated image is the only
+thing that moves on its own in a README. The source recording is
+[`docs/media/usage.mp4`](docs/media/usage.mp4) (H.264, 1280×800).</sup>
 
 ---
 

@@ -91,6 +91,35 @@ contrast-verified in CI: 28 pairs, WCAG 2.2 AA, on every push.
 |---|---|---|
 | ![The login page on a phone-width viewport](docs/images/mobile-login.jpg) | ![The dashboard on a phone-width viewport, single column](docs/images/mobile-dashboard.jpg) | ![The booking dialog on a phone-width viewport](docs/images/mobile-booking-dialog.jpg) |
 
+**Walkthrough**
+
+A 25-second screen recording of the running app: creating an account, signing
+in, browsing the hero carousel and popular destinations, reading the live
+weather strip, and running an ATH → LHR search.
+
+[![Watch the walkthrough](docs/media/usage-poster.jpg)](docs/media/usage.mp4)
+
+> The MP4 lives at [`docs/media/usage.mp4`](docs/media/usage.mp4) — click the
+> image above to play it on GitHub.
+
+**Refreshed screens**
+
+| Dashboard — light | Dashboard — dark |
+|---|---|
+| ![Hero carousel with glass search bar, popular destinations, live weather strip and flight results](docs/screenshots/dashboard-light.jpg) | ![The same dashboard in the dark theme](docs/screenshots/dashboard-dark.jpg) |
+
+| Search results | Register |
+|---|---|
+| ![Flight cards with route-specific photography, live weather chips and fares](docs/screenshots/results-light.jpg) | ![Editorial split registration screen](docs/screenshots/register-light.jpg) |
+
+| Mobile — dashboard | Mobile — log in |
+|---|---|
+| ![Dashboard on a phone](docs/screenshots/mobile-dashboard.jpg) | ![Sign in on a phone](docs/screenshots/mobile-login.jpg) |
+
+Live weather on the destination cards and in the dashboard strip comes from
+Open-Meteo — current conditions plus a three-day forecast, cached for 30
+minutes, with a quiet fallback when a city fails.
+
 > **No payment is taken and no card details are collected.** The booking form
 > has no card field, and the API returns `422` to a request carrying one.
 > Do not enter real payment information.

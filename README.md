@@ -25,6 +25,10 @@ are first-class artefacts here, alongside the API and the interface.
 **FastAPI · PostgreSQL · SQLAlchemy 2.0 · Alembic · React 19 · TypeScript ·
 Tailwind v4 · Docker**
 
+[**Run it**](#running-it) · [What was wrong](#from-assignment-to-product) ·
+[What was left out](#what-was-not-built-and-why) · [Tests](#tests) ·
+[Documentation](docs/README.md)
+
 ![The dashboard: search, fare-priced results, and a confirmed itinerary](docs/images/dashboard-dark.jpg)
 
 ---
@@ -64,19 +68,22 @@ a product.
 
 The previous README called it "production-ready". Recording precisely why
 that was wrong, rather than quietly rewriting it, is the point of the
-exercise.
+exercise — and it is the reason the section on
+[what was deliberately not built](#what-was-not-built-and-why) is as long as
+the section on what was.
 
 ---
 
 ## The interface
 
 Built on **[Atlas](frontend/src/design-system/README.md)**, a design system
-of my own — rounded glass over navy and chartreuse. The refreshed screens below
-run the newer **[Airy Sky Editorial](docs/design/airy-sky-editorial.md)**
-direction: a light-first Paper & Sky palette, Outfit over Figtree, and a glass
-search bar floating on destination photography. DS Airlines owns the
-words; Atlas owns everything you can see. Both themes are token-complete and
-contrast-verified in CI: 28 pairs, WCAG 2.2 AA, on every push.
+of my own: rounded glass over navy and chartreuse, Gabarito for the interface
+and Spline Sans Mono for anything numeric — fares, times, IATA codes, booking
+references. DS Airlines owns the words; Atlas owns everything you can see.
+
+Both themes are token-complete and contrast-verified on every push: **14
+colour pairs, checked in light and dark, 28 assertions against WCAG 2.2 AA.**
+A hex literal in a component is a bug.
 
 **Web**
 
@@ -94,41 +101,46 @@ contrast-verified in CI: 28 pairs, WCAG 2.2 AA, on every push.
 |---|---|---|
 | ![The login page on a phone-width viewport](docs/images/mobile-login.jpg) | ![The dashboard on a phone-width viewport, single column](docs/images/mobile-dashboard.jpg) | ![The booking dialog on a phone-width viewport](docs/images/mobile-booking-dialog.jpg) |
 
-**Walkthrough**
+> **No payment is taken and no card details are collected.** The booking form
+> has no card field, and the API returns `422` to a request carrying one.
+> Do not enter real payment information. See [SECURITY.md](SECURITY.md).
 
-A 25-second screen recording of the running app: creating an account, signing
-in, browsing the hero carousel and popular destinations, reading the live
-weather strip, and running an ATH → LHR search.
+### A second direction, designed but not shipped
 
-https://github.com/aposfys/ds-airlines-booking/raw/main/docs/media/usage.mp4
+[**Airy Sky Editorial**](docs/design/airy-sky-editorial.md) is a later visual
+direction taken as far as full comps and a click-through prototype: light-first
+by default, a Paper & Sky palette over cream rather than navy, Outfit and
+Figtree in place of Gabarito, and a glass search bar floating on destination
+photography. It adds a hero carousel, popular-destination cards and a live
+weather strip to the dashboard.
 
-<sup>If the player above does not load, the file is at
-[`docs/media/usage.mp4`](docs/media/usage.mp4) (H.264 MP4, 1280×800, 25s) —
-or use the poster link below.</sup>
-
-[![Watch the walkthrough](docs/media/usage-poster.jpg)](https://github.com/aposfys/ds-airlines-booking/raw/main/docs/media/usage.mp4)
-
-**Refreshed screens**
+**None of it is in this codebase.** The screens and the recording below are
+the prototype, not the application you get from `make dev` — the shipping
+interface is the Atlas one above. The direction is documented because the
+work was done and the reasoning is worth reading, not because it is pending.
+Treating a comp as a feature is exactly the habit this project exists to
+break.
 
 | Dashboard — light | Dashboard — dark |
 |---|---|
-| ![Hero carousel with glass search bar, popular destinations, live weather strip and flight results](docs/screenshots/dashboard-light.jpg) | ![The same dashboard in the dark theme](docs/screenshots/dashboard-dark.jpg) |
+| ![Prototype: hero carousel with glass search bar, popular destinations, weather strip and flight results](docs/screenshots/dashboard-light.jpg) | ![The same prototype dashboard in the dark theme](docs/screenshots/dashboard-dark.jpg) |
 
 | Search results | Register |
 |---|---|
-| ![Flight cards with route-specific photography, live weather chips and fares](docs/screenshots/results-light.jpg) | ![Editorial split registration screen](docs/screenshots/register-light.jpg) |
+| ![Prototype flight cards with route photography, weather chips and fares](docs/screenshots/results-light.jpg) | ![Prototype editorial split registration screen](docs/screenshots/register-light.jpg) |
 
 | Mobile — dashboard | Mobile — log in |
 |---|---|
-| ![Dashboard on a phone](docs/screenshots/mobile-dashboard.jpg) | ![Sign in on a phone](docs/screenshots/mobile-login.jpg) |
+| ![The prototype dashboard on a phone](docs/screenshots/mobile-dashboard.jpg) | ![The prototype sign-in screen on a phone](docs/screenshots/mobile-login.jpg) |
 
-Live weather on the destination cards and in the dashboard strip comes from
-Open-Meteo — current conditions plus a three-day forecast, cached for 30
-minutes, with a quiet fallback when a city fails.
+A 25-second recording of the same prototype — creating an account, signing
+in, browsing the carousel and the destination cards, and running an ATH → LHR
+search:
 
-> **No payment is taken and no card details are collected.** The booking form
-> has no card field, and the API returns `422` to a request carrying one.
-> Do not enter real payment information.
+https://github.com/aposfys/ds-airlines-booking/raw/main/docs/media/usage.mp4
+
+<sup>If the player does not load, the file is
+[`docs/media/usage.mp4`](docs/media/usage.mp4) — H.264 MP4, 1280×800, 25s.</sup>
 
 ---
 
@@ -141,11 +153,109 @@ minutes, with a quiet fallback when a city fails.
 | [Personas](docs/product/personas.md) · [User stories](docs/product/user-stories.md) | Who this is for, and a story → endpoint → test traceability matrix |
 | [Product brand](docs/brand/brandbook.md) | Positioning, network, fare architecture, voice |
 | [Atlas design system](frontend/src/design-system/README.md) | The vendored token layer, and what was deliberately not vendored |
+| [Airy Sky Editorial](docs/design/airy-sky-editorial.md) | The unshipped visual direction, and the system behind it |
 | [Test strategy](docs/qa/test-strategy.md) | Layers, how to run everything, and a 42-case manual pass |
 | [Changelog](CHANGELOG.md) | What changed in each phase, including what was removed |
 | [Security](SECURITY.md) | Why this takes no payments, how to run it safely, and known limitations |
 
 Start at [`docs/`](docs/README.md), which orders these for a first read.
+
+---
+
+## Running it
+
+### Docker — needs nothing else installed
+
+```bash
+cp .env.example .env
+```
+
+`SECRET_KEY` and `POSTGRES_PASSWORD` are required; the application refuses to
+start without them. Generate a key with:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+Then:
+
+```bash
+make up
+```
+
+### Natively
+
+Needs `postgresql@17`, Python 3.13 and Node 22.
+
+```bash
+make setup   # venv, npm ci, a database cluster in .pgdata, migrations
+make seed    # demo flights and an administrator
+make dev     # API on :8000, interface on :5173
+```
+
+The cluster lives in `.pgdata` inside the repo on port 55432, so it cannot
+collide with any PostgreSQL you already run. `make db-reset` throws it away.
+
+| | |
+|---|---|
+| Interface | http://localhost:5173 (`make dev`) or http://localhost:3000 (`make up`) |
+| API | http://localhost:8000 |
+| Swagger UI | http://localhost:8000/docs |
+
+Demo data is opt-in. Nothing is seeded unless you ask, and there are no
+default credentials — `make seed` supplies its own, for local use only.
+
+**The administrative surface has no interface.** Publishing flights,
+repricing and load factor all run through Swagger — see
+[Scope](#what-was-not-built-and-why).
+
+---
+
+## Tests
+
+```bash
+make check       # backend + component tests, lint, build, contrast
+make check-all   # the above plus end to end
+```
+
+| | |
+|---|---|
+| `make test` | **89** backend tests against real PostgreSQL |
+| `make test-frontend` | **69** component tests (Vitest + Testing Library) |
+| `make e2e` | **17** end-to-end tests in a real browser (Playwright) |
+| `make contrast` | 14 colour pairs × 2 themes, WCAG 2.2 AA |
+
+**175 automated tests**, all in CI, across four jobs.
+
+The backend suite runs against a **real PostgreSQL**, and the fixtures build
+the schema by running the Alembic migrations — so every run also proves the
+migration chain applies. CI additionally fails on migration drift: a model
+changed without a revision to match does not merge.
+
+That matters because of what it replaced. The original six tests all
+exercised the same two auth endpoints, since anything touching flights,
+bookings or authorisation needed a database they had no way to provide —
+which is precisely why a completely dead admin surface sat in the repository
+alongside a green suite.
+
+The tests that matter most assert the defects stay fixed:
+
+```
+tests/test_authorization.py   an admin gets 200, a passenger gets 403,
+                              revoking admin takes effect before expiry
+tests/test_bookings.py        payment details are refused outright,
+                              cancelling twice cannot credit a seat back
+tests/test_flights.py         search does no pattern matching,
+                              a flight with bookings cannot be deleted
+tests/test_constraints.py     the database itself refuses bad data
+e2e/interface.spec.ts         the webfonts actually load
+```
+
+That last one exists because they once did not. Nested under Tailwind's
+`@import`, the production build shipped **zero** `.woff2` files and the whole
+typographic identity fell back to Helvetica **with no error of any kind**.
+Four Phase 1 defects were invisible to a green unit suite; the end-to-end
+suite is the answer to that.
 
 ---
 
@@ -157,7 +267,11 @@ deliberately.
 | Phase | Scope | |
 |---|---|---|
 | **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | [`v0.1.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.1.0) |
-| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, AF design system, three test suites | [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
+| **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, a design system, three test suites | [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
+
+v0.2.0 shipped on the AF design system; Atlas replaced it afterwards, with no
+change to the domain, the API or test behaviour. The swap and its four
+recovered contrast failures are in the [changelog](CHANGELOG.md).
 
 ### What was not built, and why
 
@@ -187,96 +301,12 @@ So the gaps stay, and they are named wherever they bite:
   about money owed.
 - **No special-assistance booking.** A genuine passenger need this does not
   meet — an omission, not a decision.
+- **The Airy Sky Editorial direction was never implemented.** It exists as
+  comps, a prototype recording and a written system, and
+  [is labelled as such](#a-second-direction-designed-but-not-shipped).
 
 Versions stay pre-1.0 for the same reason. 1.0.0 would claim the product is
 finished, and it is not; it is *scoped*, which is a different thing.
-
----
-
-## Running it
-
-### Docker — needs nothing else installed
-
-```bash
-cp .env.example .env
-# SECRET_KEY and POSTGRES_PASSWORD are required; the app refuses to start without them
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-
-make up
-```
-
-### Natively
-
-Needs `postgresql@17`, Python 3.13 and Node 22.
-
-```bash
-make setup   # venv, npm ci, a database cluster in .pgdata, migrations
-make seed    # demo flights and an administrator
-make dev     # API on :8000, interface on :5173
-```
-
-The cluster lives in `.pgdata` inside the repo on port 55432, so it cannot
-collide with any PostgreSQL you already run. `make db-reset` throws it away.
-
-| | |
-|---|---|
-| Interface | http://localhost:5173 (`make dev`) or :3000 (`make up`) |
-| API | http://localhost:8000 |
-| Swagger UI | http://localhost:8000/docs |
-
-Demo data is opt-in. Nothing is seeded unless you ask, and there are no
-default credentials — `make seed` supplies its own, for local use only.
-
-**The administrative surface has no interface.** Publishing flights,
-repricing and load factor all run through Swagger — see
-[Scope](#what-was-not-built-and-why).
-
----
-
-## Tests
-
-```bash
-make check       # backend + component tests, lint, build, contrast
-make check-all   # the above plus end to end
-```
-
-| | |
-|---|---|
-| `make test` | **89** backend tests against real PostgreSQL |
-| `make test-frontend` | **69** component tests (Vitest + Testing Library) |
-| `make e2e` | **17** end-to-end tests in a real browser (Playwright) |
-| `make contrast` | 28 colour pairs, WCAG 2.2 AA, in both themes |
-
-**175 automated tests**, all in CI.
-
-The backend suite runs against a **real PostgreSQL**, and the fixtures build
-the schema by running the Alembic migrations — so every run also proves the
-migration chain applies.
-
-That matters because of what it replaced. The original six tests all
-exercised the same two auth endpoints, since anything touching flights,
-bookings or authorization needed a database they had no way to provide —
-which is precisely why a completely dead admin surface sat in the repository
-alongside a green suite.
-
-The tests that matter most assert the defects stay fixed:
-
-```
-tests/test_authorization.py   an admin gets 200, a passenger gets 403,
-                              revoking admin takes effect before expiry
-tests/test_bookings.py        payment details are refused outright,
-                              cancelling twice cannot credit a seat back
-tests/test_flights.py         search does no pattern matching,
-                              a flight with bookings cannot be deleted
-tests/test_constraints.py     the database itself refuses bad data
-e2e/interface.spec.ts         the webfonts actually load
-```
-
-That last one exists because they once did not. Nested under Tailwind's
-`@import`, the production build shipped **zero** `.woff2` files and the whole
-typographic identity fell back to Helvetica **with no error of any kind**.
-Four Phase 1 defects were invisible to a green unit suite; the end-to-end
-suite is the answer to that.
 
 ---
 
@@ -284,29 +314,35 @@ suite is the answer to that.
 
 ```
 backend/
+  main.py             App factory, CORS, /health
   app/
     config.py         Validated settings; refuses a weak or missing SECRET_KEY
     db.py             Engine and one-session-per-request
-    auth.py           JWT issuance, hashing, authorization dependencies
+    auth.py           JWT issuance, hashing, authorisation dependencies
     models/domain.py  The relational domain — ten tables
     schemas.py        API request and response models
     routers/          auth · flights · bookings · admin
+    seed.py           Reference data, demo flights, the bootstrap admin
   migrations/         Alembic revisions
   scripts/seed.py     Explicit seeding, never a startup side effect
   tests/              89 tests against real PostgreSQL
 frontend/
-  e2e/                Playwright — the journey, fonts, themes, accessibility
+  e2e/                Playwright — booking.spec.ts and interface.spec.ts:
+                      the journey, fonts, themes, accessibility
   src/
     design-system/    Vendored Atlas tokens, fonts, accessibility standard
     index.css         Atlas tokens bridged into Tailwind
+    api/              Axios client and typed endpoints
     components/       BookingDialog · ThemeToggle
     context/          AuthContext · ThemeContext
+    lib/              Formatting for fares, times and durations
     pages/            Login · Register · Dashboard
                       *.test.tsx sit beside what they test
 docs/
   adr/                Architecture decisions
   analysis/           Current-state assessment
   brand/              Product brand, contrast check
+  design/             Airy Sky Editorial — designed, not shipped
   product/            Personas, user stories, traceability
   qa/                 Test strategy and the manual pass
 ```

@@ -71,7 +71,10 @@ exercise.
 ## The interface
 
 Built on **[Atlas](frontend/src/design-system/README.md)**, a design system
-of my own — rounded glass over navy and chartreuse. DS Airlines owns the
+of my own — rounded glass over navy and chartreuse. The refreshed screens below
+run the newer **[Airy Sky Editorial](docs/design/airy-sky-editorial.md)**
+direction: a light-first Paper & Sky palette, Outfit over Figtree, and a glass
+search bar floating on destination photography. DS Airlines owns the
 words; Atlas owns everything you can see. Both themes are token-complete and
 contrast-verified in CI: 28 pairs, WCAG 2.2 AA, on every push.
 
@@ -97,10 +100,13 @@ A 25-second screen recording of the running app: creating an account, signing
 in, browsing the hero carousel and popular destinations, reading the live
 weather strip, and running an ATH → LHR search.
 
-[![Watch the walkthrough](docs/media/usage-poster.jpg)](docs/media/usage.mp4)
+https://github.com/aposfys/ds-airlines-booking/raw/main/docs/media/usage.mp4
 
-> The MP4 lives at [`docs/media/usage.mp4`](docs/media/usage.mp4) — click the
-> image above to play it on GitHub.
+<sup>If the player above does not load, the file is at
+[`docs/media/usage.mp4`](docs/media/usage.mp4) (H.264 MP4, 1280×800, 25s) —
+or use the poster link below.</sup>
+
+[![Watch the walkthrough](docs/media/usage-poster.jpg)](https://github.com/aposfys/ds-airlines-booking/raw/main/docs/media/usage.mp4)
 
 **Refreshed screens**
 

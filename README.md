@@ -4,7 +4,7 @@
   <a href="https://github.com/aposfys/ds-airlines-booking/actions/workflows/ci.yml">
     <img alt="CI" src="https://github.com/aposfys/ds-airlines-booking/actions/workflows/ci.yml/badge.svg">
   </a>
-  <img alt="tests" src="https://img.shields.io/badge/tests-189-brightgreen">
+  <img alt="tests" src="https://img.shields.io/badge/tests-192-brightgreen">
   <img alt="python" src="https://img.shields.io/badge/python-3.13-blue">
   <img alt="node" src="https://img.shields.io/badge/node-22-blue">
   <img alt="licence" src="https://img.shields.io/badge/licence-MIT-lightgrey">
@@ -220,11 +220,11 @@ make check-all   # the above plus end to end
 | | |
 |---|---|
 | `make test` | **103** backend tests against real PostgreSQL |
-| `make test-frontend` | **69** component tests (Vitest + Testing Library) |
+| `make test-frontend` | **72** component tests (Vitest + Testing Library) |
 | `make e2e` | **17** end-to-end tests in a real browser (Playwright) |
 | `make contrast` | 17 colour pairs × 2 themes, WCAG 2.2 AA |
 
-**189 automated tests**, all in CI, across four jobs.
+**192 automated tests**, all in CI, across four jobs.
 
 The backend suite runs against a **real PostgreSQL**, and the fixtures build
 the schema by running the Alembic migrations — so every run also proves the

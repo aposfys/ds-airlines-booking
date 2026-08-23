@@ -62,7 +62,7 @@ make check-all   # the above plus the end-to-end suite
 Individually:
 
 ```bash
-make test       # 89 backend tests against real PostgreSQL
+make test       # 103 backend tests against real PostgreSQL
 make lint       # eslint
 make build      # tsc + vite, also proves the fonts resolve
 make contrast   # 34 colour pairs, both themes
@@ -189,7 +189,7 @@ remains the control for the rest.
 
 ## 6 · The automated suites
 
-**175 automated tests across three suites**, all running in CI.
+**189 automated tests across three suites**, all running in CI.
 
 | Suite | Count | What it can see |
 |---|---|---|

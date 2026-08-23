@@ -99,10 +99,6 @@ put underneath it. If the scrims hold there, the rule holds for any image.
 |---|---|
 | ![Flight cards with route photography, weather chips and fares](docs/screenshots/results-light.jpg) | ![Editorial split registration screen over the aircraft panel](docs/screenshots/register-light.jpg) |
 
-| Mobile — dashboard | Mobile — log in |
-|---|---|
-| ![The dashboard on a phone, single column](docs/screenshots/mobile-dashboard.jpg) | ![Signing in on a phone](docs/screenshots/mobile-login.jpg) |
-
 **Walkthrough** — creating an account, signing in, moving through the
 carousel, the destination cards and the live weather, then running an
 ATH → LHR search. It plays by itself.

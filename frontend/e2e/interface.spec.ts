@@ -30,8 +30,13 @@ test.describe('the typographic identity actually loads', () => {
 
     const loaded = await page.evaluate(
       () =>
+        // Outfit carries display and numerals, Figtree the interface — so
+        // these are the two roles, at weights the login page actually
+        // renders. Asking about a weight nothing on the page uses would fail
+        // even with the face served perfectly, because check() reports what
+        // is loaded rather than what is declared.
         document.fonts.check('700 46px "Outfit"') &&
-        document.fonts.check('500 13px "Figtree"'),
+        document.fonts.check('400 13px "Figtree"'),
     );
     expect(loaded).toBe(true);
   });

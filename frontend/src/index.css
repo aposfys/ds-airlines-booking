@@ -102,27 +102,6 @@
     -webkit-backdrop-filter: var(--blur-lg);
   }
 
-  /* Brand tag. Same device family as .v-idx (mono, tracked, uppercase)
-     without the running hairline — this marks a corner, not a section. */
-  .ds-eyebrow {
-    font-family: var(--f-display);
-    font-size: var(--t-11);
-    font-weight: var(--w-600);
-    letter-spacing: var(--ls-label);
-    text-transform: uppercase;
-    color: var(--text-accent);
-  }
-
-  /* Bare index-label typography — .v-idx without the trailing rule, for
-     captions, tags and inline status text that shouldn't carry a divider. */
-  .ds-label {
-    font-family: var(--f-num);
-    font-size: var(--t-10);
-    font-weight: var(--w-500);
-    letter-spacing: var(--ls-label);
-    text-transform: uppercase;
-  }
-
   /* Visually hidden until focused, per WCAG 2.4.1. */
   .ds-skip-link {
     position: absolute;
@@ -330,6 +309,30 @@
    Atlas defines; used once per view, since the jump from a 10px label
    straight to 46px is the system's signature. A class selector (0,1,0)
    beats an element selector (0,0,1) with no layer tricks required. */
+/* Unlayered for the same reason as .ds-hero below: these land on <h2> in the
+   destination and weather sections, and base.css's `h2 { font-size: 25px }`
+   is unlayered. An unlayered element selector beats a LAYERED class selector
+   no matter how specific the class is — layer order is decided before
+   specificity — so inside @layer components these silently rendered at
+   heading size. */
+.ds-eyebrow {
+  font-family: var(--f-display);
+  font-size: var(--t-11);
+  font-weight: var(--w-600);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--text-accent);
+}
+
+.ds-label {
+  font-family: var(--f-num);
+  font-size: var(--t-10);
+  font-weight: var(--w-500);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
 .ds-hero {
   font-family: var(--f-display);
   font-weight: var(--w-700);

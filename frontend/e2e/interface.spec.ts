@@ -9,7 +9,7 @@ import { expect, test } from '@playwright/test';
  */
 
 test.describe('the typographic identity actually loads', () => {
-  test('Gabarito and Spline Sans Mono are served, not silently substituted', async ({
+  test('Outfit and Figtree are served, not silently substituted', async ({
     page,
   }) => {
     const fonts: string[] = [];
@@ -30,8 +30,13 @@ test.describe('the typographic identity actually loads', () => {
 
     const loaded = await page.evaluate(
       () =>
-        document.fonts.check('700 46px "Gabarito"') &&
-        document.fonts.check('500 13px "Spline Sans Mono"'),
+        // Outfit carries display and numerals, Figtree the interface — so
+        // these are the two roles, at weights the login page actually
+        // renders. Asking about a weight nothing on the page uses would fail
+        // even with the face served perfectly, because check() reports what
+        // is loaded rather than what is declared.
+        document.fonts.check('700 46px "Outfit"') &&
+        document.fonts.check('400 13px "Figtree"'),
     );
     expect(loaded).toBe(true);
   });

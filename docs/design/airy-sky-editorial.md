@@ -1,8 +1,9 @@
 # Design system — Airy Sky Editorial
 
-DS Airlines runs on a two-layer token system defined entirely in
-`src/styles.css`. Components never use raw colours; a hex literal in a
-component is a bug.
+DS Airlines runs on a two-layer token system defined in
+`frontend/src/design-system/tokens/tokens.css`, bridged into Tailwind by
+`frontend/src/index.css`. Components never use raw colours; a hex literal in
+a component is a bug.
 
 ```
 1. PRIMITIVES  raw values, per theme   (--paper, --ink, --sky …)
@@ -37,8 +38,11 @@ gradient) sits behind every page so flat areas never read as dead white.
 - Scale: 10 / 11 / 12 / 13 / 14 / 16 / 19 / 25 / 33 / 46 px.
 - Labels use `.ds-label`: 11px, uppercase, `0.1em` tracking.
 
-Fonts load through a `<link>` in `src/routes/__root.tsx` — never via CSS
-`@import` (Tailwind v4 resolves imports from the filesystem).
+Fonts are self-hosted through `@fontsource`, imported by
+`design-system/tokens/fonts.css` — never as a bare `@import` nested under
+Tailwind's own, which once produced a build containing zero `.woff2` files
+with everything silently falling back to Helvetica. `e2e/interface.spec.ts`
+asserts both faces are actually served.
 
 ## Geometry, motion, controls
 
@@ -68,8 +72,11 @@ Rule: **no text ever sits on bare photography.**
 - Scrim strength comes from the themed `--scrim-rgb` token (navy in light,
   deeper navy in dark), so contrast stays AA in both themes.
 
-Images live in `src/assets` and are mapped to IATA codes in
-`src/lib/destination-images.ts`. Every image is `decoding="async"` with a
+Images live in `src/assets/destinations` and are mapped to IATA codes in
+`src/lib/destination-images.ts`. They are currently crops taken from the
+original design comps — soft at card size, and placeholders for real licensed
+photography; a station with no image falls back to `--bloom` rather than an
+empty box. Every image is `decoding="async"` with a
 responsive `sizes` attribute; only the first hero slide is eager and
 `fetchPriority="high"` (it is the LCP element).
 
@@ -87,7 +94,10 @@ responsive `sizes` attribute; only the first hero slide is eager and
 
 ## Accessibility
 
-- AA contrast verified in both themes over photography.
+- AA contrast verified in both themes, including over photography:
+  `docs/brand/contrast_check.py` measures each scrim composited over a
+  blown-out highlight, the worst an image can put beneath it, and CI fails
+  below AA. 17 pairs across 2 themes.
 - Decorative images use `alt=""`; interactive cards carry explicit
   `aria-label`s describing the action, not the picture.
 - Weather chips expose the full condition and temperature as an accessible

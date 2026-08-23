@@ -82,11 +82,33 @@ const BOOKING: Booking = {
   created_at: '2026-08-02T10:00:00Z',
 };
 
-const mockGet = (flights: Flight[] = FLIGHTS, bookings: Booking[] = []) => {
+const STATION = {
+  iata_code: 'LHR',
+  city: 'London',
+  temperature_c: 17,
+  condition: 'Mainly clear',
+  wind_kph: 10,
+  forecast: [{ date: '2026-08-24', condition: 'Rain', high_c: 23, low_c: 16 }],
+};
+
+/** `weather` defaults to null, meaning the call rejects — the state every
+ *  other test in this file runs in, and the one that matters most: weather is
+ *  decoration on a booking product and must never be able to stop it
+ *  rendering. */
+const mockGet = (
+  flights: Flight[] = FLIGHTS,
+  bookings: Booking[] = [],
+  weather: { stations: typeof STATION[] } | null = null,
+) => {
   vi.mocked(api.get).mockImplementation(((url: string) => {
     if (url === '/auth/me') return Promise.resolve({ data: PROFILE });
     if (url === '/flights') return Promise.resolve({ data: flights });
     if (url === '/bookings') return Promise.resolve({ data: bookings });
+    if (url === '/weather') {
+      return weather
+        ? Promise.resolve({ data: weather })
+        : Promise.reject(new Error('provider unavailable'));
+    }
     return Promise.reject(new Error(`unexpected ${url}`));
   }) as never);
 };
@@ -117,10 +139,13 @@ describe('Dashboard', () => {
       mockGet();
       await renderDashboard();
 
-      expect(await screen.findByText('ATH → LHR')).toBeInTheDocument();
-      expect(screen.getByText('DS1040')).toBeInTheDocument();
-      expect(screen.getByText(/3h 45m/)).toBeInTheDocument();
-      expect(screen.getByText('Athens to London')).toBeInTheDocument();
+      // Scoped to the list: the hero's featured route also renders "ATH → LHR",
+      // and this test is about the flight card, not the carousel.
+      expect(await screen.findByText('DS1040')).toBeInTheDocument();
+      const flights = document.getElementById('flights')!;
+      expect(within(flights).getByText('ATH → LHR')).toBeInTheDocument();
+      expect(within(flights).getByText(/3h 45m/)).toBeInTheDocument();
+      expect(within(flights).getByText('Athens to London')).toBeInTheDocument();
     });
 
     it('shows the cheapest fare as the headline price, in EUR', async () => {
@@ -141,15 +166,56 @@ describe('Dashboard', () => {
     it('uses no primary action in the list', async () => {
       mockGet();
       await renderDashboard();
-      await screen.findByText('ATH → LHR');
-      // Atlas allows one primary per view; N flights must not mean N of them.
-      expect(document.querySelectorAll('.ds-action--primary')).toHaveLength(0);
+      await screen.findByText('DS1040');
+      // One primary per view; N flights must not mean N of them. The view's
+      // single primary belongs to the hero ("Search this route"), so this is
+      // scoped to the list rather than the document.
+      const flights = document.getElementById('flights')!;
+      expect(flights.querySelectorAll('.ds-action--primary')).toHaveLength(0);
     });
 
     it('says so when nothing matches', async () => {
       mockGet([]);
       await renderDashboard();
       expect(await screen.findByText(/no flights match that search/i)).toBeInTheDocument();
+    });
+  });
+
+  describe('weather', () => {
+    it('still renders the whole dashboard when the provider is down', async () => {
+      mockGet(); // weather rejects
+      await renderDashboard();
+
+      // Flights — the actual product — are unaffected.
+      expect(await screen.findByText('DS1040')).toBeInTheDocument();
+      // And nothing claims a forecast is coming.
+      expect(screen.queryByText(/weather at your destinations/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/km\/h wind/i)).not.toBeInTheDocument();
+    });
+
+    it('shows conditions on the destination card once they arrive', async () => {
+      mockGet(FLIGHTS, [], { stations: [STATION] });
+      await renderDashboard();
+
+      // The chip's accessible name carries the condition and the city,
+      // because "17°" on its own does not read.
+      expect(
+        await screen.findByLabelText(/17 degrees, mainly clear in London/i),
+      ).toBeInTheDocument();
+    });
+
+    it('draws no chip for a station the provider skipped', async () => {
+      mockGet(FLIGHTS, [], { stations: [STATION] });
+      await renderDashboard();
+      // The card chip specifically — the weather strip carries its own
+      // label for the same station, which is correct and not what is under
+      // test here.
+      await screen.findByLabelText(/17 degrees, mainly clear in London/i);
+
+      // Only London answered; Paris must render as a card with no chip
+      // rather than a broken or zeroed one.
+      expect(screen.queryByLabelText(/degrees.*in Paris/i)).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Search flights to Paris' })).toBeInTheDocument();
     });
   });
 

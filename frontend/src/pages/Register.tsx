@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import authPanel from '../assets/auth-panel.jpg';
 import ThemeToggle from '../components/ThemeToggle';
 
 // Field names match the API payload exactly.
@@ -43,9 +44,14 @@ const Register = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
-      <div className="ds-editorial hidden md:flex flex-col justify-between w-1/2 p-12 border-r border-hairline order-last md:order-first">
-        <span className="ds-eyebrow">DS Airlines</span>
-        <div>
+      {/* Photography under a scrim — the panel scrim is what makes this copy
+          legible whatever the picture is doing behind it. */}
+      <div className="ds-editorial relative overflow-hidden hidden md:flex flex-col justify-between w-1/2 p-12 border-r border-hairline order-last md:order-first">
+        <img src={authPanel} alt="" aria-hidden="true" decoding="async" className="ds-photo" />
+        <span className="ds-scrim ds-scrim--panel" />
+
+        <span className="ds-eyebrow relative ds-on-photo">DS Airlines</span>
+        <div className="relative ds-on-photo">
           {/* This panel advertised "A Star Alliance Member" and "Miles+Bonus"
               — a real alliance DS does not belong to, and Aegean's registered
               programme. Both were removed in Phase 0.
@@ -58,12 +64,12 @@ const Register = () => {
           <h1 className="ds-hero">
             Book in<br />fewer steps
           </h1>
-          <p className="mt-6 text-muted text-base">
+          <p className="mt-6 text-base opacity-90">
             Save your passport details once and they are filled in on every booking.
             Your itineraries stay in one place.
           </p>
         </div>
-        <span className="ds-label text-muted">220 seats · one fleet · seven routes</span>
+        <span className="ds-label relative ds-on-photo opacity-80">220 seats · one fleet · seven routes</span>
       </div>
 
       <div className="flex items-center justify-center w-full md:w-1/2 p-6 md:p-12">

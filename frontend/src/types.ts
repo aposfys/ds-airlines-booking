@@ -56,3 +56,21 @@ export interface Booking {
   amount_eur: string;
   created_at: string;
 }
+
+/** Weather is not domain data — nothing about it is stored, and a station
+ *  missing from a response simply means the provider did not answer for it. */
+export interface DailyForecast {
+  date: string;
+  condition: string;
+  high_c: number;
+  low_c: number;
+}
+
+export interface StationWeather {
+  iata_code: string;
+  city: string;
+  temperature_c: number;
+  condition: string;
+  wind_kph: number;
+  forecast: DailyForecast[];
+}

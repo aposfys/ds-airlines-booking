@@ -3,10 +3,10 @@
 Notable changes to DS Airlines. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-**The project is complete at v0.2.0 and stops there deliberately.** Versions
-stay pre-1.0 because payment capture and the operations interface were never
-built; 1.0.0 would claim the product is finished rather than scoped. What was
-left out, and why, is in [the README](README.md#what-was-not-built-and-why).
+**Versions stay pre-1.0 deliberately.** Payment capture and the operations
+interface were never built; 1.0.0 would claim the product is finished rather
+than scoped. What was left out, and why, is in
+[the README](README.md#what-was-not-built-and-why).
 
 Defect identifiers (DEF-*) refer to
 [the current-state assessment](docs/analysis/current-state-assessment.md).
@@ -14,6 +14,75 @@ Defect identifiers (DEF-*) refer to
 ---
 
 ## [Unreleased]
+
+The interface is rebuilt on **Airy Sky Editorial**, replacing Atlas, and the
+dashboard gains the hero carousel, destination cards and live weather the
+design called for.
+
+This closes a gap rather than opening one. `docs/design/airy-sky-editorial.md`
+and the screenshots beside it described an interface this repository did not
+contain — grepping the tree for `weather`, `meteo` or `carousel` hit only
+markdown, never a `.tsx` or a `.py`, and the four commits that introduced all
+of it touched images and prose only. The README had been corrected to label it
+a direction that was designed and not shipped. It is now shipped, so the label
+is gone.
+
+### Added
+- **Hero carousel** over photography, with the glass search bar on it and a
+  featured route beneath. Auto-advance stops entirely under
+  `prefers-reduced-motion`, read live through a `matchMedia` listener rather
+  than sampled once; hovering pauses it; the route strip is `aria-live`.
+- **Popular destinations** — six cards, buttons rather than links wrapped
+  round a picture, since choosing one runs a search. Photographs are `alt=""`
+  and the accessible name describes the action, not the image.
+- **`GET /api/weather`** — current conditions and a three-day forecast from
+  Open-Meteo, proxied server-side, cached thirty minutes per station. See
+  [ADR-002](docs/adr/0002-server-side-weather-proxy.md).
+- **`latitude` / `longitude` on `airports`**, with range constraints, NOT NULL
+  and a backfill for all eight stations. A forecast provider needs a position
+  and an airport's position is airport reference data.
+- **`make screenshots` and `make walkthrough`** — regenerate `docs/screenshots`
+  and the README's looping walkthrough from the running application. These are
+  the actual fix for how the drift above happened: nothing previously
+  connected the pictures in this repository to the product.
+- **`.ds-photo`, `.ds-scrim` and its three variants**, and **three contrast
+  pairs covering text over photography** — measured against each scrim
+  composited over a blown-out highlight, the worst an image can present.
+
+### Changed
+- **Token layer** — Atlas's `tokens.css` replaced with the Airy Sky set.
+  Light is now the default theme (a bare `:root`) with dark as the remap,
+  the reverse of Atlas; `parse_themes()` in `contrast_check.py` was flipped to
+  match, as was `ThemeContext`, which now asks about
+  `prefers-color-scheme: dark`. Webfonts move from Gabarito and Spline Sans
+  Mono to Outfit (display, numerals) and Figtree (interface).
+  The geometry is inherited unchanged — Atlas already shipped the 1.75px grid,
+  the 10–46px scale and radii 6/10/14 the Airy Sky spec lists.
+- **`.ds-label` and `.ds-eyebrow` moved out of `@layer components`.**
+  `base.css`'s `h2 { font-size: 25px }` is unlayered, and layer order resolves
+  before specificity, so on an `<h2>` these silently rendered at heading size.
+- **`httpx`** promoted from a test-only to a runtime dependency.
+- **Backend tests 89 → 103**, frontend unchanged at 69, e2e unchanged at 17.
+  Contrast goes 14 pairs → 17.
+
+### Fixed
+- **A real bug in `contrast_check.py`**: it composited translucent colours in
+  linear light, but browsers blend ordinary sRGB content in gamma-encoded
+  space. The card scrim resolved to 3.0:1 against the 6.2:1 a browser
+  renders, which would have driven every scrim far heavier than the design
+  needs. Compositing now happens in sRGB, converting to linear only to take
+  luminance. Two pairs needed retuning against the corrected model.
+
+### Removed
+- **`docs/images/`** and the prototype walkthrough `docs/media/usage.mp4` —
+  superseded by captures of the running application.
+
+---
+
+## [Unreleased · superseded] — the Atlas swap
+
+Kept for the record. Atlas replaced AF after v0.2.0 and was itself replaced
+by Airy Sky Editorial above, without ever being tagged.
 
 The interface is rebuilt on **Atlas**, replacing AF. Same relationship as
 before — the design system owns everything visual, DS Airlines owns only the

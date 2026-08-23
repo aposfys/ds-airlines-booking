@@ -22,10 +22,14 @@ alembic==1.18.5
 python-jose[cryptography]==3.5.0
 bcrypt==5.0.0
 
+# ── Outbound HTTP ─────────────────────────────────────────
+# Runtime, not just tests: the weather proxy calls Open-Meteo server-side so
+# the browser never talks to a third party directly.
+httpx==0.28.1
+
 # ── Config ────────────────────────────────────────────────
 python-dotenv==1.2.2
 
 # ── Testing ───────────────────────────────────────────────
 pytest==9.1.1
 pytest-asyncio==1.4.0
-httpx==0.28.1

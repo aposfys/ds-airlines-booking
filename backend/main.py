@@ -8,7 +8,7 @@ from sqlalchemy import text
 
 from app.config import SEED_ON_STARTUP
 from app.db import SessionFactory, engine
-from app.routers import admin, auth, bookings, flights
+from app.routers import admin, auth, bookings, flights, weather
 from app.seed import seed_data
 
 logging.basicConfig(
@@ -71,6 +71,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(flights.router, prefix="/api/flights", tags=["Flights"])
 app.include_router(bookings.router, prefix="/api/bookings", tags=["Bookings"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+app.include_router(weather.router, prefix="/api/weather", tags=["Weather"])
 
 
 @app.get("/")

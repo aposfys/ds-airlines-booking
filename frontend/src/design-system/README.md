@@ -1,33 +1,43 @@
-# Atlas — vendored token layer
+# Airy Sky Editorial — the token layer
 
 DS Airlines does not have its own visual identity. It is a product built on
-**Atlas**, a personal design system by Apostolos Fysekidis — a "rounded
-glass" interface language over a navy-and-chartreuse palette. Atlas supplies
-the visual system, and DS Airlines supplies the verbal one — the
+**Airy Sky Editorial**, a personal design system by Apostolos Fysekidis — a
+light-first editorial language over a Paper & Sky palette, with glass and
+scrimmed photography as its two structural devices. The design system
+supplies the visual language; DS Airlines supplies the verbal one — the
 positioning, the fare names and the words on screen. See
-[`docs/brand/brandbook.md`](../../../docs/brand/brandbook.md) for the split.
+[`docs/brand/brandbook.md`](../../../docs/brand/brandbook.md) for the split,
+and [`docs/design/airy-sky-editorial.md`](../../../docs/design/airy-sky-editorial.md)
+for the system itself.
 
-The vendored token files carry the codename `VANE` in their own header
-comments — the vendor's own working title for this system, kept because
-`tokens.css` and `base.css` below are byte-identical to source. The design
-system's name, used throughout this product's own docs and code, is Atlas.
+This is the third token layer this project has run on: AF, then Atlas from
+5 August 2026, then Airy Sky. None of them ever vendored a component kit —
+this application has always built its own components against a token layer —
+so each swap has been a token-layer replacement plus a re-skin, not a
+component migration.
 
-Atlas replaced this project's first design system, AF, on 5 August 2026.
-AF's 28-component kit was never vendored here in the first place — this
-application always built its own components against a token layer — so the
-swap is a token-layer replacement plus a re-skin of the four components that
-reach for it, not a component migration.
+Airy Sky inherits Atlas's geometry outright: the 1.75px grid, the 10–46px
+type scale, radii 6/10/14 and control heights 28/34/42 are unchanged. What
+changed is the palette, the type, and which theme is the default — **light
+is the default here**, declared on a bare `:root`, with dark as the remap.
+`docs/brand/contrast_check.py` classifies blocks by that selector shape, so
+the two must stay in step.
+
+Unlike the Atlas files, these are authored here rather than vendored
+byte-identical, so corrections go directly into `tokens/tokens.css`;
+`overrides.css` is kept, and kept in the checker's sources, but is currently
+empty.
 
 ## What is here, and what is not
 
-**Vendored:** the token layer (`tokens/tokens.css`, `tokens/base.css`), the
-webfont imports (`tokens/fonts.css`), and the accessibility standard
-(`accessibility.md`, adapted from the vendor's own readme).
+**Here:** the token layer (`tokens/tokens.css`, `tokens/base.css`), the
+webfont imports (`tokens/fonts.css` — Outfit and Figtree via `@fontsource`),
+and the accessibility standard (`accessibility.md`).
 
-**Not vendored:** Atlas ships no component set at all — its own readme
-states this plainly ("No components built. This is the language and the
-token system."). Every product-level shape (`ds-field`, `ds-action`,
-`ds-hero`, `ds-label`, `ds-eyebrow`, `ds-skip-link`) is this application's
+**Not here:** no component set. Every product-level shape (`ds-field`,
+`ds-action`, `ds-hero`, `ds-label`, `ds-eyebrow`, `ds-skip-link`,
+`ds-photo`, `ds-scrim`, `ds-card-photo`, `ds-icon-button`, `ds-dot`) is this
+application's
 own, built in `src/index.css` against Atlas's semantic tokens and its three
 vendored devices — `.v-idx` (the index label), `.v-glass` (the panel),
 `.v-num` (mono figures) — rather than reimplemented differently.

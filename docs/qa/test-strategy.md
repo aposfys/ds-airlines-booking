@@ -189,12 +189,12 @@ remains the control for the rest.
 
 ## 6 · The automated suites
 
-**189 automated tests across three suites**, all running in CI.
+**192 automated tests across three suites**, all running in CI.
 
 | Suite | Count | What it can see |
 |---|---|---|
-| Backend (pytest) | 89 | Endpoints, authorization, inventory, database constraints |
-| Component (Vitest) | 69 | Rendering, state, validation, formatting, contexts |
+| Backend (pytest) | 103 | Endpoints, authorization, inventory, database constraints, the weather proxy |
+| Component (Vitest) | 72 | Rendering, state, validation, formatting, contexts |
 | End-to-end (Playwright) | 17 | Everything only a real browser can observe |
 
 The end-to-end suite exists because of §5. It asserts the things that were

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import authPanel from '../assets/auth-panel.jpg';
 import ThemeToggle from '../components/ThemeToggle';
 import { useAuth } from '../context/AuthContext';
 
@@ -26,19 +27,24 @@ const Login = () => {
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">
-      {/* Editorial side. Glass over the bloom, per Atlas. */}
-      <div className="ds-editorial hidden md:flex flex-col justify-between w-1/2 p-12 border-r border-hairline">
-        <span className="ds-eyebrow">DS Airlines</span>
-        <div>
+      {/* Editorial side. Photography under a scrim — no text ever sits on a
+          bare image, so the panel scrim is what makes this copy legible
+          regardless of what the picture happens to be doing behind it. */}
+      <div className="ds-editorial relative overflow-hidden hidden md:flex flex-col justify-between w-1/2 p-12 border-r border-hairline">
+        <img src={authPanel} alt="" aria-hidden="true" decoding="async" className="ds-photo" />
+        <span className="ds-scrim ds-scrim--panel" />
+
+        <span className="ds-eyebrow relative ds-on-photo">DS Airlines</span>
+        <div className="relative ds-on-photo">
           <h1 className="ds-hero">
             Your journey<br />begins here
           </h1>
-          <p className="mt-6 text-muted text-base">
+          <p className="mt-6 text-base opacity-90">
             Short-haul across Europe from Athens and Thessaloniki. Cabin bag included,
             in every fare.
           </p>
         </div>
-        <span className="ds-label text-muted">ATH · SKG · LHR · CDG · FRA · MUC · FCO · BCN</span>
+        <span className="ds-label relative ds-on-photo opacity-80">ATH · SKG · LHR · CDG · FRA · MUC · FCO · BCN</span>
       </div>
 
       {/* Form side */}

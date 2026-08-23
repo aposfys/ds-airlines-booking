@@ -75,6 +75,11 @@ class TestRouteConstraints:
 
 
 class TestAirportConstraints:
+    """Coordinates are supplied on every station here, including the ones
+    testing something else. Without them the row trips NOT NULL first and the
+    constraint under test is never reached — a green assertion about the wrong
+    failure."""
+
     async def test_iata_code_must_be_uppercase(self, session):
         await _expect_violation(
             session,
@@ -84,8 +89,56 @@ class TestAirportConstraints:
                 city="Athens",
                 country="GR",
                 timezone="Europe/Athens",
+                latitude=37.9364,
+                longitude=23.9445,
             ),
             "ck_airport_iata_upper",
+        )
+
+    async def test_latitude_must_be_on_the_globe(self, session):
+        await _expect_violation(
+            session,
+            Airport(
+                iata_code="XXA",
+                name="Off the top of the world",
+                city="Nowhere",
+                country="GR",
+                timezone="Europe/Athens",
+                latitude=91.0,
+                longitude=23.9445,
+            ),
+            "ck_airport_latitude_range",
+        )
+
+    async def test_longitude_must_be_on_the_globe(self, session):
+        await _expect_violation(
+            session,
+            Airport(
+                iata_code="XXB",
+                name="Past the date line",
+                city="Nowhere",
+                country="GR",
+                timezone="Europe/Athens",
+                latitude=37.9364,
+                longitude=-181.0,
+            ),
+            "ck_airport_longitude_range",
+        )
+
+    async def test_a_station_cannot_be_stored_without_a_position(self, session):
+        """The weather proxy asks the provider about a coordinate. A station
+        with none would either be silently skipped or defaulted to 0,0, which
+        is in the Atlantic — so the database refuses it instead."""
+        await _expect_violation(
+            session,
+            Airport(
+                iata_code="XXC",
+                name="Positionless",
+                city="Nowhere",
+                country="GR",
+                timezone="Europe/Athens",
+            ),
+            "not-null",
         )
 
 

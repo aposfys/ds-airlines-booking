@@ -26,6 +26,7 @@ from sqlalchemy import (
     Date,
     DateTime,
     Enum,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -73,9 +74,22 @@ class Airport(Base):
     country: Mapped[str] = mapped_column(String(2), nullable=False)  # ISO 3166-1 alpha-2
     timezone: Mapped[str] = mapped_column(String(64), nullable=False)  # IANA
 
+    # Station coordinates. Present so the weather proxy can ask a forecast
+    # provider about a station without a second source of truth for where
+    # airports are — an airport's position is airport reference data, and it
+    # belongs in the same row as its IANA zone.
+    latitude: Mapped[float] = mapped_column(Float, nullable=False)
+    longitude: Mapped[float] = mapped_column(Float, nullable=False)
+
     __table_args__ = (
         CheckConstraint("iata_code = upper(iata_code)", name="ck_airport_iata_upper"),
         CheckConstraint("char_length(iata_code) = 3", name="ck_airport_iata_len"),
+        CheckConstraint(
+            "latitude >= -90 AND latitude <= 90", name="ck_airport_latitude_range"
+        ),
+        CheckConstraint(
+            "longitude >= -180 AND longitude <= 180", name="ck_airport_longitude_range"
+        ),
     )
 
     def __repr__(self) -> str:

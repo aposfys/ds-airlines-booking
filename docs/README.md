@@ -36,6 +36,10 @@ carry their limitation.
 
 ## 4 · What it says and how it looks
 
+**[Airy Sky Editorial](design/airy-sky-editorial.md)** — the design system the
+interface runs on: the Paper & Sky palette, Outfit and Figtree, glass, and the
+rule that no text ever sits on bare photography.
+
 **[Product brand](brand/brandbook.md)** — positioning, network, fare
 architecture and voice. It owns only the words: the visual system belongs to
 [Atlas](../frontend/src/design-system/README.md).

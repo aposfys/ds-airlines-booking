@@ -201,3 +201,40 @@ class BookingResponse(BaseModel):
     card_last4: str | None = None
     amount_eur: Decimal
     created_at: datetime
+
+
+# ──────────────────────────────────────────────────────────────────────────
+# Weather
+#
+# Not domain data — nothing here is stored. These are the shapes the weather
+# proxy hands the interface, deliberately narrow: the provider returns a good
+# deal more, and passing it through unshaped would make the interface depend
+# on a third party's field names.
+# ──────────────────────────────────────────────────────────────────────────
+
+
+class DailyForecast(BaseModel):
+    date: str
+    condition: str
+    high_c: int
+    low_c: int
+
+
+class StationWeather(BaseModel):
+    iata_code: str
+    city: str
+    temperature_c: int
+    condition: str
+    wind_kph: int
+    forecast: list[DailyForecast]
+
+
+class WeatherResponse(BaseModel):
+    """Stations we could actually reach.
+
+    A station missing from this list means the provider did not answer for
+    it. That is not an error the caller needs to handle beyond drawing
+    nothing — see the router for why this never fails loudly.
+    """
+
+    stations: list[StationWeather]

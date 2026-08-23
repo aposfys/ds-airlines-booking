@@ -62,7 +62,7 @@ make check-all   # the above plus the end-to-end suite
 Individually:
 
 ```bash
-make test       # 89 backend tests against real PostgreSQL
+make test       # 103 backend tests against real PostgreSQL
 make lint       # eslint
 make build      # tsc + vite, also proves the fonts resolve
 make contrast   # 34 colour pairs, both themes
@@ -189,12 +189,12 @@ remains the control for the rest.
 
 ## 6 · The automated suites
 
-**175 automated tests across three suites**, all running in CI.
+**192 automated tests across three suites**, all running in CI.
 
 | Suite | Count | What it can see |
 |---|---|---|
-| Backend (pytest) | 89 | Endpoints, authorization, inventory, database constraints |
-| Component (Vitest) | 69 | Rendering, state, validation, formatting, contexts |
+| Backend (pytest) | 103 | Endpoints, authorization, inventory, database constraints, the weather proxy |
+| Component (Vitest) | 72 | Rendering, state, validation, formatting, contexts |
 | End-to-end (Playwright) | 17 | Everything only a real browser can observe |
 
 The end-to-end suite exists because of §5. It asserts the things that were

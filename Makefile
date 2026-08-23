@@ -15,6 +15,7 @@ PY         := $(VENV)/bin/python
 PIP        := $(VENV)/bin/pip
 PGDATA     := .pgdata
 PGPORT     := 55432
+SCREENSHOT_BASE_URL ?= http://localhost:5173
 PGHOST     := /tmp
 PGBIN      := $(shell brew --prefix postgresql@17 2>/dev/null)/bin
 DB         := dsairlines
@@ -183,8 +184,16 @@ build:
 contrast:
 	$(PY) docs/brand/contrast_check.py
 
+# Recapture docs/screenshots/* from a running stack. Needs `make dev` up in
+# another shell — these are captures of the real product, not design comps,
+# and the difference is the reason this target exists.
+screenshots:
+	@curl -sf $(SCREENSHOT_BASE_URL)/ >/dev/null 2>&1 || { \
+		echo "Nothing serving on $(SCREENSHOT_BASE_URL) — run 'make dev' first."; exit 1; }
+	cd frontend && node scripts/screenshots.mjs
+
 clean:
 	rm -rf $(VENV) frontend/node_modules frontend/dist
 
 .PHONY: help up down setup db-start db-stop db-reset psql migrate dev seed \
-        check check-all test test-frontend e2e lint build contrast clean
+        check check-all test test-frontend e2e lint build contrast screenshots clean

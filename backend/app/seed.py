@@ -37,14 +37,15 @@ _CABIN_COLUMNS = "ABCDEF"
 _EXIT_ROWS = {12, 13}
 
 _AIRPORTS = [
-    ("ATH", "LGAV", "Athens International Eleftherios Venizelos", "Athens", "GR", "Europe/Athens"),
-    ("SKG", "LGTS", "Thessaloniki Makedonia", "Thessaloniki", "GR", "Europe/Athens"),
-    ("LHR", "EGLL", "London Heathrow", "London", "GB", "Europe/London"),
-    ("CDG", "LFPG", "Paris Charles de Gaulle", "Paris", "FR", "Europe/Paris"),
-    ("FRA", "EDDF", "Frankfurt am Main", "Frankfurt", "DE", "Europe/Berlin"),
-    ("MUC", "EDDM", "Munich Franz Josef Strauss", "Munich", "DE", "Europe/Berlin"),
-    ("FCO", "LIRF", "Rome Fiumicino", "Rome", "IT", "Europe/Rome"),
-    ("BCN", "LEBL", "Barcelona El Prat", "Barcelona", "ES", "Europe/Madrid"),
+    # iata, icao, name, city, country, tz, latitude, longitude
+    ("ATH", "LGAV", "Athens International Eleftherios Venizelos", "Athens", "GR", "Europe/Athens", 37.9364, 23.9445),
+    ("SKG", "LGTS", "Thessaloniki Makedonia", "Thessaloniki", "GR", "Europe/Athens", 40.5197, 22.9709),
+    ("LHR", "EGLL", "London Heathrow", "London", "GB", "Europe/London", 51.4700, -0.4543),
+    ("CDG", "LFPG", "Paris Charles de Gaulle", "Paris", "FR", "Europe/Paris", 49.0097, 2.5479),
+    ("FRA", "EDDF", "Frankfurt am Main", "Frankfurt", "DE", "Europe/Berlin", 50.0379, 8.5622),
+    ("MUC", "EDDM", "Munich Franz Josef Strauss", "Munich", "DE", "Europe/Berlin", 48.3538, 11.7861),
+    ("FCO", "LIRF", "Rome Fiumicino", "Rome", "IT", "Europe/Rome", 41.8003, 12.2389),
+    ("BCN", "LEBL", "Barcelona El Prat", "Barcelona", "ES", "Europe/Madrid", 41.2974, 2.0833),
 ]
 
 # (origin, destination, distance_km, minutes)
@@ -108,9 +109,16 @@ async def _seed_reference_data(session: AsyncSession) -> None:
     logger.info("Seeding reference data")
     session.add_all(
         Airport(
-            iata_code=iata, icao_code=icao, name=name, city=city, country=cc, timezone=tz
+            iata_code=iata,
+            icao_code=icao,
+            name=name,
+            city=city,
+            country=cc,
+            timezone=tz,
+            latitude=lat,
+            longitude=lon,
         )
-        for iata, icao, name, city, cc, tz in _AIRPORTS
+        for iata, icao, name, city, cc, tz, lat, lon in _AIRPORTS
     )
 
     aircraft_type = AircraftType(

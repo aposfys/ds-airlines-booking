@@ -1,12 +1,16 @@
-/* Atlas — webfonts. Gabarito (UI) and Spline Sans Mono (numerics), self-hosted
-   via @fontsource rather than the CDN links in the vendor readme's "Using
-   it" section — the vendor's own "Open" notes flag CDN fonts as something to
-   fix "before production", so this project does it up front. Only the
-   weights Atlas's tokens.css declares (400/500/600/700 UI, 400/500 mono) are
-   pulled in. Family names match --f-ui / --f-num in tokens.css exactly. */
-@import "@fontsource/gabarito/400.css";
-@import "@fontsource/gabarito/500.css";
-@import "@fontsource/gabarito/600.css";
-@import "@fontsource/gabarito/700.css";
-@import "@fontsource/spline-sans-mono/400.css";
-@import "@fontsource/spline-sans-mono/500.css";
+/* Airy Sky Editorial — webfonts. Outfit (display and numerals) and Figtree
+   (interface), self-hosted via @fontsource rather than a CDN link.
+
+   Loaded as CSS imports from an entry that Vite resolves against node_modules,
+   NOT as a bare `@import` nested under Tailwind's own import. That nesting is
+   what once shipped a production build containing zero .woff2 files, with the
+   whole typographic identity silently falling back to Helvetica and no error
+   of any kind — see e2e/interface.spec.ts, which exists to catch exactly that
+   and asserts these faces are actually served. */
+@import "@fontsource/outfit/400.css";
+@import "@fontsource/outfit/500.css";
+@import "@fontsource/outfit/600.css";
+@import "@fontsource/outfit/700.css";
+@import "@fontsource/figtree/400.css";
+@import "@fontsource/figtree/500.css";
+@import "@fontsource/figtree/600.css";

@@ -262,6 +262,21 @@
     color: var(--text-on-photo);
   }
 
+  /* A card whose surface is a photograph rather than glass. The border is
+     a hairline over the image, not around it, so the card reads as a window
+     rather than a framed picture. */
+  .ds-card-photo {
+    border: 1px solid var(--border-subtle);
+    cursor: pointer;
+    transition: transform var(--d-2) var(--ease);
+  }
+  .ds-card-photo:hover {
+    transform: translateY(-2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ds-card-photo:hover { transform: none; }
+  }
+
   /* ── Carousel controls ──────────────────────────────────── */
   .ds-icon-button {
     display: inline-flex;

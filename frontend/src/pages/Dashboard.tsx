@@ -3,10 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { Airplane, MagnifyingGlass, SignOut } from '@phosphor-icons/react';
 import api from '../api';
 import BookingDialog from '../components/BookingDialog';
+import DestinationCards from '../components/DestinationCards';
+import HeroCarousel from '../components/HeroCarousel';
 import ThemeToggle from '../components/ThemeToggle';
+import WeatherStrip from '../components/WeatherStrip';
 import { useAuth } from '../context/AuthContext';
+import { DESTINATIONS } from '../lib/destination-images';
 import { formatDuration, formatFare, formatFlightDate, formatTime } from '../lib/format';
+import { useWeather } from '../lib/useWeather';
 import type { Booking, Flight } from '../types';
+
+const DESTINATION_CODES = DESTINATIONS.map((d) => d.iata);
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
@@ -19,6 +26,10 @@ const Dashboard = () => {
     null,
   );
   const [bookingFlight, setBookingFlight] = useState<Flight | null>(null);
+
+  // Decoration on top of a booking product: this never throws and never
+  // blocks a render — an empty map simply draws no chips.
+  const weather = useWeather(DESTINATION_CODES);
 
   // IATA codes, matched exactly by the API. Free-text city search used to be
   // interpolated into a Mongo $regex (DEF-005); there is no pattern matching
@@ -73,6 +84,14 @@ const Dashboard = () => {
     }, 300);
     return () => clearTimeout(timer);
   }, [origin, destination, user, loading, loadFlights]);
+
+  /* Choosing a destination — from a card or the carousel — is a search, not
+     navigation. Origin defaults to Athens, which is where the network is. */
+  const searchRoute = (iata: string) => {
+    setOrigin('ATH');
+    setDestination(iata);
+    document.getElementById('flights')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const handleLogout = () => {
     logout();
@@ -153,17 +172,14 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      {/* Search. Glass over the bloom, per Atlas. */}
-      <header className="ds-editorial border-b border-hairline">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <h1 className="ds-hero">
-            Where to next
-          </h1>
-          <p className="text-muted text-sm mt-3">
-            Short-haul across Europe from Athens and Thessaloniki.
-          </p>
+      {/* The hero. Photography, a scrim, and the glass search bar over it —
+          glass needs something with structure to refract, which is why the
+          backdrop is an image rather than flat paper. */}
+      <HeroCarousel onSearchRoute={searchRoute}>
+        <h1 className="ds-hero ds-on-photo text-center">Where to next?</h1>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mt-8">
+        <div className="v-glass v-glass-frame mt-8 p-5 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label htmlFor="origin" className="ds-label block mb-2 text-muted">
                 From
@@ -214,7 +230,7 @@ const Dashboard = () => {
             and BCN.
           </p>
         </div>
-      </header>
+      </HeroCarousel>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
         {notice && (
@@ -230,7 +246,11 @@ const Dashboard = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <DestinationCards weather={weather} onSelect={searchRoute} />
+
+        <WeatherStrip weather={weather} />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mt-12">
           <section id="flights" className="lg:col-span-2">
             <h2 className="v-idx mb-5">Available flights</h2>
 

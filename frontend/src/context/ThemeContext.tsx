@@ -13,26 +13,28 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const STORAGE_KEY = 'ds-theme';
 
 /**
- * Atlas ships both themes token-complete and defaults to dark. Nothing
+ * Airy Sky ships both themes token-complete and defaults to light. Nothing
  * exposed a switch, so the light theme was unreachable — and unreachable
  * styling is where accessibility regressions hide, which is exactly what
  * docs/brand/contrast_check.py checks for.
  *
  * Resolution order: an explicit stored choice, then the operating system's
- * preference, then Atlas's dark default.
+ * preference, then the system's light default.
  */
 const resolveInitialTheme = (): Theme => {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === 'dark' || stored === 'light') return stored;
-  return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  // Light is the default now, so the query asks about dark: an unset or
+  // unsupported matchMedia lands on light, which is what a bare :root renders.
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<Theme>(resolveInitialTheme);
 
   useEffect(() => {
-    // Atlas's tokens.css keys the light palette off [data-theme="light"] and
-    // treats anything else as dark, but the attribute is set explicitly in
+    // tokens.css keys the dark palette off [data-theme="dark"] and treats a
+    // bare :root as light, but the attribute is set explicitly in
     // both directions so the state is legible in the DOM.
     document.documentElement.dataset.theme = theme;
   }, [theme]);
@@ -40,8 +42,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Follow the system while the passenger has not chosen for themselves.
     if (localStorage.getItem(STORAGE_KEY)) return;
-    const query = window.matchMedia('(prefers-color-scheme: light)');
-    const onChange = (e: MediaQueryListEvent) => setTheme(e.matches ? 'light' : 'dark');
+    const query = window.matchMedia('(prefers-color-scheme: dark)');
+    const onChange = (e: MediaQueryListEvent) => setTheme(e.matches ? 'dark' : 'light');
     query.addEventListener('change', onChange);
     return () => query.removeEventListener('change', onChange);
   }, []);

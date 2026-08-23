@@ -8,7 +8,7 @@ import HeroCarousel from '../components/HeroCarousel';
 import ThemeToggle from '../components/ThemeToggle';
 import WeatherStrip from '../components/WeatherStrip';
 import { useAuth } from '../context/AuthContext';
-import { DESTINATIONS } from '../lib/destination-images';
+import { DESTINATIONS, imageFor as destinationImage } from '../lib/destination-images';
 import { formatDuration, formatFare, formatFlightDate, formatTime } from '../lib/format';
 import { useWeather } from '../lib/useWeather';
 import type { Booking, Flight } from '../types';
@@ -269,9 +269,35 @@ const Dashboard = () => {
                   return (
                     <li
                       key={flight.id}
-                      className="v-glass p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5"
+                      className="v-glass overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-5 pr-5"
                     >
-                      <div className="flex-1">
+                      {/* Route photography. Decorative — the destination is
+                          already in the flight code and the city line beside
+                          it, so repeating it here would just be noise to a
+                          screen reader. */}
+                      <span
+                        className="relative hidden sm:block shrink-0 self-stretch"
+                        style={{ width: 'var(--sp-9)' }}
+                        aria-hidden="true"
+                      >
+                        {destinationImage(flight.destination_iata) ? (
+                          <img
+                            src={destinationImage(flight.destination_iata)}
+                            alt=""
+                            decoding="async"
+                            loading="lazy"
+                            className="ds-photo"
+                          />
+                        ) : (
+                          <span className="ds-photo" style={{ background: 'var(--bloom)' }} />
+                        )}
+                        <span className="ds-scrim ds-scrim--card" />
+                        <span className="absolute left-2 bottom-2 ds-label ds-on-photo">
+                          {flight.destination_city}
+                        </span>
+                      </span>
+
+                      <div className="flex-1 py-5 pl-5 sm:pl-0">
                         <div className="flex items-baseline gap-3 flex-wrap">
                           <span className="v-num text-lg text-strong">
                             {flight.origin_iata} → {flight.destination_iata}

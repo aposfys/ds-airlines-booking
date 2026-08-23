@@ -109,7 +109,10 @@ const HeroCarousel = ({
             <ArrowRight aria-hidden="true" weight="regular" className="v-icon" />
           </button>
 
-          <div className="flex items-center gap-1 ml-auto">
+          {/* ml-auto only once there is room for it: at 390px the strip
+              wraps, and pushing the controls right clipped the next button
+              off the edge of the glass frame. */}
+          <div className="flex items-center gap-1 flex-wrap sm:ml-auto">
             <button
               type="button"
               className="ds-icon-button"

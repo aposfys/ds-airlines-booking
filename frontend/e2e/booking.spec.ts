@@ -1,5 +1,16 @@
 import { expect, test, type Page } from '@playwright/test';
 
+/** The flight list, scoped.
+ *
+ *  Not `page.getByRole('listitem')`: the dashboard now opens with a carousel
+ *  and a row of destination cards, both of which are lists, so the first
+ *  listitem on the page is a pagination dot rather than a flight. Naming the
+ *  region keeps this pointing at what it means even as the page above it
+ *  grows. Itineraries are a separate list for the same reason. */
+const flightList = (page: Page) => page.locator('#flights').getByRole('listitem');
+const itineraryList = (page: Page) =>
+  page.locator('main').getByRole('listitem');
+
 /**
  * The passenger journey, end to end: register, sign in, search, book, cancel.
  *
@@ -38,7 +49,7 @@ test.describe('the passenger journey', () => {
     // The dashboard greets by real name, not the literal "User" (DEF-016).
     await expect(page.getByText('Ada Papadopoulou')).toBeVisible();
 
-    const firstFlight = page.getByRole('listitem').first();
+    const firstFlight = flightList(page).first();
     await expect(firstFlight).toBeVisible();
 
     await firstFlight.getByRole('button', { name: 'Select' }).click();
@@ -59,7 +70,7 @@ test.describe('the passenger journey', () => {
     // I, O, 0 and 1 are excluded: a reference gets read aloud and written down.
     expect(reference).not.toMatch(/[IO01]/);
 
-    const itinerary = page.getByRole('listitem').filter({ hasText: reference });
+    const itinerary = itineraryList(page).filter({ hasText: reference });
     await expect(itinerary).toBeVisible();
     await expect(itinerary).toContainText('Confirmed');
 
@@ -68,7 +79,7 @@ test.describe('the passenger journey', () => {
 
     await expect(page.getByRole('status')).toContainText('has been cancelled');
     await expect(
-      page.getByRole('listitem').filter({ hasText: reference }),
+      itineraryList(page).filter({ hasText: reference }),
     ).toContainText('Cancelled');
   });
 
@@ -79,17 +90,17 @@ test.describe('the passenger journey', () => {
     // a seat number up front is not safe: this database keeps its data
     // between runs, so any given seat may already be sold and the test would
     // fail on its own setup rather than on what it is checking.
-    await page.getByRole('listitem').first().getByRole('button', { name: 'Select' }).click();
+    await flightList(page).first().getByRole('button', { name: 'Select' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Confirm' }).click();
     await expect(page.getByRole('status')).toContainText('Booked');
 
     const reference = (await page.getByRole('status').textContent())!.match(
       /([A-Z0-9]{6})/,
     )![1];
-    const itinerary = page.getByRole('listitem').filter({ hasText: reference });
+    const itinerary = itineraryList(page).filter({ hasText: reference });
     const seat = (await itinerary.textContent())!.match(/seat ([0-9]{1,2}[A-F])/)![1];
 
-    await page.getByRole('listitem').first().getByRole('button', { name: 'Select' }).click();
+    await flightList(page).first().getByRole('button', { name: 'Select' }).click();
     const dialog = page.getByRole('dialog');
     await dialog.getByLabel(/Seat/).fill(seat);
     await dialog.getByRole('button', { name: 'Confirm' }).click();
@@ -101,7 +112,7 @@ test.describe('the passenger journey', () => {
   test('the fare a passenger picks is the fare they are charged', async ({ page }) => {
     await registerAndSignIn(page);
 
-    await page.getByRole('listitem').first().getByRole('button', { name: 'Select' }).click();
+    await flightList(page).first().getByRole('button', { name: 'Select' }).click();
     const dialog = page.getByRole('dialog');
 
     const flex = dialog.getByRole('radio', { name: /Flex/ });
@@ -114,7 +125,7 @@ test.describe('the passenger journey', () => {
     const reference = (await page.getByRole('status').textContent())!.match(
       /([A-Z0-9]{6})/,
     )![1];
-    const itinerary = page.getByRole('listitem').filter({ hasText: reference });
+    const itinerary = itineraryList(page).filter({ hasText: reference });
     await expect(itinerary).toContainText('FLEX');
     await expect(itinerary).toContainText(total!.replace(/\s/g, ' ').trim());
   });
@@ -123,7 +134,7 @@ test.describe('the passenger journey', () => {
 test.describe('payment', () => {
   test('the booking form offers no way to enter a card', async ({ page }) => {
     await registerAndSignIn(page);
-    await page.getByRole('listitem').first().getByRole('button', { name: 'Select' }).click();
+    await flightList(page).first().getByRole('button', { name: 'Select' }).click();
 
     const dialog = page.getByRole('dialog');
     await expect(dialog).toBeVisible();

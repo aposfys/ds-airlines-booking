@@ -16,6 +16,7 @@ PIP        := $(VENV)/bin/pip
 PGDATA     := .pgdata
 PGPORT     := 55432
 SCREENSHOT_BASE_URL ?= http://localhost:5173
+WALKTHROUGH_TRIM    ?= 1.6
 PGHOST     := /tmp
 PGBIN      := $(shell brew --prefix postgresql@17 2>/dev/null)/bin
 DB         := dsairlines
@@ -192,8 +193,31 @@ screenshots:
 		echo "Nothing serving on $(SCREENSHOT_BASE_URL) — run 'make dev' first."; exit 1; }
 	cd frontend && node scripts/screenshots.mjs
 
+# Re-record the README walkthrough from a running stack, then convert it to
+# the looping animated WebP the README embeds. GitHub will not autoplay a
+# video — it strips autoplay/loop/muted from any <video> tag — so an animated
+# image is the only thing that moves on its own in a README.
+# Needs ffmpeg and img2webp (brew install ffmpeg webp).
+walkthrough:
+	@curl -sf $(SCREENSHOT_BASE_URL)/ >/dev/null 2>&1 || { \
+		echo "Nothing serving on $(SCREENSHOT_BASE_URL) — run 'make dev' first."; exit 1; }
+	@command -v ffmpeg >/dev/null || { echo "ffmpeg not found: brew install ffmpeg"; exit 1; }
+	@command -v img2webp >/dev/null || { echo "img2webp not found: brew install webp"; exit 1; }
+	cd frontend && node scripts/walkthrough.mjs
+	@rm -rf docs/media/.frames && mkdir -p docs/media/.frames
+# -ss trims the opening: the recording starts on a blank page-load frame,
+# which is invisible in a click-to-play video but flashes white on every
+# repeat of a loop, and would be the still shown before playback.
+	ffmpeg -hide_banner -loglevel error -y -ss $(WALKTHROUGH_TRIM) -i docs/media/usage.webm \
+		-vf "fps=12,scale=900:-2:flags=lanczos" docs/media/.frames/f_%04d.png
+	img2webp -loop 0 -o docs/media/usage.webp -d 83 -lossy -q 70 -m 6 \
+		docs/media/.frames/f_*.png
+	@rm -rf docs/media/.frames
+	@echo "docs/media/usage.webp written"
+
+
 clean:
 	rm -rf $(VENV) frontend/node_modules frontend/dist
 
 .PHONY: help up down setup db-start db-stop db-reset psql migrate dev seed \
-        check check-all test test-frontend e2e lint build contrast screenshots clean
+        check check-all test test-frontend e2e lint build contrast screenshots walkthrough clean

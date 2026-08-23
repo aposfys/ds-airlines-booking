@@ -4,7 +4,7 @@
   <a href="https://github.com/aposfys/ds-airlines-booking/actions/workflows/ci.yml">
     <img alt="CI" src="https://github.com/aposfys/ds-airlines-booking/actions/workflows/ci.yml/badge.svg">
   </a>
-  <img alt="tests" src="https://img.shields.io/badge/tests-175-brightgreen">
+  <img alt="tests" src="https://img.shields.io/badge/tests-189-brightgreen">
   <img alt="python" src="https://img.shields.io/badge/python-3.13-blue">
   <img alt="node" src="https://img.shields.io/badge/node-22-blue">
   <img alt="licence" src="https://img.shields.io/badge/licence-MIT-lightgrey">
@@ -25,11 +25,12 @@ are first-class artefacts here, alongside the API and the interface.
 **FastAPI · PostgreSQL · SQLAlchemy 2.0 · Alembic · React 19 · TypeScript ·
 Tailwind v4 · Docker**
 
-[**Run it**](#running-it) · [What was wrong](#from-assignment-to-product) ·
+[**Run it**](#running-it) · [The interface](#the-interface) ·
+[What was wrong](#from-assignment-to-product) ·
 [What was left out](#what-was-not-built-and-why) · [Tests](#tests) ·
 [Documentation](docs/README.md)
 
-![The dashboard: search, fare-priced results, and a confirmed itinerary](docs/images/dashboard-dark.jpg)
+![The dashboard: hero carousel, popular destinations, live weather and fare-priced results](docs/screenshots/dashboard-light.jpg)
 
 ---
 
@@ -76,74 +77,68 @@ the section on what was.
 
 ## The interface
 
-Built on **[Atlas](frontend/src/design-system/README.md)**, a design system
-of my own: rounded glass over navy and chartreuse, Gabarito for the interface
-and Spline Sans Mono for anything numeric — fares, times, IATA codes, booking
-references. DS Airlines owns the words; Atlas owns everything you can see.
+Built on **[Airy Sky Editorial](docs/design/airy-sky-editorial.md)**, a design
+system of my own: light-first, a Paper & Sky palette over cream rather than
+white, Outfit for display and numerals, Figtree for the interface. DS Airlines
+owns the words; the design system owns everything you can see.
 
-Both themes are token-complete and contrast-verified on every push: **14
-colour pairs, checked in light and dark, 28 assertions against WCAG 2.2 AA.**
+Both themes are token-complete and contrast-verified on every push: **17
+colour pairs, checked in light and dark, 34 assertions against WCAG 2.2 AA.**
 A hex literal in a component is a bug.
 
-**Web**
+Three of those pairs are new, and they are the ones the design rests on. The
+rule is that **no text ever sits on bare photography**, so what CI measures is
+the scrim — composited over a blown-out highlight, the worst a photograph can
+put underneath it. If the scrims hold there, the rule holds for any image.
 
-| Log in | Register |
+| Dashboard — light | Dashboard — dark |
 |---|---|
-| ![The login page in the light theme, split-panel editorial layout](docs/images/login-light.jpg) | ![The register page in the dark theme](docs/images/register-dark.jpg) |
+| ![Hero carousel with glass search bar, popular destinations, live weather strip and flight results](docs/screenshots/dashboard-light.jpg) | ![The same dashboard in the dark theme](docs/screenshots/dashboard-dark.jpg) |
 
-| Dashboard | Confirm booking |
+| Search results | Register |
 |---|---|
-| ![The dashboard in the light theme: search, fare-priced results, confirmed itineraries](docs/images/dashboard-light.jpg) | ![The booking dialog: three branded fares with their rules, and no card field](docs/images/booking-dialog.jpg) |
+| ![Flight cards with route photography, weather chips and fares](docs/screenshots/results-light.jpg) | ![Editorial split registration screen over the aircraft panel](docs/screenshots/register-light.jpg) |
 
-**Mobile**
+| Mobile — dashboard | Mobile — log in |
+|---|---|
+| ![The dashboard on a phone, single column](docs/screenshots/mobile-dashboard.jpg) | ![Signing in on a phone](docs/screenshots/mobile-login.jpg) |
 
-| Log in | Dashboard | Confirm booking |
-|---|---|---|
-| ![The login page on a phone-width viewport](docs/images/mobile-login.jpg) | ![The dashboard on a phone-width viewport, single column](docs/images/mobile-dashboard.jpg) | ![The booking dialog on a phone-width viewport](docs/images/mobile-booking-dialog.jpg) |
+**Walkthrough** — creating an account, signing in, moving through the
+carousel, the destination cards and the live weather, then running an
+ATH → LHR search. It plays by itself.
+
+[![Registering, signing in, browsing destinations and searching ATH to LHR](docs/media/usage.webp)](docs/media/usage.webm)
+
+<sup>Animated WebP — 900×562, 24s, 869 KB — so it autoplays and loops inline
+with no player and no sound. GitHub strips `autoplay`, `loop` and `muted` from
+hand-written `<video>` tags, so an animated image is the only thing that moves
+on its own in a README. Click through for the source recording
+([`docs/media/usage.webm`](docs/media/usage.webm)), and regenerate both with
+`make walkthrough`.</sup>
+
+Every image and frame above is a capture of the running application, taken by
+`make screenshots` and `make walkthrough` against a live stack. Those targets
+exist because these files were once design comps and a prototype recording
+instead: the README described a hero carousel, destination cards and live
+weather that the code did not contain, and nothing caught it, because nothing
+connected the pictures to the product.
+
+**Live weather** on the destination cards, the flight cards and the dashboard
+strip comes from [Open-Meteo](https://open-meteo.com/) — current conditions
+plus a three-day forecast, proxied server-side and cached for thirty minutes.
+It fails quietly by design: a station the provider does not answer for simply
+has no chip. See [ADR-002](docs/adr/0002-server-side-weather-proxy.md).
+
+**On the photography.** The destination and panel images are crops lifted out
+of the original design comps, which is the only place they existed. They are
+small, already recompressed, and soft at card size — the scrim the design puts
+over them anyway hides most of it, but not all. They are honest placeholders
+for real licensed photography, and replacing one is a single line in
+[`destination-images.ts`](frontend/src/lib/destination-images.ts).
 
 > **No payment is taken and no card details are collected.** The booking form
 > has no card field, and the API returns `422` to a request carrying one.
 > Do not enter real payment information. See [SECURITY.md](SECURITY.md).
-
-### A second direction, designed but not shipped
-
-[**Airy Sky Editorial**](docs/design/airy-sky-editorial.md) is a later visual
-direction taken as far as full comps and a click-through prototype: light-first
-by default, a Paper & Sky palette over cream rather than navy, Outfit and
-Figtree in place of Gabarito, and a glass search bar floating on destination
-photography. It adds a hero carousel, popular-destination cards and a live
-weather strip to the dashboard.
-
-**None of it is in this codebase.** The screens and the recording below are
-the prototype, not the application you get from `make dev` — the shipping
-interface is the Atlas one above. The direction is documented because the
-work was done and the reasoning is worth reading, not because it is pending.
-Treating a comp as a feature is exactly the habit this project exists to
-break.
-
-| Dashboard — light | Dashboard — dark |
-|---|---|
-| ![Prototype: hero carousel with glass search bar, popular destinations, weather strip and flight results](docs/screenshots/dashboard-light.jpg) | ![The same prototype dashboard in the dark theme](docs/screenshots/dashboard-dark.jpg) |
-
-| Search results | Register |
-|---|---|
-| ![Prototype flight cards with route photography, weather chips and fares](docs/screenshots/results-light.jpg) | ![Prototype editorial split registration screen](docs/screenshots/register-light.jpg) |
-
-| Mobile — dashboard | Mobile — log in |
-|---|---|
-| ![The prototype dashboard on a phone](docs/screenshots/mobile-dashboard.jpg) | ![The prototype sign-in screen on a phone](docs/screenshots/mobile-login.jpg) |
-
-A 24-second loop of the same prototype — creating an account, signing in,
-browsing the carousel and the destination cards, and running an ATH → LHR
-search. It plays by itself; click it for the full-resolution recording.
-
-[![The Airy Sky prototype: registration, sign-in, the destination carousel and an ATH → LHR search](docs/media/usage.webp)](docs/media/usage.mp4)
-
-<sup>Animated WebP — 900×562, 23.8s, 1.1 MB — so it autoplays and loops
-inline with no player and no sound. GitHub strips `autoplay`, `loop` and
-`muted` from hand-written `<video>` tags, so an animated image is the only
-thing that moves on its own in a README. The source recording is
-[`docs/media/usage.mp4`](docs/media/usage.mp4) (H.264, 1280×800).</sup>
 
 ---
 
@@ -155,8 +150,9 @@ thing that moves on its own in a README. The source recording is
 | [ADR-001 · PostgreSQL over MongoDB](docs/adr/0001-postgresql-over-mongodb.md) | Why the booking engine left the document model |
 | [Personas](docs/product/personas.md) · [User stories](docs/product/user-stories.md) | Who this is for, and a story → endpoint → test traceability matrix |
 | [Product brand](docs/brand/brandbook.md) | Positioning, network, fare architecture, voice |
-| [Atlas design system](frontend/src/design-system/README.md) | The vendored token layer, and what was deliberately not vendored |
-| [Airy Sky Editorial](docs/design/airy-sky-editorial.md) | The unshipped visual direction, and the system behind it |
+| [Airy Sky Editorial](docs/design/airy-sky-editorial.md) | The design system: palette, type, glass, scrims, photography |
+| [Design system README](frontend/src/design-system/README.md) | The token layer as the application loads it |
+| [ADR-002 · Server-side weather proxy](docs/adr/0002-server-side-weather-proxy.md) | Why the browser never calls the forecast provider |
 | [Test strategy](docs/qa/test-strategy.md) | Layers, how to run everything, and a 42-case manual pass |
 | [Changelog](CHANGELOG.md) | What changed in each phase, including what was removed |
 | [Security](SECURITY.md) | Why this takes no payments, how to run it safely, and known limitations |
@@ -223,12 +219,12 @@ make check-all   # the above plus end to end
 
 | | |
 |---|---|
-| `make test` | **89** backend tests against real PostgreSQL |
+| `make test` | **103** backend tests against real PostgreSQL |
 | `make test-frontend` | **69** component tests (Vitest + Testing Library) |
 | `make e2e` | **17** end-to-end tests in a real browser (Playwright) |
-| `make contrast` | 14 colour pairs × 2 themes, WCAG 2.2 AA |
+| `make contrast` | 17 colour pairs × 2 themes, WCAG 2.2 AA |
 
-**175 automated tests**, all in CI, across four jobs.
+**189 automated tests**, all in CI, across four jobs.
 
 The backend suite runs against a **real PostgreSQL**, and the fixtures build
 the schema by running the Alembic migrations — so every run also proves the
@@ -250,11 +246,20 @@ tests/test_bookings.py        payment details are refused outright,
                               cancelling twice cannot credit a seat back
 tests/test_flights.py         search does no pattern matching,
                               a flight with bookings cannot be deleted
-tests/test_constraints.py     the database itself refuses bad data
+tests/test_constraints.py     the database itself refuses bad data,
+                              and a station cannot exist without a position
+tests/test_weather.py         a dead forecast provider still returns 200
 e2e/interface.spec.ts         the webfonts actually load
 ```
 
-That last one exists because they once did not. Nested under Tailwind's
+The weather tests are worth a word. Every one of them asserts a **200** —
+an upstream that returns nothing, an upstream that raises, and a station
+outside the network must each leave the dashboard rendering. None of them
+touch Open-Meteo: a suite that reached a third party could go red because
+someone else was having a bad afternoon, which is the same mistake in the
+tests that the proxy exists to avoid in the product.
+
+The font test exists because the fonts once did not load. Nested under Tailwind's
 `@import`, the production build shipped **zero** `.woff2` files and the whole
 typographic identity fell back to Helvetica **with no error of any kind**.
 Four Phase 1 defects were invisible to a green unit suite; the end-to-end
@@ -271,10 +276,12 @@ deliberately.
 |---|---|---|
 | **0 · Foundation** | Defect register, critical fixes, CI, repo hygiene | [`v0.1.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.1.0) |
 | **1 · Domain** | PostgreSQL, routes and schedules, fare classes, seat maps, a design system, three test suites | [`v0.2.0`](https://github.com/aposfys/ds-airlines-booking/releases/tag/v0.2.0) |
+| **2 · Interface** | Airy Sky Editorial, hero carousel, destination cards, live weather, coordinates on stations | unreleased |
 
-v0.2.0 shipped on the AF design system; Atlas replaced it afterwards, with no
-change to the domain, the API or test behaviour. The swap and its four
-recovered contrast failures are in the [changelog](CHANGELOG.md).
+The design system has been replaced twice. v0.2.0 shipped on AF; Atlas
+replaced it; Airy Sky Editorial replaced Atlas and is what the product runs on
+now. Each swap left the domain, the API and test behaviour alone — the
+[changelog](CHANGELOG.md) has what moved and what it recovered.
 
 ### What was not built, and why
 
@@ -304,9 +311,8 @@ So the gaps stay, and they are named wherever they bite:
   about money owed.
 - **No special-assistance booking.** A genuine passenger need this does not
   meet — an omission, not a decision.
-- **The Airy Sky Editorial direction was never implemented.** It exists as
-  comps, a prototype recording and a written system, and
-  [is labelled as such](#a-second-direction-designed-but-not-shipped).
+- **The photography is placeholder.** Real licensed images would replace the
+  comp crops described [above](#the-interface); nothing else changes.
 
 Versions stay pre-1.0 for the same reason. 1.0.0 would claim the product is
 finished, and it is not; it is *scoped*, which is a different thing.
@@ -324,28 +330,32 @@ backend/
     auth.py           JWT issuance, hashing, authorisation dependencies
     models/domain.py  The relational domain — ten tables
     schemas.py        API request and response models
-    routers/          auth · flights · bookings · admin
+    routers/          auth · flights · bookings · admin · weather
     seed.py           Reference data, demo flights, the bootstrap admin
   migrations/         Alembic revisions
   scripts/seed.py     Explicit seeding, never a startup side effect
-  tests/              89 tests against real PostgreSQL
+  tests/              103 tests against real PostgreSQL
 frontend/
   e2e/                Playwright — booking.spec.ts and interface.spec.ts:
                       the journey, fonts, themes, accessibility
   src/
-    design-system/    Vendored Atlas tokens, fonts, accessibility standard
-    index.css         Atlas tokens bridged into Tailwind
+    design-system/    Airy Sky tokens, fonts, accessibility standard
+    index.css         Tokens bridged into Tailwind, plus glass and scrims
     api/              Axios client and typed endpoints
-    components/       BookingDialog · ThemeToggle
+    assets/           Destination and panel photography
+    components/       BookingDialog · HeroCarousel · DestinationCards
+                      WeatherStrip · WeatherChip · ThemeToggle
     context/          AuthContext · ThemeContext
-    lib/              Formatting for fares, times and durations
+    lib/              Fare/time formatting, the IATA image map, useWeather
     pages/            Login · Register · Dashboard
                       *.test.tsx sit beside what they test
+  scripts/            screenshots.mjs — regenerates docs/screenshots
 docs/
   adr/                Architecture decisions
+  screenshots/        Captures of the running app, via `make screenshots`
   analysis/           Current-state assessment
   brand/              Product brand, contrast check
-  design/             Airy Sky Editorial — designed, not shipped
+  design/             Airy Sky Editorial — the design system
   product/            Personas, user stories, traceability
   qa/                 Test strategy and the manual pass
 ```

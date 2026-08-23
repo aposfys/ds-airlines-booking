@@ -9,7 +9,7 @@ import { expect, test } from '@playwright/test';
  */
 
 test.describe('the typographic identity actually loads', () => {
-  test('Gabarito and Spline Sans Mono are served, not silently substituted', async ({
+  test('Outfit and Figtree are served, not silently substituted', async ({
     page,
   }) => {
     const fonts: string[] = [];
@@ -30,8 +30,8 @@ test.describe('the typographic identity actually loads', () => {
 
     const loaded = await page.evaluate(
       () =>
-        document.fonts.check('700 46px "Gabarito"') &&
-        document.fonts.check('500 13px "Spline Sans Mono"'),
+        document.fonts.check('700 46px "Outfit"') &&
+        document.fonts.check('500 13px "Figtree"'),
     );
     expect(loaded).toBe(true);
   });

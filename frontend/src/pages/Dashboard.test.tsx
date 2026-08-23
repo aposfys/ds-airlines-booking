@@ -117,10 +117,13 @@ describe('Dashboard', () => {
       mockGet();
       await renderDashboard();
 
-      expect(await screen.findByText('ATH → LHR')).toBeInTheDocument();
-      expect(screen.getByText('DS1040')).toBeInTheDocument();
-      expect(screen.getByText(/3h 45m/)).toBeInTheDocument();
-      expect(screen.getByText('Athens to London')).toBeInTheDocument();
+      // Scoped to the list: the hero's featured route also renders "ATH → LHR",
+      // and this test is about the flight card, not the carousel.
+      expect(await screen.findByText('DS1040')).toBeInTheDocument();
+      const flights = document.getElementById('flights')!;
+      expect(within(flights).getByText('ATH → LHR')).toBeInTheDocument();
+      expect(within(flights).getByText(/3h 45m/)).toBeInTheDocument();
+      expect(within(flights).getByText('Athens to London')).toBeInTheDocument();
     });
 
     it('shows the cheapest fare as the headline price, in EUR', async () => {
@@ -141,9 +144,12 @@ describe('Dashboard', () => {
     it('uses no primary action in the list', async () => {
       mockGet();
       await renderDashboard();
-      await screen.findByText('ATH → LHR');
-      // Atlas allows one primary per view; N flights must not mean N of them.
-      expect(document.querySelectorAll('.ds-action--primary')).toHaveLength(0);
+      await screen.findByText('DS1040');
+      // One primary per view; N flights must not mean N of them. The view's
+      // single primary belongs to the hero ("Search this route"), so this is
+      // scoped to the list rather than the document.
+      const flights = document.getElementById('flights')!;
+      expect(flights.querySelectorAll('.ds-action--primary')).toHaveLength(0);
     });
 
     it('says so when nothing matches', async () => {

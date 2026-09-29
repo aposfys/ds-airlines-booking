@@ -73,6 +73,23 @@ const WeatherStrip = ({ weather }: { weather: Map<string, StationWeather> }) => 
           </li>
         ))}
       </ul>
+
+      {/* Open-Meteo data is licensed CC BY 4.0, which requires this credit
+          wherever the data is shown. */}
+      <p className="text-xs text-faint mt-4">
+        Weather data by{' '}
+        <a href="https://open-meteo.com/" className="text-editorial underline">
+          Open-Meteo.com
+        </a>
+        , licensed{' '}
+        <a
+          href="https://creativecommons.org/licenses/by/4.0/"
+          className="text-editorial underline"
+        >
+          CC BY 4.0
+        </a>
+        .
+      </p>
     </section>
   );
 };

@@ -204,6 +204,20 @@ describe('Dashboard', () => {
       ).toBeInTheDocument();
     });
 
+    it('credits Open-Meteo wherever its data is shown', async () => {
+      mockGet(FLIGHTS, [], { stations: [STATION] });
+      await renderDashboard();
+      await screen.findByText(/weather at your destinations/i);
+
+      // The data is CC BY 4.0, so showing it without a credit is a licence
+      // breach rather than a style choice.
+      expect(screen.getByRole('link', { name: 'Open-Meteo.com' })).toHaveAttribute(
+        'href',
+        'https://open-meteo.com/',
+      );
+      expect(screen.getByRole('link', { name: 'CC BY 4.0' })).toBeInTheDocument();
+    });
+
     it('draws no chip for a station the provider skipped', async () => {
       mockGet(FLIGHTS, [], { stations: [STATION] });
       await renderDashboard();

@@ -1,5 +1,4 @@
 # Pinned for reproducible builds. Resolved 2026-07-29 against Python 3.13.
-# Phase 1 moves this to pyproject.toml with a proper lockfile.
 
 # ── Web framework ─────────────────────────────────────────
 fastapi==0.141.1

@@ -285,8 +285,8 @@ Scenario: The operations summary
 
 Not built. Everything in D1–D4 is reachable only through the API
 documentation page. This is the largest gap between what the product does and
-what a person could use, and it is left open deliberately — see the README on
-scope.
+what a person could use, and it is left open deliberately. See
+[docs/scope.md](../scope.md#what-was-not-built-and-why).
 
 ---
 

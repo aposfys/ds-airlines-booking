@@ -6,7 +6,7 @@ Notable changes to DS Airlines. Format follows
 **Versions stay pre-1.0 deliberately.** Payment capture and the operations
 interface were never built; 1.0.0 would claim the product is finished rather
 than scoped. What was left out, and why, is in
-[the README](README.md#what-was-not-built-and-why).
+[docs/scope.md](docs/scope.md#what-was-not-built-and-why).
 
 Defect identifiers (DEF-*) refer to
 [the current-state assessment](docs/analysis/current-state-assessment.md).
@@ -45,6 +45,8 @@ is gone.
   and the README's looping walkthrough from the running application. These are
   the actual fix for how the drift above happened: nothing previously
   connected the pictures in this repository to the product.
+- **An Open-Meteo credit under the weather strip.** The data is licensed
+  CC BY 4.0, which requires attribution wherever it is shown.
 - **`.ds-photo`, `.ds-scrim` and its three variants**, and **three contrast
   pairs covering text over photography** — measured against each scrim
   composited over a blown-out highlight, the worst an image can present.
@@ -62,7 +64,7 @@ is gone.
   `base.css`'s `h2 { font-size: 25px }` is unlayered, and layer order resolves
   before specificity, so on an `<h2>` these silently rendered at heading size.
 - **`httpx`** promoted from a test-only to a runtime dependency.
-- **Backend tests 89 → 103**, frontend unchanged at 69, e2e unchanged at 17.
+- **Backend tests 89 → 104**, frontend 69 → 73, e2e unchanged at 17.
   Contrast goes 14 pairs → 17.
 
 ### Fixed
@@ -72,10 +74,21 @@ is gone.
   renders, which would have driven every scrim far heavier than the design
   needs. Compositing now happens in sRGB, converting to linear only to take
   luminance. Two pairs needed retuning against the corrected model.
+- **Login timing revealed which usernames exist.** For an unknown username
+  the password was checked against an empty string, which bcrypt rejects on
+  the salt without hashing, so those requests answered far faster than a
+  wrong password for a real account. It is now checked against a real hash
+  of the same cost.
+- **`make seed` printed the administrator's email as the login**, but login
+  takes the username, so the printed credentials returned 401. It now prints
+  the username.
 
 ### Removed
 - **`docs/images/`** and the prototype walkthrough `docs/media/usage.mp4` —
   superseded by captures of the running application.
+- **`backend/run_seed.py`**, a MongoDB-era script that imported a module
+  which no longer exists, and the Vite scaffold's favicon, page title,
+  `react.svg` and template README.
 
 ---
 
@@ -210,8 +223,8 @@ the interface is built on the AF design system.
 
 ## [0.1.0] — 2026-07-29 · Phase 0, Foundation
 
-An audit of the original university project code, and the fixes it
-demanded. 30
+An audit of commit `f1f732d`, my own March 2026 port of the 2022 Flask
+coursework to FastAPI and React on MongoDB, and the fixes it demanded. 30
 defects recorded — 4 Critical, 6 High.
 
 ### Fixed

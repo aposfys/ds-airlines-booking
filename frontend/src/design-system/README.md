@@ -23,10 +23,11 @@ is the default here**, declared on a bare `:root`, with dark as the remap.
 `docs/brand/contrast_check.py` classifies blocks by that selector shape, so
 the two must stay in step.
 
-Unlike the Atlas files, these are authored here rather than vendored
-byte-identical, so corrections go directly into `tokens/tokens.css`;
-`overrides.css` is kept, and kept in the checker's sources, but is currently
-empty.
+`tokens/tokens.css` and `tokens/fonts.css` are authored here rather than
+vendored, so corrections go directly into them. `tokens/base.css` is still
+the Atlas file vendored on 5 August 2026, unchanged, because its glass,
+index label and numeral devices carried over as they were. `overrides.css`
+is kept, and kept in the checker's sources, but is currently empty.
 
 ## What is here, and what is not
 
@@ -38,33 +39,31 @@ and the accessibility standard (`accessibility.md`).
 `ds-action`, `ds-hero`, `ds-label`, `ds-eyebrow`, `ds-skip-link`,
 `ds-photo`, `ds-scrim`, `ds-card-photo`, `ds-icon-button`, `ds-dot`) is this
 application's
-own, built in `src/index.css` against Atlas's semantic tokens and its three
-vendored devices — `.v-idx` (the index label), `.v-glass` (the panel),
-`.v-num` (mono figures) — rather than reimplemented differently.
+own, built in `src/index.css` against the semantic tokens and the three
+devices `base.css` supplies, `.v-idx` (the index label), `.v-glass` (the
+panel) and `.v-num` (figures), rather than reimplemented differently.
 
 ## Provenance
 
-| | |
+| File | Origin |
 |---|---|
-| Source | `Atlas design system setup`, local working copy |
-| Vendored | 5 August 2026 |
-| Files | `tokens/{tokens,base,fonts}.css`, `accessibility.md` |
-| Modifications | `tokens.css` and `base.css` are byte-identical to source; `overrides.css` carries this product's corrections on top, same as AF before it. `fonts.css` is new — the source ships CDN font links; this vendors the same families via `@fontsource` instead, matching how AF's fonts were self-hosted here previously. |
+| `tokens/tokens.css` | Airy Sky Editorial, authored here |
+| `tokens/fonts.css` | Outfit and Figtree via `@fontsource`, authored here |
+| `tokens/base.css` | Atlas, vendored byte-identical on 5 August 2026 and not modified since |
+| `tokens/index.css` | Import order for the three files above, authored here |
+| `overrides.css` | Product corrections on top of the tokens, currently empty |
+| `accessibility.md` | This product's accessibility standard, rewritten for Airy Sky |
 
-`tokens.css` and `base.css` are unmodified deliberately, so they can be
-re-copied over the top when Atlas changes without a merge. Re-syncing means
-re-copying those two files and re-running
-`python docs/brand/contrast_check.py`, which reads the palette from
+`python docs/brand/contrast_check.py` reads the palette from
 `tokens/tokens.css` **and** `overrides.css` in that order and fails CI on any
-pair below WCAG 2.2 AA.
+pair below WCAG 2.2 AA. Any change to either file is checked on the next
+push.
 
-`overrides.css` exists because four token pairs, measured as this product
-actually composites them — status text on its own tint, and the
-selected-fare-card border against a glass panel — landed under AA once
-rendered, not in the abstract. Each correction is documented at the token
-with the measured before/after ratio; see the file itself. This is the same
-role AF's `overrides.css` played, and the same discipline: two real defects
-found in AF's light theme, four found here.
+`overrides.css` once held four Atlas corrections, status text on its own
+tint and the selected-fare-card border against a glass panel, each of which
+landed under AA once rendered. Airy Sky's tints were chosen against these
+grounds in the first place, so the file is empty now. The Atlas-era
+measurements are in the [changelog](../../../CHANGELOG.md).
 
 ## Using it
 
@@ -93,13 +92,13 @@ is declared unlayered too, so a class selector beats an element selector on
 plain CSS specificity, no layer required. See the comments in
 `tokens/index.css` and `../../index.css`.
 
-Two rules from Atlas's brief that the review checks for:
+Two rules the design system sets, and that review checks for:
 
-1. **Never use a primitive directly.** `--navy-900` and `--lime-400` do not
-   belong in component code; use the semantic alias — `--surface`,
-   `--fill-accent`. Re-theming works only if this holds — it is exactly what
-   broke before the accent was split into `--fill-accent` (backgrounds) and
-   `--text-accent` (type).
-2. **One primary action per view.** Chartreuse fill means "act"; a list of
-   options gets one Signal button at most, and it is never spent on N
-   equally-weighted rows.
+1. **Never use a primitive directly.** `--paper`, `--ink` and `--deep-sky`
+   do not belong in component code. Use the semantic alias, `--ground`,
+   `--text-primary`, `--fill-accent`. Re-theming works only if this holds,
+   and it is exactly what broke under Atlas before the accent was split into
+   `--fill-accent` (backgrounds) and `--text-accent` (type).
+2. **One primary action per view.** The deep sky fill of
+   `.ds-action--primary` means "act". A list of options gets one primary
+   button at most, and it is never spent on N equally weighted rows.

@@ -8,7 +8,7 @@ import muc from '../assets/destinations/muc.jpg';
 /** Station photography, keyed by the real-world key.
  *
  *  These are small crops lifted from the original design comps, which is the
- *  only place the photography existed — see the README. They are soft at card
+ *  only place the photography existed (see docs/scope.md). They are soft at card
  *  size and deliberately sit under a scrim, which is where the design puts
  *  them anyway. Replacing one is a single line here; nothing else knows where
  *  an image came from.

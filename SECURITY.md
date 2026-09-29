@@ -57,7 +57,7 @@ Stated plainly rather than implied:
 
 ## Reporting
 
-If you find a vulnerability, open an issue at
-https://github.com/aposfys/ds-airlines-booking/issues — this is a demonstration
-project, so there is no private disclosure process and nothing here is at
-risk in production.
+Issues and private vulnerability reporting are both turned off on this
+repository, so there is no reporting channel here at present. This is a
+demonstration project with no production deployment, so nothing here is at
+risk.

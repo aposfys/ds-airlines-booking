@@ -7,8 +7,9 @@ project.
 
 ## 1 · What was wrong
 
-**[Current-state assessment](analysis/current-state-assessment.md)** — an
-audit of the original code. 30 defects, 4 Critical, each with its business
+**[Current-state assessment](analysis/current-state-assessment.md)**, an
+audit of commit `f1f732d`, my own March 2026 port of the 2022 Flask
+coursework to FastAPI and React. 30 defects, 4 Critical, each with its business
 impact, the evidence, and where it was resolved. It also lists what was
 deliberately deferred and what was accepted, so the omissions are explicit.
 
@@ -19,6 +20,9 @@ This is the document the project is built around. Start here.
 **[ADR-001 · PostgreSQL over MongoDB](adr/0001-postgresql-over-mongodb.md)** —
 the decision that shaped Phase 1. Context, the three options considered, what
 was chosen and what it cost.
+
+**[ADR-002 · A server-side weather proxy](adr/0002-server-side-weather-proxy.md)**
+covers why forecasts come through the API rather than from the browser.
 
 New architecture decisions get a numbered file in `adr/`, following the same
 shape: context, options, decision, consequences.
@@ -40,13 +44,15 @@ carry their limitation.
 interface runs on: the Paper & Sky palette, Outfit and Figtree, glass, and the
 rule that no text ever sits on bare photography.
 
-**[Product brand](brand/brandbook.md)** — positioning, network, fare
-architecture and voice. It owns only the words: the visual system belongs to
-[Atlas](../frontend/src/design-system/README.md).
+**[Product brand](brand/brandbook.md)**, positioning, network, fare
+architecture and voice. It owns only the words. The visual system belongs to
+[Airy Sky Editorial](design/airy-sky-editorial.md), whose token layer lives in
+[`frontend/src/design-system/`](../frontend/src/design-system/README.md).
 
-**[contrast_check.py](brand/contrast_check.py)** — reads the palette out of
-the token files the application actually loads, converts hex/rgba to linear
-sRGB, and fails CI if any pair drops below WCAG 2.2 AA in either theme.
+**[contrast_check.py](brand/contrast_check.py)** reads the palette out of
+the token files the application actually loads, composites translucent
+values in sRGB, and fails CI if any of its 17 pairs drops below WCAG 2.2 AA
+in either theme.
 
 ```bash
 make contrast
@@ -71,5 +77,6 @@ is still not covered.
 
 ## Images
 
-`images/` holds the screenshots used by the root README. They are captured
-from a real running stack, not mocked up.
+`screenshots/` holds the stills used by the root README and `media/` the
+walkthrough. Both are captured from a running stack by `make screenshots` and
+`make walkthrough`, not mocked up.

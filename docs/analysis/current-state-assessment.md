@@ -3,6 +3,10 @@
 **DS Airlines · assessed 29 July 2026 against commit `f1f732d`**
 **Resolution status updated 2 August 2026, after Phase 1.**
 
+Commit `f1f732d` is my own March 2026 port of the 2022 Flask coursework
+(commit `3e5e625`) to FastAPI and React, still on MongoDB. That port, not
+the 2022 app, is the code audited here.
+
 An audit of the codebase as it stood before Phase 0, recording every defect
 found, its business consequence, and where it was resolved.
 
@@ -51,9 +55,11 @@ DEF-001 immediately.
 
 | Status | Count |
 |---|---|
-| Fixed in Phase 0 | 24 |
-| Deferred to a later phase, by design | 5 |
-| Accepted, documented | 1 |
+| Fixed (DEF-003 finished in Phase 1, the rest in Phase 0) | 30 |
+| Not fixed | 0 |
+
+The four deferred items in §6 and the one accepted change in §7 sit outside
+the 30 numbered defects. All four deferred items were resolved in Phase 1.
 
 ---
 
@@ -292,7 +298,7 @@ PostgreSQL replaces the code they live in and fixing them twice is waste.
 | Finding | Why deferred |
 |---|---|
 | ~~No true transaction around booking~~ | **Resolved in Phase 1.** Seat lock, seat state change and booking insert are one transaction; the compensating write is deleted |
-| ~~No seat inventory model — only a scalar counter~~ | **Resolved in Phase 1.** `flight_seats` rows replace the counter. A seat map in the interface was not built — see the README |
+| ~~No seat inventory model, only a scalar counter~~ | **Resolved in Phase 1.** `flight_seats` rows replace the counter. A seat map in the interface was not built, see [docs/scope.md](../scope.md#what-was-not-built-and-why) |
 | ~~No fare classes; one price per flight~~ | **Resolved in Phase 1.** Light, Standard and Flex, with their rules in data |
 | ~~No frontend test suite~~ | **Resolved in Phase 1.** 69 component tests and 17 end-to-end |
 

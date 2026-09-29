@@ -329,9 +329,9 @@ const Dashboard = () => {
                             {cheapest === null ? '—' : formatFare(cheapest)}
                           </span>
                         </div>
-                        {/* Secondary, deliberately. Atlas allows one primary
+                        {/* Secondary, deliberately. Airy Sky allows one primary
                             action per view, and a list of N flights would
-                            otherwise put N chartreuse buttons on screen —
+                            otherwise put N deep sky buttons on screen,
                             which reads as N equally urgent choices and
                             spends the colour that is supposed to mean "act".
                             The single primary lives in the booking dialog,

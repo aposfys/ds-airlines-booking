@@ -39,7 +39,7 @@
   --color-invert: var(--text-inverse);
   --color-editorial: var(--text-link);
 
-  /* ── Action. Chartreuse means "act" — one primary per view. ── */
+  /* ── Action. The accent fill means "act", one primary per view. ── */
   --color-action: var(--fill-accent);
   --color-action-hover: var(--fill-accent-hover);
   --color-action-fg: var(--text-on-accent);

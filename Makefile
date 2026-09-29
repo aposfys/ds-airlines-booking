@@ -34,7 +34,7 @@ help:
 	@echo "    make up            build and run the whole stack"
 	@echo "    make down          stop it"
 	@echo
-	@echo "  Native (needs postgresql@17, python3, node 22):"
+	@echo "  Native (macOS with Homebrew postgresql@17, python3, node 22):"
 	@echo "    make setup         create the venv, install everything, start the db"
 	@echo "    make dev           run API :8000 and interface :5173"
 	@echo "    make seed          load demo flights and an admin account"
@@ -42,10 +42,10 @@ help:
 	@echo "  Checks:"
 	@echo "    make check         backend + frontend tests, lint, build, contrast"
 	@echo "    make check-all     the above plus the end-to-end suite"
-	@echo "    make test          backend suite only (89 tests)"
-	@echo "    make test-frontend frontend suite only (69 tests)"
+	@echo "    make test          backend suite only (104 tests)"
+	@echo "    make test-frontend frontend suite only (73 tests)"
 	@echo "    make e2e           Playwright against the real stack (17 tests)"
-	@echo "    make contrast      WCAG check on the AF palette"
+	@echo "    make contrast      WCAG check on the Airy Sky palette"
 	@echo
 	@echo "  Database:"
 	@echo "    make db-start / db-stop / db-reset / psql"
@@ -131,7 +131,8 @@ seed: db-start migrate
 	@cd backend && SEED_ADMIN_EMAIL=$(SEED_ADMIN_EMAIL) \
 		SEED_ADMIN_PASSWORD=$(SEED_ADMIN_PASSWORD) \
 		../$(VENV)/bin/python scripts/seed.py
-	@echo "Administrator: $(SEED_ADMIN_EMAIL) / $(SEED_ADMIN_PASSWORD)"
+	@echo "Administrator: sign in as $(firstword $(subst @, ,$(SEED_ADMIN_EMAIL))) / $(SEED_ADMIN_PASSWORD)"
+	@echo "(login takes the username, the part of $(SEED_ADMIN_EMAIL) before the @)"
 
 # ── Checks ────────────────────────────────────────────────
 # `check` is what CI runs, minus the end-to-end suite, which needs the API

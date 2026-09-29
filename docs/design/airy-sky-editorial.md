@@ -36,7 +36,7 @@ gradient) sits behind every page so flat areas never read as dead white.
 - **Body / UI** — Figtree.
 - **Numerals** — Outfit via `.v-num` for fares, times and IATA codes.
 - Scale: 10 / 11 / 12 / 13 / 14 / 16 / 19 / 25 / 33 / 46 px.
-- Labels use `.ds-label`: 11px, uppercase, `0.1em` tracking.
+- Labels use `.ds-label`: 10px, uppercase, `0.1em` tracking.
 
 Fonts are self-hosted through `@fontsource`, imported by
 `design-system/tokens/fonts.css` — never as a bare `@import` nested under

@@ -10,7 +10,8 @@ Answering those questions meant starting with an honest look at what was already
 most useful document in this repository is not the API reference; it is the
 [**current-state assessment**](analysis/current-state-assessment.md) — an audit of the
 original code recording all 30 defects found, what each would have cost the business, and
-where it was resolved.
+where it was resolved. The code it audits is commit `f1f732d`, my own March 2026 port of the
+2022 Flask coursework to FastAPI and React, still on MongoDB.
 
 Four were Critical:
 
@@ -24,9 +25,9 @@ Four were Critical:
 - **`docker-compose up --build` could not build**, because the frontend image pinned Node 18
   against a toolchain requiring Node 20+.
 
-None of this reflects badly on the original. An assignment is judged on whether it
-demonstrates the concept, and it did. What it was never judged on is whether anyone could
-run it, sell a seat with it, or trust it with a card number — and those are the only
+None of this reflects badly on the coursework. An assignment is judged on whether it
+demonstrates the concept, and it did. What neither it nor the port that followed was ever
+judged on is whether anyone could run it, sell a seat with it, or trust it with a card number, and those are the only
 questions that matter once you call something a product.
 
 The previous README called it "production-ready". Recording precisely why that was wrong,
@@ -54,16 +55,18 @@ these files were once design comps and a prototype recording instead: the README
 hero carousel, destination cards and live weather that the code did not contain, and nothing
 caught it, because nothing connected the pictures to the product.
 
-**Live weather** on the destination cards, the flight cards and the dashboard strip comes
+**Live weather** on the destination cards and the dashboard strip comes
 from [Open-Meteo](https://open-meteo.com/) — current conditions plus a three-day forecast,
-proxied server-side and cached for thirty minutes. It fails quietly by design: a station the
-provider does not answer for simply has no chip. See
+proxied server-side and cached for thirty minutes. It fails quietly by design, and a station
+the provider does not answer for simply has no chip. The flight cards carry a route photo,
+times and fares but no weather. The strip credits Open-Meteo, whose data is CC BY 4.0. See
 [ADR-002](adr/0002-server-side-weather-proxy.md).
 
 **On the photography.** The destination and panel images are crops lifted out of the
 original design comps, which is the only place they existed. They are small, already
-recompressed, and soft at card size. They are honest placeholders for real licensed
-photography, and replacing one is a single line in
+recompressed, and soft at card size. Their original source and licence are not
+recorded, which is one more reason they are placeholders for real licensed photography.
+Replacing one is a single line in
 [`destination-images.ts`](../frontend/src/lib/destination-images.ts).
 
 ## Phases delivered
@@ -87,7 +90,7 @@ An earlier plan ran to five phases: seat selection in the interface, payment cap
 operations interface, a published brand site. They were dropped on purpose, and the
 reasoning is worth stating because the omissions are visible in the product.
 
-What this repository argues is about **judgement** — auditing inherited code and finding
+What this repository argues is about **judgement**, auditing existing code and finding
 thirty defects in it, choosing a datastore and writing down what that cost, and building
 tests that catch what a green suite cannot see. A seat picker and a payment integration
 would demonstrate *craft*, which is not what is in question, and would take considerably

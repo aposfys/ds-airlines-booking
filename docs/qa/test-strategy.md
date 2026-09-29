@@ -62,7 +62,7 @@ make check-all   # the above plus the end-to-end suite
 Individually:
 
 ```bash
-make test       # 103 backend tests against real PostgreSQL
+make test       # 104 backend tests against real PostgreSQL
 make lint       # eslint
 make build      # tsc + vite, also proves the fonts resolve
 make contrast   # 34 colour pairs, both themes
@@ -118,7 +118,7 @@ is a real gap, not an oversight in this document.
 | TC-M13 | Type `.*` in From | **No results.** Not "everything". Search takes IATA codes and does no pattern matching (DEF-005) |
 | TC-M14 | Type `ath` lowercase | Same results as `ATH` |
 | TC-M15 | Check fares on a card | A "from" price showing the cheapest fare, in **EUR** — never `$` (DEF-015) |
-| TC-M16 | Count primary buttons | Exactly zero chartreuse buttons in the list. Row actions are secondary; Atlas allows one primary per view |
+| TC-M16 | Count primary buttons | Exactly zero filled deep-sky (primary) buttons in the list. Row actions are secondary, and Airy Sky allows one primary action per view |
 
 ### 4.4 · `/dashboard` — booking and itineraries
 
@@ -189,12 +189,12 @@ remains the control for the rest.
 
 ## 6 · The automated suites
 
-**192 automated tests across three suites**, all running in CI.
+**194 automated tests across three suites**, all running in CI.
 
 | Suite | Count | What it can see |
 |---|---|---|
-| Backend (pytest) | 103 | Endpoints, authorization, inventory, database constraints, the weather proxy |
-| Component (Vitest) | 72 | Rendering, state, validation, formatting, contexts |
+| Backend (pytest) | 104 | Endpoints, authorization, inventory, database constraints, the weather proxy |
+| Component (Vitest) | 73 | Rendering, state, validation, formatting, contexts |
 | End-to-end (Playwright) | 17 | Everything only a real browser can observe |
 
 The end-to-end suite exists because of §5. It asserts the things that were
@@ -219,8 +219,15 @@ Stated so the gaps are known rather than implied.
   UPDATE` and is correct by construction, but it has not been tested under
   real contention. The end-to-end suite runs single-worker against one
   database for the same reason.
-- **No admin interface**, so §4.5 runs through Swagger. Not built — see the
-  README on scope.
+- **No admin interface**, so §4.5 runs through Swagger. Not built, see
+  [docs/scope.md](../scope.md#what-was-not-built-and-why).
+- **No automated mobile layout test.** Playwright runs at a desktop viewport
+  only. The 390px captures come from `make screenshots`, which asserts
+  nothing.
+- **End-to-end retries once in CI.** The booking journey and the taken-seat
+  test have each needed that retry. Both now wait explicitly for the redirect
+  and the itinerary row, and the retry stays until CI shows it is no longer
+  used.
 - **No automated axe scan.** The accessibility cases here are hand-written
   checks of specific rules, not a full audit.
 - **One browser.** Playwright runs Chromium only; Firefox and WebKit are a

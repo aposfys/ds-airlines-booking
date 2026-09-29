@@ -13,7 +13,7 @@ backend/
     seed.py           Reference data, demo flights, the bootstrap admin
   migrations/         Alembic revisions
   scripts/seed.py     Explicit seeding, never a startup side effect
-  tests/              103 tests against real PostgreSQL
+  tests/              104 tests against real PostgreSQL
 frontend/
   e2e/                Playwright — booking.spec.ts and interface.spec.ts:
                       the journey, fonts, themes, accessibility
@@ -48,12 +48,12 @@ make check-all   # the above plus end to end
 
 | | |
 |---|---|
-| `make test` | **103** backend tests against real PostgreSQL |
-| `make test-frontend` | **72** component tests (Vitest + Testing Library) |
+| `make test` | **104** backend tests against real PostgreSQL |
+| `make test-frontend` | **73** component tests (Vitest + Testing Library) |
 | `make e2e` | **17** end-to-end tests in a real browser (Playwright) |
 | `make contrast` | 17 colour pairs × 2 themes, WCAG 2.2 AA |
 
-**192 automated tests**, all in CI, across four jobs.
+**194 automated tests**, all in CI, across four jobs.
 
 ## Regenerating the media
 

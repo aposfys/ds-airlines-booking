@@ -244,7 +244,7 @@ describe('BookingDialog', () => {
 
     it('offers exactly one primary action', () => {
       setup();
-      // Atlas allows one primary action per view; Confirm is it.
+      // One primary action per view, and Confirm is it.
       const primaries = document.querySelectorAll('.ds-action--primary');
       expect(primaries).toHaveLength(1);
       expect(primaries[0]).toHaveTextContent(/confirm/i);

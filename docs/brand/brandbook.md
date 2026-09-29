@@ -1,13 +1,15 @@
 # DS Airlines — Product Brand
 
-**Version 3.0 · August 2026**
+**Version 3.1 · September 2026**
 
 DS Airlines has no visual identity of its own. It is a product built on
-**[Atlas](../../frontend/src/design-system/README.md)**, a design system by
-Apostolos Fysekidis, and Atlas owns everything you can see: colour, type,
-space, motion, elevation, the accessibility floor.
+**[Airy Sky Editorial](../design/airy-sky-editorial.md)**, a design system by
+Apostolos Fysekidis, and Airy Sky owns everything you can see. That means
+colour, type, space, motion, glass, photography and the accessibility floor.
+Its token layer lives in
+[`frontend/src/design-system/`](../../frontend/src/design-system/README.md).
 
-This document owns the other half — what the airline *is* and what it *says*.
+This document owns the other half, what the airline *is* and what it *says*.
 Name, positioning, network, fare architecture, voice, and the words on
 screen.
 
@@ -20,26 +22,28 @@ screen.
 > by Atlas on 5 August 2026: same relationship (a house system applied
 > wholesale, the product supplying only the words), different system —
 > "rounded glass" over navy and chartreuse, Gabarito and Spline Sans Mono.
-> Nothing in this document's split changed, only which system sits on the
-> other side of it. (The vendored token files carry the codename `VANE` in
-> their own header comments — the vendor's own working title, kept because
-> those two files are byte-identical to source. The system's name is Atlas.)
+>
+> **Version 3.0 built on Atlas.** Airy Sky Editorial replaced Atlas on
+> 23 August 2026. It keeps Atlas's geometry and changes the palette to Paper
+> and Sky over cream, the type to Outfit and Figtree, and the default theme
+> to light. Nothing in this document's split changed, only which system sits
+> on the other side of it.
 
 ---
 
 ## 1 · The split
 
-| Owned by Atlas | Owned here |
+| Owned by Airy Sky Editorial | Owned here |
 |---|---|
 | Colour, and every semantic alias | The name, and how it is written |
-| Type: Gabarito and Spline Sans Mono | Positioning and the competitive wager |
+| Type, Outfit for display and numerals, Figtree for the interface | Positioning and the competitive wager |
 | Space, radius, blur, motion | Network, fleet, currency |
-| The three devices — index label, glass, hairline | Fare architecture and what each fare promises |
+| Glass, scrimmed photography and the index label | Fare architecture and what each fare promises |
 | WCAG 2.2 AA floor | Voice, tone, and every string on screen |
-| Dark ground by default, chartreuse accent | Naming of passenger-facing concepts |
+| Light ground by default, deep sky accent | Naming of passenger-facing concepts |
 
-The rule for anything not listed: **if it can be seen, Atlas decides; if it
-can be read, this document decides.**
+The rule for anything not listed is simple. **If it can be seen, Airy Sky
+decides. If it can be read, this document decides.**
 
 ---
 
@@ -165,9 +169,9 @@ a redemption path before it gets a name.
 ## 3 · Voice
 
 This document's own content rules apply — short declarative sentences,
-concrete nouns, no salesmanship, no emoji, no Title Case. Atlas, unlike AF
-before it, ships no copy guidance of its own; it is tokens and glass, not
-words. What follows is what these rules sound like when an airline says
+concrete nouns, no salesmanship, no emoji, no Title Case. Airy Sky, like
+Atlas before it and unlike AF, ships no copy guidance of its own. It is
+tokens, glass and photography, not words. What follows is what these rules sound like when an airline says
 them.
 
 Calm, specific, in the passenger's terms. Say what happened and what to do
@@ -209,56 +213,34 @@ written on paper; those four are where transcription goes wrong.
 
 ## 4 · Accessibility
 
-Atlas's standard — [`accessibility.md`](../../frontend/src/design-system/accessibility.md),
-WCAG 2.2 AA, non-negotiable — is inherited whole. Two things are enforced
-mechanically rather than by review:
+The design system's standard,
+[`accessibility.md`](../../frontend/src/design-system/accessibility.md),
+WCAG 2.2 AA and non-negotiable, is inherited whole. Two things are enforced
+mechanically rather than by review.
 
 **Contrast.** [`contrast_check.py`](contrast_check.py) reads the palette out
-of the token files the application actually loads, converts hex/rgba to
-linear sRGB, composites translucent values over their background, and checks
-14 pairs in **both** themes. It runs in CI and fails the build.
+of the token files the application actually loads, composites translucent
+values over their background in sRGB, and checks 17 pairs in **both**
+themes, 34 checks in all. Three of the pairs are text over the photo scrims,
+measured over a blown-out highlight. It runs in CI and fails the build.
 
-It found four real failures, both themes this time, now corrected in
-[`overrides.css`](../../frontend/src/design-system/overrides.css) and all
-candidates to upstream:
+Airy Sky's tints were chosen against this product's grounds, so
+[`overrides.css`](../../frontend/src/design-system/overrides.css) is empty
+at present. The closest pair to the floor is light-theme success text on its
+tint, at 4.51:1. The corrections made under Atlas are recorded in the
+[changelog](../../CHANGELOG.md).
 
-- `--tint-danger` and `--tint-info`, in the **dark** theme, measured
-  **3.73:1** and **4.48:1** under their own status text — under the 4.5:1
-  floor for the cancelled badge and the booking dialog's demonstration
-  notice. Lowered to 0.06 and 0.10 alpha for 4.78:1 and 5.10:1.
-- `--tint-success`, in the **light** theme, measured **4.50:1** — at the
-  floor, not over it. Lowered to 0.09 alpha for 4.62:1, so a rounding
-  difference cannot flip it.
-- `--border-accent`, in the **light** theme, measured **1.37:1** on the
-  selected-fare card's outline — close to invisible, and SC 1.4.11 requires
-  3:1 for a control boundary. No alpha of Atlas's own hue clears 3:1 against
-  a ground this pale; re-based on `--lime-700`, the same deep lime already
-  used for `--text-accent` in this theme, for 3.6:1.
-
-A fifth change, in the dark theme, is headroom rather than a failure:
-`--border-accent` there measured 3.05:1, over the floor by 0.05 with no
-margin for a rounding difference, so it was raised the same way to 3.5:1.
-
-Two further findings were fixed in the application rather than the palette,
-because the palette pair itself was fine — the product was reaching for the
-wrong one. Index-label text (Atlas's `--text-tertiary`) measures 3.10:1 on a
-glass panel in the dark theme; every place that combination occurred now
-reads `--text-secondary` instead, which clears 4.6:1 there. And the
-selected-fare border was wired to `--fill-accent` (the solid button colour)
-rather than `--border-accent`, which is 1.16:1 in light — solid chartreuse on
-a near-white ground.
-
-**Targets and focus.** Controls are 44px minimum; the focus ring is Atlas's,
-2px, and never removed. `prefers-reduced-motion` collapses motion in Atlas's
-base layer.
+**Targets and focus.** Controls are 44px minimum. The focus ring is a 2px
+`--focus-ring` outline at 2px offset, deep sky in light and sky in dark, and
+it is never removed. `prefers-reduced-motion` collapses both motion
+durations and stops the hero carousel from advancing.
 
 ### Open items
 
-- **Theme switching** is not exposed. Both themes are token-complete and both
-  pass contrast, but nothing in the interface toggles `data-theme`.
-- **Photography** direction is unwritten. The pages once hotlinked a stock
-  photograph from Unsplash on every render; that is gone, and Atlas's glass
-  over the bloom stands in until owned or licensed assets exist.
-- **No logo.** Atlas ships no mark by design, and DS Airlines has not been
-  given one. The name is set in type — Gabarito 700 — wherever a mark would
-  go.
+- **Photography** is placeholder. The destination and panel images are crops
+  from the original design comps, and their source and licence are not
+  recorded. Owned or licensed images would replace them, one line each in
+  `destination-images.ts`.
+- **No logo.** Airy Sky Editorial defines no mark, and DS Airlines has not
+  been given one. The name is set in type wherever a mark would go, and the
+  browser tab uses a plain "DS" monogram in deep sky.

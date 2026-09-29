@@ -38,7 +38,9 @@ async function registerAndSignIn(page: Page) {
   await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Sign in' }).click();
 
-  await expect(page).toHaveURL(/\/dashboard/);
+  // Sign-in makes two API calls (token, then /me) before it navigates, and on
+  // a cold CI runner that has overrun the default 5 s expect timeout.
+  await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
   return { username, password };
 }
 
@@ -92,12 +94,15 @@ test.describe('the passenger journey', () => {
     // fail on its own setup rather than on what it is checking.
     await flightList(page).first().getByRole('button', { name: 'Select' }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Confirm' }).click();
-    await expect(page.getByRole('status')).toContainText('Booked');
+    await expect(page.getByRole('status')).toContainText('Booked. Your reference is');
 
     const reference = (await page.getByRole('status').textContent())!.match(
       /([A-Z0-9]{6})/,
     )![1];
+    // Wait for the row and its seat before reading text. textContent() does
+    // not retry on content, so reading a row mid-render could hang the test.
     const itinerary = itineraryList(page).filter({ hasText: reference });
+    await expect(itinerary).toContainText(/seat [0-9]{1,2}[A-F]/);
     const seat = (await itinerary.textContent())!.match(/seat ([0-9]{1,2}[A-F])/)![1];
 
     await flightList(page).first().getByRole('button', { name: 'Select' }).click();

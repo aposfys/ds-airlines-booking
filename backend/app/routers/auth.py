@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import (
+    DUMMY_PASSWORD_HASH,
     create_access_token,
     get_current_active_user,
     get_password_hash,
@@ -54,9 +55,10 @@ async def login(payload: UserLogin, session: AsyncSession = Depends(get_session)
         select(User).where(func.lower(User.username) == payload.username.lower())
     )
 
-    # The hash comparison runs even when no such user exists, so response
-    # time does not reveal which usernames are registered.
-    stored_hash = user.hashed_password if user else ""
+    # The hash comparison runs even when no such user exists, against a real
+    # hash of the same cost, so response time does not reveal which usernames
+    # are registered.
+    stored_hash = user.hashed_password if user else DUMMY_PASSWORD_HASH
     password_ok = verify_password(payload.password, stored_hash)
 
     if not user or not password_ok:

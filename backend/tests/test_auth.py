@@ -1,6 +1,8 @@
+import bcrypt
 from sqlalchemy import func, select
 
-from app.auth import get_password_hash, verify_password
+import app.auth
+from app.auth import DUMMY_PASSWORD_HASH, get_password_hash, verify_password
 from app.models.domain import User
 
 
@@ -118,6 +120,29 @@ class TestLogin:
             "/api/auth/login", json={"username": "passenger", "password": "wrongpassword1"}
         )
         assert unknown.json()["detail"] == wrong.json()["detail"]
+
+    async def test_an_unknown_user_still_costs_a_full_hash_check(
+        self, client, monkeypatch
+    ):
+        # Timing is too noisy to assert on directly, so assert on the work.
+        # The unknown-user path must reach bcrypt with a well-formed hash of
+        # the usual cost. An empty or malformed hash fails on the salt in
+        # microseconds, which is what made usernames enumerable.
+        checked = []
+        real_checkpw = bcrypt.checkpw
+
+        def spy(password, hashed):
+            result = real_checkpw(password, hashed)
+            checked.append(hashed)
+            return result
+
+        monkeypatch.setattr(app.auth.bcrypt, "checkpw", spy)
+        response = await client.post(
+            "/api/auth/login", json={"username": "ghost", "password": "whatever123"}
+        )
+        assert response.status_code == 401
+        assert checked == [DUMMY_PASSWORD_HASH.encode("utf-8")]
+        assert bcrypt.gensalt().decode()[:7] == DUMMY_PASSWORD_HASH[:7]
 
     async def test_deactivated_account_cannot_log_in(self, client, session, passenger):
         passenger.is_active = False

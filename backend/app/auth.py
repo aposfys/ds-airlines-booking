@@ -14,6 +14,7 @@ The caller is resolved against the database on every request, and privilege
 is read from the stored row rather than the token.
 """
 
+import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
@@ -31,6 +32,15 @@ from app.models.domain import User
 # bcrypt truncates silently at 72 bytes, which would make every password
 # sharing a 72-byte prefix equivalent. We reject rather than truncate.
 BCRYPT_MAX_BYTES = 72
+
+# A real bcrypt hash of a random password nobody knows, made once at import
+# with the same cost as every stored hash. Login checks against it when the
+# username does not exist, so an unknown username costs the same bcrypt work
+# as a known one. Checking against an empty string instead fails at once on
+# the salt, so an unknown username answered measurably faster.
+DUMMY_PASSWORD_HASH = bcrypt.hashpw(
+    secrets.token_urlsafe(32).encode("utf-8"), bcrypt.gensalt()
+).decode("utf-8")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
